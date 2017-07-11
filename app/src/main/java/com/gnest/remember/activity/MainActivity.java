@@ -85,8 +85,7 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
     }
 
     @Override
-    public void onEditButtonPressed(SelectableMemo memo, ActionMode mode) {
-        mode.finish();
+    public void onEditButtonPressed(SelectableMemo memo) {
         Bundle bundle = new Bundle();
         bundle.putBinder(EditMemoFragment.MEMO_KEY, memo);
         insertEditFragment(bundle);
@@ -102,24 +101,12 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
         ft.commit();
     }
 
-    @Override
-    public void onDeleteButtonPressed(SelectableMemo memo) {
-        if (itemFragment != null) {
-            itemFragment.onDeleteButtonPressed(memo);
-        }
-    }
 
     @Override
     public void refreshItemFragment(Fragment fragment) {
         insertItemFragment();
     }
 
-    @Override
-    public void onShareButtonPressed(SelectableMemo memo) {
-        if (itemFragment != null) {
-            itemFragment.onShareButtonPressed(memo);
-        }
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

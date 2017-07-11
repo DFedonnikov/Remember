@@ -35,7 +35,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_item, parent, false);
-        return new SelectableViewHolder(view, (FrameLayout) view.findViewById(R.id.item_frame_layout), this);
+        return new SelectableViewHolder(view, this);
     }
 
     @Override

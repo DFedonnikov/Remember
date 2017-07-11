@@ -21,15 +21,13 @@ public class SelectableViewHolder extends RecyclerView.ViewHolder {
 
     private View mView;
     private ImageView mImageView;
-    private FrameLayout mFrameLayout;
     private OnItemSelectedListener mListener;
     TextView mTextView;
     SelectableMemo mMemo;
 
-    SelectableViewHolder(View itemView, FrameLayout mFrameLayout, final OnItemSelectedListener onItemSelectedListener) {
+    SelectableViewHolder(View itemView, final OnItemSelectedListener onItemSelectedListener) {
         super(itemView);
         this.mView = itemView;
-        this.mFrameLayout = mFrameLayout;
         this.mListener = onItemSelectedListener;
         mTextView = itemView.findViewById(R.id.memo_textView);
         mImageView = itemView.findViewById(R.id.stick_image);

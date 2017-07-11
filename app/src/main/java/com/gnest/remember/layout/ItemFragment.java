@@ -31,7 +31,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnItemListFragmentInteractionListener}
  * interface.
  */
-public class ItemFragment extends Fragment implements SelectableViewHolder.OnItemSelectedListener {
+public class ItemFragment extends Fragment implements SelectableViewHolder.OnItemSelectedListener, ActionMenu.OnMenuItemClickedListener {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount;
@@ -40,6 +40,9 @@ public class ItemFragment extends Fragment implements SelectableViewHolder.OnIte
     private DatabaseAccess databaseAccess;
     private List<Memo> memos;
     private ActionMode actionMode;
+    private ActionMenu currentMenu;
+    private SelectableMemo currentSelectedMemo;
+    private View currentSelectedView;
     private RecyclerView recyclerView;
 
 
@@ -134,31 +137,50 @@ public class ItemFragment extends Fragment implements SelectableViewHolder.OnIte
 
     @Override
     public void onItemSelected(SelectableMemo memo, View view) {
-        ActionMenu menu = new ActionMenu(mListener, view, memo);
-        actionMode = getActivity().startActionMode(menu);
+        currentSelectedMemo = memo;
+        currentSelectedView = view;
+        if (actionMode == null) {
+            currentMenu = new ActionMenu(this);
+            actionMode = getActivity().startActionMode(currentMenu);
+        }
         if (!memo.isSelected()) {
             actionMode.finish();
             actionMode = null;
         }
     }
 
-    public void onDeleteButtonPressed(SelectableMemo memo) {
+    @Override
+    public void onEditButtonPressed() {
+        actionMode.finish();
+        mListener.onEditButtonPressed(currentSelectedMemo);
+    }
+
+    @Override
+    public void onDeleteButtonPressed() {
         DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
         databaseAccess.open();
-        if (memo != null) {
-            databaseAccess.delete(memo);
+        if (currentSelectedMemo != null) {
+            databaseAccess.delete(currentSelectedMemo);
         }
         databaseAccess.close();
         actionMode.finish();
         mListener.refreshItemFragment(this);
     }
 
-    public void onShareButtonPressed(SelectableMemo memo) {
+    @Override
+    public void onShareButtonPressed() {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, memo.getMemoText());
+        intent.putExtra(Intent.EXTRA_TEXT, currentSelectedMemo.getMemoText());
         Intent chooserIntent = Intent.createChooser(intent, "Send Memo...");
         startActivity(chooserIntent);
+    }
+
+    @Override
+    public void onDeselectMemo() {
+        if (currentSelectedMemo.isSelected()) {
+            currentSelectedView.callOnClick();
+        }
     }
 
     public void setmColumnCount(int mColumnCount) {
@@ -179,14 +201,9 @@ public class ItemFragment extends Fragment implements SelectableViewHolder.OnIte
 
         void onAddButtonPressed();
 
-        void onEditButtonPressed(SelectableMemo memo, ActionMode mode);
-
-        void onDeleteButtonPressed(SelectableMemo memo);
+        void onEditButtonPressed(SelectableMemo memo);
 
         void refreshItemFragment(Fragment fragment);
 
-        void onShareButtonPressed(SelectableMemo memo);
     }
-
-
 }

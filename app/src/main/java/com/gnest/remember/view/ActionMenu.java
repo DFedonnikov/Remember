@@ -15,14 +15,11 @@ import com.gnest.remember.layout.ItemFragment;
  */
 
 public class ActionMenu implements ActionMode.Callback {
-    private ItemFragment.OnItemListFragmentInteractionListener listener;
-    private SelectableMemo memo;
-    private View selectedView;
 
-    public ActionMenu(ItemFragment.OnItemListFragmentInteractionListener listener, View selectedView, SelectableMemo memo) {
+    private OnMenuItemClickedListener listener;
+
+    public ActionMenu(OnMenuItemClickedListener listener) {
         this.listener = listener;
-        this.selectedView = selectedView;
-        this.memo = memo;
     }
 
     @Override
@@ -40,31 +37,29 @@ public class ActionMenu implements ActionMode.Callback {
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.edit:
-                listener.onEditButtonPressed(memo, mode);
+                listener.onEditButtonPressed();
                 return true;
             case R.id.delete:
-                memo.setSelected(false);
-                listener.onDeleteButtonPressed(memo);
+                listener.onDeleteButtonPressed();
                 return true;
             case R.id.share:
-                listener.onShareButtonPressed(memo);
+                listener.onShareButtonPressed();
 
         }
         return false;
     }
 
 
-
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        /*When action menu back button clicked to deselect memo, at the moment of executing of onDestroyActionMode()selectableMemo memo field will be still set to true.
-        Deselection will be executed through calling onClick method of selectedView that was passed to ActionMenu constructor during creating context menu after selecting SelectableMemo;
-        When memo itself clicked to be deselected, at the moment of executing of onDestroyActionMode() SelectableMemo memo field will be already set to false.
-        This checking avoiding executing onClick method more than once.
-        * */
-
-        if (memo.isSelected()) {
-            selectedView.callOnClick();
-        }
+        listener.onDeselectMemo();
     }
+
+    public interface OnMenuItemClickedListener {
+        void onEditButtonPressed();
+        void onDeleteButtonPressed();
+        void onShareButtonPressed();
+        void onDeselectMemo();
+    }
+
 }
