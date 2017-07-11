@@ -1,0 +1,192 @@
+package com.gnest.remember.layout;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.gnest.remember.R;
+import com.gnest.remember.data.Memo;
+import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.db.DatabaseAccess;
+import com.gnest.remember.view.ActionMenu;
+import com.gnest.remember.view.MySelectableAdapter;
+import com.gnest.remember.view.SelectableViewHolder;
+
+import java.util.List;
+
+/**
+ * A fragment representing a list of Items.
+ * <p/>
+ * Activities containing this fragment MUST implement the {@link OnItemListFragmentInteractionListener}
+ * interface.
+ */
+public class ItemFragment extends Fragment implements SelectableViewHolder.OnItemSelectedListener {
+
+    private static final String ARG_COLUMN_COUNT = "column-count";
+    private int mColumnCount;
+    private OnItemListFragmentInteractionListener mListener;
+    private MySelectableAdapter adapter;
+    private DatabaseAccess databaseAccess;
+    private List<Memo> memos;
+    private ActionMode actionMode;
+    private RecyclerView recyclerView;
+
+
+    /**
+     * Mandatory empty constructor for the fragment manager to instantiate the
+     * fragment (e.g. upon screen orientation changes).
+     */
+    public ItemFragment() {
+    }
+
+    @SuppressWarnings("unused")
+    public static ItemFragment newInstance(int columnCount) {
+        ItemFragment fragment = new ItemFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        this.databaseAccess = DatabaseAccess.getInstance(this.getContext());
+        if (getArguments() != null) {
+            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+        }
+        databaseAccess.open();
+        this.memos = databaseAccess.getAllMemos();
+        databaseAccess.close();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        recyclerView = view.findViewById(R.id.memo_list);
+        Context context = view.getContext();
+        if (mColumnCount <= 1) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+        }
+        adapter = new MySelectableAdapter(memos, this, false);
+        recyclerView.setAdapter(adapter);
+        return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.action_bar_menu, menu);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnItemListFragmentInteractionListener) {
+            mListener = (OnItemListFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnItemListFragmentInteractionListener");
+        }
+
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+        memos = null;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add:
+                mListener.onAddButtonPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    @Override
+    public void onItemSelected(SelectableMemo memo, View view) {
+        ActionMenu menu = new ActionMenu(mListener, view, memo);
+        actionMode = getActivity().startActionMode(menu);
+        if (!memo.isSelected()) {
+            actionMode.finish();
+            actionMode = null;
+        }
+    }
+
+    public void onDeleteButtonPressed(SelectableMemo memo) {
+        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
+        databaseAccess.open();
+        if (memo != null) {
+            databaseAccess.delete(memo);
+        }
+        databaseAccess.close();
+        actionMode.finish();
+        mListener.refreshItemFragment(this);
+    }
+
+    public void onShareButtonPressed(SelectableMemo memo) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, memo.getMemoText());
+        Intent chooserIntent = Intent.createChooser(intent, "Send Memo...");
+        startActivity(chooserIntent);
+    }
+
+    public void setmColumnCount(int mColumnCount) {
+        this.mColumnCount = mColumnCount;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnItemListFragmentInteractionListener {
+
+        void onAddButtonPressed();
+
+        void onEditButtonPressed(SelectableMemo memo, ActionMode mode);
+
+        void onDeleteButtonPressed(SelectableMemo memo);
+
+        void refreshItemFragment(Fragment fragment);
+
+        void onShareButtonPressed(SelectableMemo memo);
+    }
+
+
+}
