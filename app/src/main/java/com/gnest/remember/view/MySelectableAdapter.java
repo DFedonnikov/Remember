@@ -4,25 +4,26 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.helper.ItemTouchHelperAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by DFedonnikov on 08.07.2017.
  */
 
-public class MySelectableAdapter extends RecyclerView.Adapter implements SelectableViewHolder.OnItemSelectedListener {
+public class MySelectableAdapter extends RecyclerView.Adapter implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter {
     private List<SelectableMemo > mMemos;
     private boolean isMultiSelectEnabled = false;
-    private SelectableViewHolder.OnItemSelectedListener mListener;
+    private OnItemActionPerformed mListener;
 
-    public MySelectableAdapter(List<Memo> memos, SelectableViewHolder.OnItemSelectedListener listener, boolean isMultiSelectEnabled) {
+    public MySelectableAdapter(List<Memo> memos, OnItemActionPerformed listener, boolean isMultiSelectEnabled) {
         mMemos = new ArrayList<>();
         for (Memo memo : memos) {
             mMemos.add(new SelectableMemo(memo, false));
@@ -75,5 +76,27 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
             notifyDataSetChanged();
         }
         mListener.onItemSelected(memo, view);
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        mListener.onUpdateDBUponElementsSwap(mMemos.get(fromPosition), mMemos.get(toPosition));
+        Collections.swap(mMemos, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        SelectableMemo memoToDelete = mMemos.get(position);
+        mMemos.remove(position);
+        mListener.onUpdateDBUponSwipeDismiss(memoToDelete);
+        notifyItemRemoved(position);
+    }
+
+    public interface OnItemActionPerformed {
+        void onItemSelected(SelectableMemo memo, View view);
+        void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete);
+        void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
     }
 }

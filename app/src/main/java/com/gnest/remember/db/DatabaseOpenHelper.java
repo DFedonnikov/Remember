@@ -15,7 +15,7 @@ class DatabaseOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE memo(_id INTEGER PRIMARY KEY AUTOINCREMENT, memo TEXT);");
+        db.execSQL("CREATE TABLE memo(_id INTEGER PRIMARY KEY AUTOINCREMENT, memo TEXT, position TEXT);");
     }
 
     @Override

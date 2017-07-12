@@ -44,6 +44,7 @@ public class ActionMenu implements ActionMode.Callback {
                 return true;
             case R.id.share:
                 listener.onShareButtonPressed();
+                return true;
 
         }
         return false;

@@ -8,7 +8,7 @@ public class SelectableMemo extends Memo {
     private boolean isSelected = false;
 
     public SelectableMemo(Memo memo, boolean isSelected) {
-        super(memo.getId(), memo.getMemoText());
+        super(memo.getId(), memo.getMemoText(), memo.getPosition());
         this.isSelected = isSelected;
     }
 

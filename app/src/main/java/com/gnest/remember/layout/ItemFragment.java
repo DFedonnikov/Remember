@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,9 +20,9 @@ import com.gnest.remember.R;
 import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.SelectableMemo;
 import com.gnest.remember.db.DatabaseAccess;
+import com.gnest.remember.helper.ItemTouchHelperCallback;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MySelectableAdapter;
-import com.gnest.remember.view.SelectableViewHolder;
 
 import java.util.List;
 
@@ -31,12 +32,13 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnItemListFragmentInteractionListener}
  * interface.
  */
-public class ItemFragment extends Fragment implements SelectableViewHolder.OnItemSelectedListener, ActionMenu.OnMenuItemClickedListener {
+public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.OnMenuItemClickedListener {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount;
     private OnItemListFragmentInteractionListener mListener;
     private MySelectableAdapter adapter;
+    private ItemTouchHelper itemTouchHelper;
     private DatabaseAccess databaseAccess;
     private List<Memo> memos;
     private ActionMode actionMode;
@@ -88,6 +90,10 @@ public class ItemFragment extends Fragment implements SelectableViewHolder.OnIte
         }
         adapter = new MySelectableAdapter(memos, this, false);
         recyclerView.setAdapter(adapter);
+
+        ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         return view;
     }
 
@@ -157,14 +163,32 @@ public class ItemFragment extends Fragment implements SelectableViewHolder.OnIte
 
     @Override
     public void onDeleteButtonPressed() {
+        deleteCurrentMemoFromDB();
+        actionMode.finish();
+        mListener.refreshItemFragment(this);
+    }
+
+    private void deleteCurrentMemoFromDB() {
         DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
         databaseAccess.open();
         if (currentSelectedMemo != null) {
             databaseAccess.delete(currentSelectedMemo);
         }
         databaseAccess.close();
-        actionMode.finish();
-        mListener.refreshItemFragment(this);
+    }
+
+    @Override
+    public void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete) {
+        currentSelectedMemo = memoToDelete;
+        deleteCurrentMemoFromDB();
+    }
+
+    @Override
+    public void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to) {
+        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
+        databaseAccess.open();
+        databaseAccess.swipeMemos(from, to);
+        databaseAccess.close();
     }
 
     @Override
