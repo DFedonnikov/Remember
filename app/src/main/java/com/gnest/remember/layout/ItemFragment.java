@@ -40,7 +40,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private MySelectableAdapter adapter;
     private ItemTouchHelper itemTouchHelper;
     private DatabaseAccess databaseAccess;
-    private List<Memo> memos;
+    private List<SelectableMemo> memos;
     private ActionMode actionMode;
     private ActionMenu currentMenu;
     private SelectableMemo currentSelectedMemo;
@@ -163,31 +163,34 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
     @Override
     public void onDeleteButtonPressed() {
-        deleteCurrentMemoFromDB();
+        memos.remove(currentSelectedMemo.getPosition());
+        adapter.notifyItemRemoved(currentSelectedMemo.getPosition());
+        deleteCurrentMemoFromDB(memos, currentSelectedMemo.getPosition());
         actionMode.finish();
-        mListener.refreshItemFragment(this);
     }
 
-    private void deleteCurrentMemoFromDB() {
+    private void deleteCurrentMemoFromDB(List<SelectableMemo> mMemos, int position) {
         DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
         databaseAccess.open();
         if (currentSelectedMemo != null) {
-            databaseAccess.delete(currentSelectedMemo);
+            databaseAccess.delete(currentSelectedMemo, mMemos, position);
         }
         databaseAccess.close();
     }
 
     @Override
-    public void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete) {
+    public void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position) {
         currentSelectedMemo = memoToDelete;
-        deleteCurrentMemoFromDB();
+        deleteCurrentMemoFromDB(mMemos, position);
     }
+
+
 
     @Override
     public void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to) {
         DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
         databaseAccess.open();
-        databaseAccess.swipeMemos(from, to);
+        databaseAccess.swapMemos(from, to);
         databaseAccess.close();
     }
 

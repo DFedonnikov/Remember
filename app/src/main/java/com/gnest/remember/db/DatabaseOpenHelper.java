@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 class DatabaseOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE = "memos.db";
-    static final String TABLE = "memo";
+    static final String TABLE = "memos";
     private static final int VERSION = 1;
 
     DatabaseOpenHelper(Context context) {
@@ -15,7 +15,7 @@ class DatabaseOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE memo(_id INTEGER PRIMARY KEY AUTOINCREMENT, memo TEXT, position TEXT);");
+        db.execSQL("CREATE TABLE memos(_id INTEGER PRIMARY KEY AUTOINCREMENT, memo TEXT, position INTEGER);");
     }
 
     @Override

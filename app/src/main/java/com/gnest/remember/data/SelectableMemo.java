@@ -7,8 +7,8 @@ package com.gnest.remember.data;
 public class SelectableMemo extends Memo {
     private boolean isSelected = false;
 
-    public SelectableMemo(Memo memo, boolean isSelected) {
-        super(memo.getId(), memo.getMemoText(), memo.getPosition());
+    public SelectableMemo(int id, String memoText, int position, boolean isSelected) {
+        super(id, memoText, position);
         this.isSelected = isSelected;
     }
 

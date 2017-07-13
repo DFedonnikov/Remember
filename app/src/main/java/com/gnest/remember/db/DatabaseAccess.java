@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.SelectableMemo;
@@ -13,13 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseAccess {
-    private SQLiteDatabase database;
     private DatabaseOpenHelper openHelper;
+    private SQLiteDatabase database;
     private static volatile DatabaseAccess instance;
     private static volatile int currentLastPosition = 0;
 
     private DatabaseAccess(Context context) {
         this.openHelper = new DatabaseOpenHelper(context);
+        open();
+        Cursor cursor = database.rawQuery("SELECT IFNULL(max(position), -1) From memos", null);
+        if (cursor.moveToFirst()) {
+            currentLastPosition = cursor.getInt(0) + 1;
+        }
+        cursor.close();
+        close();
     }
 
     public static synchronized DatabaseAccess getInstance(Context context) {
@@ -56,15 +62,26 @@ public class DatabaseAccess {
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
     }
 
-    public void delete(Memo memo) {
+    public void delete(Memo memo, List<SelectableMemo> mMemos, int position) {
         int id = memo.getId();
         int rows = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(id)});
         if (rows != 0) {
             currentLastPosition--;
         }
+        updatePositionAfterDelete(mMemos, position);
     }
 
-    public void swipeMemos(SelectableMemo from, SelectableMemo to) {
+    private void updatePositionAfterDelete(List<SelectableMemo> mMemos, int position) {
+        ContentValues values = new ContentValues();
+        for (int i = position + 1; i < mMemos.size(); i++) {
+            SelectableMemo memoToUpdate = mMemos.get(i);
+            values.put("position", i - 1);
+            int id = memoToUpdate.getId();
+            database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
+        }
+    }
+
+    public void swapMemos(SelectableMemo from, SelectableMemo to) {
         ContentValues values = new ContentValues();
         values.put("position", to.getPosition());
         int fromId = from.getId();
@@ -75,15 +92,15 @@ public class DatabaseAccess {
     }
 
 
-    public List<Memo> getAllMemos() {
-        List<Memo> memos = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT * From memo ORDER BY position", null);
+    public List<SelectableMemo> getAllMemos() {
+        List<SelectableMemo> memos = new ArrayList<>();
+        Cursor cursor = database.rawQuery("SELECT * From memos ORDER BY position", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             int id = Integer.valueOf(cursor.getString(0));
             String text = cursor.getString(1);
             int position = Integer.valueOf(cursor.getString(2));
-            memos.add(new Memo(id, text, position));
+            memos.add(new SelectableMemo(id, text, position, false));
             cursor.moveToNext();
         }
         cursor.close();

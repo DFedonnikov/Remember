@@ -13,13 +13,7 @@ public class Memo extends Binder {
         position = -1;
     }
 
-    public Memo(int id, String memoText) {
-        this.id = id;
-        this.memoText = memoText;
-        position = -1;
-    }
-
-    public Memo(int id, String memoText, int position) {
+    private Memo(int id, String memoText, int position) {
         this.id = id;
         this.memoText = memoText;
         this.position = position;
@@ -39,6 +33,10 @@ public class Memo extends Binder {
 
     public int getPosition() {
         return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     @Override

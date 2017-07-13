@@ -6,11 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gnest.remember.R;
-import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.SelectableMemo;
 import com.gnest.remember.helper.ItemTouchHelperAdapter;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,11 +21,8 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     private boolean isMultiSelectEnabled = false;
     private OnItemActionPerformed mListener;
 
-    public MySelectableAdapter(List<Memo> memos, OnItemActionPerformed listener, boolean isMultiSelectEnabled) {
-        mMemos = new ArrayList<>();
-        for (Memo memo : memos) {
-            mMemos.add(new SelectableMemo(memo, false));
-        }
+    public MySelectableAdapter(List<SelectableMemo> memos, OnItemActionPerformed listener, boolean isMultiSelectEnabled) {
+        mMemos = memos;
         mListener = listener;
         this.isMultiSelectEnabled = isMultiSelectEnabled;
     }
@@ -80,23 +75,41 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        mListener.onUpdateDBUponElementsSwap(mMemos.get(fromPosition), mMemos.get(toPosition));
-        Collections.swap(mMemos, fromPosition, toPosition);
+//        mListener.onUpdateDBUponElementsSwap(mMemos.get(fromPosition), mMemos.get(toPosition));
+//        Collections.swap(mMemos, fromPosition, toPosition);
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                makeSwap(i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                makeSwap(i, i - 1);
+            }
+        }
         notifyItemMoved(fromPosition, toPosition);
         return true;
+    }
+
+    private void makeSwap(int from, int to) {
+        SelectableMemo memoFrom = mMemos.get(from);
+        SelectableMemo memoTo = mMemos.get(to);
+        mListener.onUpdateDBUponElementsSwap(memoFrom, memoTo);
+        memoTo.setPosition(from);
+        memoFrom.setPosition(to);
+        Collections.swap(mMemos, from, to);
     }
 
     @Override
     public void onItemDismiss(int position) {
         SelectableMemo memoToDelete = mMemos.get(position);
+        mListener.onUpdateDBUponSwipeDismiss(memoToDelete, mMemos, position);
         mMemos.remove(position);
-        mListener.onUpdateDBUponSwipeDismiss(memoToDelete);
         notifyItemRemoved(position);
     }
 
     public interface OnItemActionPerformed {
         void onItemSelected(SelectableMemo memo, View view);
-        void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete);
+        void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
     }
 }
