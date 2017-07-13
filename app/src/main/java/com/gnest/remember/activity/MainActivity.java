@@ -102,10 +102,6 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
     }
 
 
-    @Override
-    public void refreshItemFragment(Fragment fragment) {
-        insertItemFragment();
-    }
 
 
     @Override

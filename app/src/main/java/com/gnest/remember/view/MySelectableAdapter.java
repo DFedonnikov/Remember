@@ -75,8 +75,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-//        mListener.onUpdateDBUponElementsSwap(mMemos.get(fromPosition), mMemos.get(toPosition));
-//        Collections.swap(mMemos, fromPosition, toPosition);
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 makeSwap(i, i + 1);

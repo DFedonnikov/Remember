@@ -230,7 +230,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
         void onEditButtonPressed(SelectableMemo memo);
 
-        void refreshItemFragment(Fragment fragment);
 
     }
 }
