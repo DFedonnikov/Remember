@@ -157,8 +157,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
     @Override
     public void onEditButtonPressed() {
-        actionMode.finish();
         mListener.onEditButtonPressed(currentSelectedMemo);
+        actionMode.finish();
     }
 
     @Override
