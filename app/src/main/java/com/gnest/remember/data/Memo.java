@@ -13,7 +13,7 @@ public class Memo extends Binder {
         position = -1;
     }
 
-    private Memo(int id, String memoText, int position) {
+    Memo(int id, String memoText, int position) {
         this.id = id;
         this.memoText = memoText;
         this.position = position;
