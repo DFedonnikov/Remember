@@ -156,6 +156,14 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
     @Override
+    public void onDeselectMemo() {
+        if (currentSelectedMemo.isSelected()) {
+            currentSelectedMemo.setSelected(false);
+            adapter.onItemSelected(currentSelectedMemo, currentSelectedView);
+        }
+    }
+
+    @Override
     public void onEditButtonPressed() {
         mListener.onEditButtonPressed(currentSelectedMemo);
         actionMode.finish();
@@ -178,13 +186,12 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         databaseAccess.close();
     }
 
+
     @Override
     public void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position) {
         currentSelectedMemo = memoToDelete;
         deleteCurrentMemoFromDB(mMemos, position);
     }
-
-
 
     @Override
     public void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to) {
@@ -201,13 +208,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         intent.putExtra(Intent.EXTRA_TEXT, currentSelectedMemo.getMemoText());
         Intent chooserIntent = Intent.createChooser(intent, "Send Memo...");
         startActivity(chooserIntent);
-    }
-
-    @Override
-    public void onDeselectMemo() {
-        if (currentSelectedMemo.isSelected()) {
-            currentSelectedView.callOnClick();
-        }
     }
 
     public void setmColumnCount(int mColumnCount) {

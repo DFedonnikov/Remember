@@ -18,9 +18,10 @@ import com.gnest.remember.data.SelectableMemo;
 public class SelectableViewHolder extends RecyclerView.ViewHolder {
     static final int MULTI_SELECTION = 2;
     static final int SINGLE_SELECTION = 1;
+    private static ImageView selectedView;
 
     private View mView;
-    private ImageView mImageView;
+    ImageView mImageView;
     private OnItemSelectedListener mListener;
     TextView mTextView;
     SelectableMemo mMemo;

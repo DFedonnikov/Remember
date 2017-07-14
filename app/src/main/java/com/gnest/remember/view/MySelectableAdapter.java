@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.SelectableMemo;
@@ -35,7 +36,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         SelectableViewHolder holder = (SelectableViewHolder) viewHolder;
         SelectableMemo selectableMemo = mMemos.get(position);
         String memoText = selectableMemo.getMemoText();
@@ -66,10 +67,12 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
                     selectableMemo.setSelected(false);
                 } else if (selectableMemo.equals(memo) && memo.isSelected()) {
                     selectableMemo.setSelected(true);
+                } else if (selectableMemo.equals(memo) && !memo.isSelected()) {
+                    selectableMemo.setSelected(false);
                 }
             }
-            notifyDataSetChanged();
         }
+        notifyDataSetChanged();
         mListener.onItemSelected(memo, view);
     }
 
