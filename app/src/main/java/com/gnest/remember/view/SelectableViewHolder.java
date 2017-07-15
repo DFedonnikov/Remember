@@ -8,12 +8,13 @@ import android.widget.TextView;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.helper.ItemTouchHelperViewHolder;
 
 /**
  * Created by DFedonnikov on 08.07.2017.
  */
 
-class SelectableViewHolder extends RecyclerView.ViewHolder {
+class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
     static final int MULTI_SELECTION = 2;
     static final int SINGLE_SELECTION = 1;
 
@@ -45,11 +46,23 @@ class SelectableViewHolder extends RecyclerView.ViewHolder {
 
     void setChecked(boolean value) {
         if (value) {
-            mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), R.drawable.note_select));
+            setSelectedBackground();
         } else {
-            mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), R.drawable.sticky_note));
+            setDeselectedBackground();
         }
         mMemo.setSelected(value);
+    }
+
+    @Override
+    public void setSelectedBackground() {
+        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), R.drawable.note_select));
+        pin.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void setDeselectedBackground() {
+        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), R.drawable.sticky_note));
+        pin.setVisibility(View.VISIBLE);
     }
 
     interface OnItemSelectedListener {
