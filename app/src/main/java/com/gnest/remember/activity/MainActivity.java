@@ -1,33 +1,32 @@
 package com.gnest.remember.activity;
 
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.ActionMode;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.SelectableMemo;
 import com.gnest.remember.layout.EditMemoFragment;
 import com.gnest.remember.layout.ItemFragment;
 
-import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 
 public class MainActivity extends AppCompatActivity implements EditMemoFragment.OnEditMemoFragmentInteractionListener, ItemFragment.OnItemListFragmentInteractionListener {
     private static final String EDIT_FRAG_VISIBILITY_KEY = "edit_frag_visibility_key";
     private static final String EDIT_FRAMENT_NAME = "edit_fragment";
     private static final String ITEM_FRAMENT_NAME = "item_fragment";
+    private static final int MEMO_WIDTH = 175;
     private ItemFragment itemFragment;
     private EditMemoFragment editMemoFragment;
     private boolean isEditFragVisible;
-    private static int COLUMNS_FOR_PORTRAIT = 2;
-    private static int COLUMNS_FOR_LANDSCAPE = 3;
+    private static int COLUMNS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        int screenWidthDP = getResources().getConfiguration().screenWidthDp;
+        COLUMNS = screenWidthDP / MEMO_WIDTH;
         if (savedInstanceState != null) {
             isEditFragVisible = savedInstanceState.getBoolean(EDIT_FRAG_VISIBILITY_KEY);
             FragmentManager manager = getSupportFragmentManager();
@@ -35,30 +34,16 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
                 editMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAMENT_NAME);
             } else {
                 itemFragment = (ItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAMENT_NAME);
-                switch (getResources().getConfiguration().orientation) {
-                    case ORIENTATION_LANDSCAPE:
-                        itemFragment.setmColumnCount(COLUMNS_FOR_LANDSCAPE);
-                        break;
-                    default:
-                        itemFragment.setmColumnCount(COLUMNS_FOR_PORTRAIT);
-                        break;
-                }
+                itemFragment.setmColumnCount(COLUMNS);
             }
         } else {
             insertItemFragment();
         }
+
     }
 
     private void insertItemFragment() {
-        switch (getResources().getConfiguration().orientation) {
-            case ORIENTATION_LANDSCAPE:
-                itemFragment = ItemFragment.newInstance(COLUMNS_FOR_LANDSCAPE);
-                break;
-            default:
-                itemFragment = ItemFragment.newInstance(COLUMNS_FOR_PORTRAIT);
-                break;
-        }
-
+        itemFragment = ItemFragment.newInstance(COLUMNS);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.current_fragment, itemFragment, null);
         ft.commit();
@@ -102,12 +87,10 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
     }
 
 
-
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        boolean isEditFragmentVisible = editMemoFragment == null ? false : editMemoFragment.isVisible();
+        boolean isEditFragmentVisible = editMemoFragment != null && editMemoFragment.isVisible();
         FragmentManager manager = getSupportFragmentManager();
         if (isEditFragmentVisible) {
             manager.putFragment(outState, EDIT_FRAMENT_NAME, editMemoFragment);

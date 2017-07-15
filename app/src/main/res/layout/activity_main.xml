@@ -7,7 +7,4 @@
     tools:context="com.gnest.remember.activity.MainActivity"
     android:name="com.gnest.remember.layout.ItemFragment"
     tools:layout="@layout/fragment_item_list">
-
-
-
 </FrameLayout>

@@ -20,10 +20,13 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
         return true;
     }
 
+
     @Override
     public boolean isItemViewSwipeEnabled() {
         return true;
     }
+
+
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {

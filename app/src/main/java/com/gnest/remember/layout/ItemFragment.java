@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gnest.remember.R;
-import com.gnest.remember.data.Memo;
+
 import com.gnest.remember.data.SelectableMemo;
 import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.helper.ItemTouchHelperCallback;
@@ -26,12 +26,7 @@ import com.gnest.remember.view.MySelectableAdapter;
 
 import java.util.List;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnItemListFragmentInteractionListener}
- * interface.
- */
+
 public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.OnMenuItemClickedListener {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -55,7 +50,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public ItemFragment() {
     }
 
-    @SuppressWarnings("unused")
     public static ItemFragment newInstance(int columnCount) {
         ItemFragment fragment = new ItemFragment();
         Bundle args = new Bundle();
@@ -191,6 +185,9 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position) {
         currentSelectedMemo = memoToDelete;
         deleteCurrentMemoFromDB(mMemos, position);
+        if (actionMode != null) {
+            actionMode.finish();
+        }
     }
 
     @Override
