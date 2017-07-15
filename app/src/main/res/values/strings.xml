@@ -6,4 +6,5 @@
     <string name="memo_note_background">memo note background</string>
     <string name="add_button">Добавить</string>
     <string name="memo_text_hint">Type your memo here</string>
+    <string name="pin_descr">pin for sticky note</string>
 </resources>

@@ -1,7 +1,9 @@
 package com.gnest.remember.view;
 
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -36,12 +38,23 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        SelectableViewHolder holder = (SelectableViewHolder) viewHolder;
+        final SelectableViewHolder holder = (SelectableViewHolder) viewHolder;
         SelectableMemo selectableMemo = mMemos.get(position);
         String memoText = selectableMemo.getMemoText();
         holder.mMemo = selectableMemo;
         holder.mTextView.setText(memoText);
+        holder.pin.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
+                    mListener.onStartDrag(holder);
+                }
+                return false;
+            }
+        });
+
         holder.setChecked(holder.mMemo.isSelected());
+
     }
 
     @Override
@@ -111,5 +124,12 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         void onItemSelected(SelectableMemo memo, View view);
         void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
+
+        /**
+         * Called when a view is requesting a start of a drag.
+         *
+         * @param viewHolder The holder of the view to drag.
+         */
+        void onStartDrag(RecyclerView.ViewHolder viewHolder);
     }
 }

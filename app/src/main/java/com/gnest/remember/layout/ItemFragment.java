@@ -207,6 +207,11 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         startActivity(chooserIntent);
     }
 
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
+    }
+
     public void setmColumnCount(int mColumnCount) {
         this.mColumnCount = mColumnCount;
     }

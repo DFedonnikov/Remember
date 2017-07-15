@@ -3,6 +3,7 @@ package com.gnest.remember.view;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gnest.remember.R;
@@ -18,6 +19,8 @@ class SelectableViewHolder extends RecyclerView.ViewHolder {
 
     private View mView;
     private OnItemSelectedListener mListener;
+
+    ImageView pin;
     TextView mTextView;
     SelectableMemo mMemo;
 
@@ -26,6 +29,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder {
         this.mView = itemView;
         this.mListener = onItemSelectedListener;
         mTextView = itemView.findViewById(R.id.memo_textView);
+        pin = itemView.findViewById(R.id.pin);
         mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
