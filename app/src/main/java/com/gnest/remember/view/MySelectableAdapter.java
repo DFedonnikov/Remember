@@ -2,6 +2,7 @@ package com.gnest.remember.view;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,13 +21,14 @@ import java.util.List;
 
 public class MySelectableAdapter extends RecyclerView.Adapter implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter {
     private List<SelectableMemo > mMemos;
-    private boolean isMultiSelectEnabled = false;
+    private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
+    private SparseIntArray mSelectedList = new SparseIntArray();
 
-    public MySelectableAdapter(List<SelectableMemo> memos, OnItemActionPerformed listener, boolean isMultiSelectEnabled) {
-        mMemos = memos;
-        mListener = listener;
-        this.isMultiSelectEnabled = isMultiSelectEnabled;
+    public MySelectableAdapter(List<SelectableMemo> memos, OnItemActionPerformed listener, boolean multiChoiceEnabled) {
+        this.mMemos = memos;
+        this.mListener = listener;
+        this.multiChoiceEnabled = multiChoiceEnabled;
     }
 
     @Override
@@ -39,10 +41,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         final SelectableViewHolder holder = (SelectableViewHolder) viewHolder;
-        SelectableMemo selectableMemo = mMemos.get(position);
-        String memoText = selectableMemo.getMemoText();
-        holder.mMemo = selectableMemo;
-        holder.mTextView.setText(memoText);
+        holder.bind(mMemos.get(position), position);
         holder.pin.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -53,7 +52,11 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
             }
         });
 
-        holder.setChecked(holder.mMemo.isSelected());
+        if (multiChoiceEnabled && mSelectedList.indexOfKey(position) >= 0) {
+            holder.setChecked(true);
+        } else {
+            holder.setChecked(false);
+        }
 
     }
 
@@ -64,7 +67,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public int getItemViewType(int position) {
-        if (isMultiSelectEnabled) {
+        if (multiChoiceEnabled) {
             return SelectableViewHolder.MULTI_SELECTION;
         } else {
             return SelectableViewHolder.SINGLE_SELECTION;
@@ -73,7 +76,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public void onItemSelected(SelectableMemo memo, View view) {
-        if (!isMultiSelectEnabled) {
+        if (!multiChoiceEnabled) {
             for (SelectableMemo selectableMemo : mMemos) {
                 if (!selectableMemo.equals(memo) && selectableMemo.isSelected()) {
                     selectableMemo.setSelected(false);
@@ -120,10 +123,44 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         notifyItemRemoved(position);
     }
 
+    @Override
+    public boolean isMultiChoiceEnabled() {
+        return multiChoiceEnabled;
+    }
+
+    @Override
+    public void updateSelectedList(int pos) {
+        if (mSelectedList.indexOfKey(pos) >= 0) {
+            mSelectedList.delete(pos);
+        } else {
+            mSelectedList.put(pos, pos);
+        }
+        if (mSelectedList.size() == 0) {
+            mListener.shutDownActionMode();
+        }
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void showActionMode() {
+        mListener.showActionMode();
+    }
+
+    public void switchMultiSelect(boolean switchedOn) {
+        multiChoiceEnabled = switchedOn;
+    }
+
+    public void clearSelectedList() {
+        mSelectedList.clear();
+        notifyDataSetChanged();
+    }
+
     public interface OnItemActionPerformed {
         void onItemSelected(SelectableMemo memo, View view);
         void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
+        void showActionMode();
+        void shutDownActionMode();
 
         /**
          * Called when a view is requesting a start of a drag.

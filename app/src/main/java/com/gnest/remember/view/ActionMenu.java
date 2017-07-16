@@ -14,15 +14,16 @@ import com.gnest.remember.R;
 
 public class ActionMenu implements ActionMode.Callback {
 
-    private OnMenuItemClickedListener listener;
+    private MenuInteractionHelper listener;
 
-    public ActionMenu(OnMenuItemClickedListener listener) {
+    public ActionMenu(MenuInteractionHelper listener) {
         this.listener = listener;
     }
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.context_menu_bar, menu);
+        listener.switchMultiSelect(true);
         return true;
     }
 
@@ -51,14 +52,18 @@ public class ActionMenu implements ActionMode.Callback {
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        listener.onDeselectMemo();
+        listener.switchMultiSelect(false);
+        listener.clearSelection();
+
     }
 
-    public interface OnMenuItemClickedListener {
+    public interface MenuInteractionHelper {
         void onEditButtonPressed();
         void onDeleteButtonPressed();
         void onShareButtonPressed();
         void onDeselectMemo();
+        void switchMultiSelect(boolean switchedOn);
+        void clearSelection();
     }
 
 }

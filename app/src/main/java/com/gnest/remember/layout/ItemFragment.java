@@ -27,7 +27,7 @@ import com.gnest.remember.view.MySelectableAdapter;
 import java.util.List;
 
 
-public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.OnMenuItemClickedListener {
+public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount;
@@ -38,6 +38,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private List<SelectableMemo> memos;
     private ActionMode actionMode;
     private ActionMenu currentMenu;
+    private ActionMenu actionMenu;
     private SelectableMemo currentSelectedMemo;
     private View currentSelectedView;
     private RecyclerView recyclerView;
@@ -66,6 +67,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+        actionMenu = new ActionMenu(this);
+
         databaseAccess.open();
         this.memos = databaseAccess.getAllMemos();
         databaseAccess.close();
@@ -210,6 +213,30 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         itemTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public void showActionMode() {
+        if (actionMenu != null) {
+            actionMode = getActivity().startActionMode(actionMenu);
+        }
+    }
+
+    @Override
+    public void shutDownActionMode() {
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+    }
+
+    @Override
+    public void switchMultiSelect(boolean switchedOn) {
+        adapter.switchMultiSelect(switchedOn);
+    }
+
+    @Override
+    public void clearSelection() {
+        adapter.clearSelectedList();
     }
 
     public void setmColumnCount(int mColumnCount) {

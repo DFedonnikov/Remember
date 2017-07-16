@@ -20,10 +20,11 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     private View mView;
     private OnItemSelectedListener mListener;
+    private int mPosition = 0;
+    private SelectableMemo mMemo;
+    private TextView mTextView;
 
     ImageView pin;
-    TextView mTextView;
-    SelectableMemo mMemo;
 
     SelectableViewHolder(View itemView, final OnItemSelectedListener onItemSelectedListener) {
         super(itemView);
@@ -34,12 +35,17 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mMemo.isSelected()) {
-                    setChecked(false);
-                } else {
-                    setChecked(true);
-                }
-                mListener.onItemSelected(mMemo, view);
+               if (mListener.isMultiChoiceEnabled()) {
+                    mListener.updateSelectedList(mPosition);
+               }
+            }
+        });
+        mTextView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                mListener.updateSelectedList(mPosition);
+                mListener.showActionMode();
+                return true;
             }
         });
     }
@@ -65,10 +71,19 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         pin.setVisibility(View.VISIBLE);
     }
 
+    void bind(SelectableMemo memo, int position) {
+        String memoText = memo.getMemoText();
+        mMemo = memo;
+        mPosition = position;
+        mTextView.setText(memoText);
+        setChecked(mMemo.isSelected());
+    }
+
     interface OnItemSelectedListener {
         void onItemSelected(SelectableMemo memo, View view);
-
-
+        boolean isMultiChoiceEnabled();
+        void updateSelectedList(int pos);
+        void showActionMode();
     }
 
 }
