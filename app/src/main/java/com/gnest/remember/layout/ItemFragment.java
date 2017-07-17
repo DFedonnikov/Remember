@@ -38,10 +38,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private DatabaseAccess databaseAccess;
     private List<SelectableMemo> memos;
     private ActionMode actionMode;
-    private ActionMenu currentMenu;
     private ActionMenu actionMenu;
     private SelectableMemo currentSelectedMemo;
-    private View currentSelectedView;
     private RecyclerView recyclerView;
 
 
