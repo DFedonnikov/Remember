@@ -15,10 +15,7 @@ import com.gnest.remember.helper.ItemTouchHelperViewHolder;
  */
 
 class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
-    static final int MULTI_SELECTION = 2;
-    static final int SINGLE_SELECTION = 1;
 
-    private View mView;
     private OnItemSelectedListener mListener;
     private int mPosition = 0;
     private TextView mTextView;
@@ -28,7 +25,6 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     SelectableViewHolder(final View itemView, final OnItemSelectedListener onItemSelectedListener) {
         super(itemView);
-        this.mView = itemView;
         this.mListener = onItemSelectedListener;
         mTextView = itemView.findViewById(R.id.memo_textView);
         pin = itemView.findViewById(R.id.pin);
@@ -89,7 +85,6 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     }
 
     interface OnItemSelectedListener {
-        void onItemSelected(SelectableMemo memo, View view);
 
         boolean isMultiChoiceEnabled();
 

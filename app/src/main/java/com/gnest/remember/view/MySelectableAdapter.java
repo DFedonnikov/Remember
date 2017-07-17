@@ -25,10 +25,9 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     private OnItemActionPerformed mListener;
     private SparseArray<SelectableMemo> mSelectedList = new SparseArray<>();
 
-    public MySelectableAdapter(List<SelectableMemo> memos, OnItemActionPerformed listener, boolean multiChoiceEnabled) {
+    public MySelectableAdapter(List<SelectableMemo> memos, OnItemActionPerformed listener) {
         this.mMemos = memos;
         this.mListener = listener;
-        this.multiChoiceEnabled = multiChoiceEnabled;
     }
 
     @Override
@@ -63,32 +62,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     @Override
     public int getItemCount() {
         return mMemos.size();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        if (multiChoiceEnabled) {
-            return SelectableViewHolder.MULTI_SELECTION;
-        } else {
-            return SelectableViewHolder.SINGLE_SELECTION;
-        }
-    }
-
-    @Override
-    public void onItemSelected(SelectableMemo memo, View view) {
-        if (!multiChoiceEnabled) {
-            for (SelectableMemo selectableMemo : mMemos) {
-                if (!selectableMemo.equals(memo) && selectableMemo.isSelected()) {
-                    selectableMemo.setSelected(false);
-                } else if (selectableMemo.equals(memo) && memo.isSelected()) {
-                    selectableMemo.setSelected(true);
-                } else if (selectableMemo.equals(memo) && !memo.isSelected()) {
-                    selectableMemo.setSelected(false);
-                }
-            }
-        }
-        notifyDataSetChanged();
-        mListener.onItemSelected(memo, view);
     }
 
     @Override
@@ -174,7 +147,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     public interface OnItemActionPerformed {
-        void onItemSelected(SelectableMemo memo, View view);
         void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
         void showActionMode();

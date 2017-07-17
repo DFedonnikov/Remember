@@ -86,7 +86,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
-        adapter = new MySelectableAdapter(memos, this, false);
+        adapter = new MySelectableAdapter(memos, this);
         recyclerView.setAdapter(adapter);
 
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
@@ -135,29 +135,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-
-    @Override
-    public void onItemSelected(SelectableMemo memo, View view) {
-        currentSelectedMemo = memo;
-        currentSelectedView = view;
-        if (actionMode == null) {
-            currentMenu = new ActionMenu(this);
-            actionMode = getActivity().startActionMode(currentMenu);
-        }
-        if (!memo.isSelected()) {
-            actionMode.finish();
-            actionMode = null;
-        }
-    }
-
-    @Override
-    public void onDeselectMemo() {
-        if (currentSelectedMemo.isSelected()) {
-            currentSelectedMemo.setSelected(false);
-            adapter.onItemSelected(currentSelectedMemo, currentSelectedView);
         }
     }
 

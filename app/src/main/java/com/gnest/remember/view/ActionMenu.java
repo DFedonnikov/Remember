@@ -73,8 +73,6 @@ public class ActionMenu implements ActionMode.Callback {
 
         void onShareButtonPressed();
 
-        void onDeselectMemo();
-
         void switchMultiSelect(boolean switchedOn);
 
         void clearSelection();
