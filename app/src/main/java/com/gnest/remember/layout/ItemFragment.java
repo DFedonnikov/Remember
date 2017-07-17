@@ -237,6 +237,11 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         }
     }
 
+    @Override
+    public void onItemEditButtonClicker(SelectableMemo mMemo) {
+        mListener.onEditButtonPressed(mMemo);
+    }
+
     public void setmColumnCount(int mColumnCount) {
         this.mColumnCount = mColumnCount;
     }

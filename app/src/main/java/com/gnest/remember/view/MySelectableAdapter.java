@@ -146,12 +146,18 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         mListener.setEditAndShareButtonVisibility(isVisible);
     }
 
+    @Override
+    public void onItemEditButtonClicked(SelectableMemo mMemo) {
+        mListener.onItemEditButtonClicker(mMemo);
+    }
+
     public interface OnItemActionPerformed {
         void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
         void showActionMode();
         void shutDownActionMode();
         void setEditAndShareButtonVisibility(boolean isVisible);
+        void onItemEditButtonClicker(SelectableMemo mMemo);
 
         /**
          * Called when a view is requesting a start of a drag.

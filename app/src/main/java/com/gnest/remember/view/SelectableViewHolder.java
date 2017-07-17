@@ -38,7 +38,8 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
                     } else {
                         mListener.setEditAndShareButtonVisibility(false);
                     }
-
+                } else {
+                    mListener.onItemEditButtonClicked(mMemo);
                 }
             }
         });
@@ -95,6 +96,8 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         int getSelectedListSize();
 
         void setEditAndShareButtonVisibility(boolean isVisible);
+
+        void onItemEditButtonClicked(SelectableMemo mMemo);
     }
 
 }
