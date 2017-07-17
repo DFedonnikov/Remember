@@ -21,12 +21,12 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     private View mView;
     private OnItemSelectedListener mListener;
     private int mPosition = 0;
-    private SelectableMemo mMemo;
     private TextView mTextView;
+    private SelectableMemo mMemo;
 
     ImageView pin;
 
-    SelectableViewHolder(View itemView, final OnItemSelectedListener onItemSelectedListener) {
+    SelectableViewHolder(final View itemView, final OnItemSelectedListener onItemSelectedListener) {
         super(itemView);
         this.mView = itemView;
         this.mListener = onItemSelectedListener;
@@ -35,17 +35,26 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               if (mListener.isMultiChoiceEnabled()) {
-                    mListener.updateSelectedList(mPosition);
-               }
+                if (mListener.isMultiChoiceEnabled()) {
+                    mListener.updateSelectedList(mPosition, mMemo);
+                    if (mListener.getSelectedListSize() < 2) {
+                        mListener.setEditAndShareButtonVisibility(true);
+                    } else {
+                        mListener.setEditAndShareButtonVisibility(false);
+                    }
+
+                }
             }
         });
         mTextView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                mListener.updateSelectedList(mPosition);
-                mListener.showActionMode();
-                return true;
+                if (!mListener.isMultiChoiceEnabled()) {
+                    mListener.updateSelectedList(mPosition, mMemo);
+                    mListener.showActionMode();
+                    return true;
+                }
+                return false;
             }
         });
     }
@@ -81,9 +90,16 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     interface OnItemSelectedListener {
         void onItemSelected(SelectableMemo memo, View view);
+
         boolean isMultiChoiceEnabled();
-        void updateSelectedList(int pos);
+
+        void updateSelectedList(int pos, SelectableMemo memo);
+
         void showActionMode();
+
+        int getSelectedListSize();
+
+        void setEditAndShareButtonVisibility(boolean isVisible);
     }
 
 }

@@ -15,6 +15,8 @@ import com.gnest.remember.R;
 public class ActionMenu implements ActionMode.Callback {
 
     private MenuInteractionHelper listener;
+    private MenuItem editButton;
+    private MenuItem shareButton;
 
     public ActionMenu(MenuInteractionHelper listener) {
         this.listener = listener;
@@ -24,6 +26,8 @@ public class ActionMenu implements ActionMode.Callback {
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.context_menu_bar, menu);
         listener.switchMultiSelect(true);
+        editButton = menu.findItem(R.id.edit);
+        shareButton = menu.findItem(R.id.share);
         return true;
     }
 
@@ -57,12 +61,22 @@ public class ActionMenu implements ActionMode.Callback {
 
     }
 
+    public void setEditAndShareButtonVisibility(boolean isVisible) {
+        editButton.setVisible(isVisible);
+        shareButton.setVisible(isVisible);
+    }
+
     public interface MenuInteractionHelper {
         void onEditButtonPressed();
+
         void onDeleteButtonPressed();
+
         void onShareButtonPressed();
+
         void onDeselectMemo();
+
         void switchMultiSelect(boolean switchedOn);
+
         void clearSelection();
     }
 

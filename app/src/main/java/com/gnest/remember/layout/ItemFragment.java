@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.SparseArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -162,17 +163,42 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
     @Override
     public void onEditButtonPressed() {
-        mListener.onEditButtonPressed(currentSelectedMemo);
-        actionMode.finish();
+        SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
+        if (selectedList.size() == 1) {
+            currentSelectedMemo = selectedList.valueAt(0);
+            mListener.onEditButtonPressed(currentSelectedMemo);
+            actionMode.finish();
+        }
     }
 
     @Override
     public void onDeleteButtonPressed() {
-        memos.remove(currentSelectedMemo.getPosition());
-        adapter.notifyItemRemoved(currentSelectedMemo.getPosition());
-        deleteCurrentMemoFromDB(memos, currentSelectedMemo.getPosition());
+        SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
+        for (int i = 0; i < selectedList.size(); i++) {
+            currentSelectedMemo = selectedList.valueAt(i);
+            adapter.removeSelectedMemo(currentSelectedMemo);
+            deleteCurrentMemoFromDB(memos, currentSelectedMemo.getPosition());
+        }
+        adapter.notifyDataSetChanged();
         actionMode.finish();
     }
+
+    @Override
+    public void onShareButtonPressed() {
+        SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
+        if (selectedList.size() == 1) {
+            currentSelectedMemo = selectedList.valueAt(0);
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, currentSelectedMemo.getMemoText());
+            Intent chooserIntent = Intent.createChooser(intent, "Send Memo...");
+            startActivity(chooserIntent);
+            actionMode.finish();
+        }
+
+
+    }
+
 
     private void deleteCurrentMemoFromDB(List<SelectableMemo> mMemos, int position) {
         DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
@@ -182,7 +208,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         }
         databaseAccess.close();
     }
-
 
     @Override
     public void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position) {
@@ -199,15 +224,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         databaseAccess.open();
         databaseAccess.swapMemos(from, to);
         databaseAccess.close();
-    }
-
-    @Override
-    public void onShareButtonPressed() {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, currentSelectedMemo.getMemoText());
-        Intent chooserIntent = Intent.createChooser(intent, "Send Memo...");
-        startActivity(chooserIntent);
     }
 
     @Override
@@ -237,6 +253,13 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     @Override
     public void clearSelection() {
         adapter.clearSelectedList();
+    }
+
+    @Override
+    public void setEditAndShareButtonVisibility(boolean isVisible) {
+        if (actionMenu != null) {
+            actionMenu.setEditAndShareButtonVisibility(isVisible);
+        }
     }
 
     public void setmColumnCount(int mColumnCount) {

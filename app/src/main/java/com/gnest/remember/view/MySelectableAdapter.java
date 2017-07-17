@@ -2,7 +2,7 @@ package com.gnest.remember.view;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseIntArray;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +23,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     private List<SelectableMemo > mMemos;
     private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
-    private SparseIntArray mSelectedList = new SparseIntArray();
+    private SparseArray<SelectableMemo> mSelectedList = new SparseArray<>();
 
     public MySelectableAdapter(List<SelectableMemo> memos, OnItemActionPerformed listener, boolean multiChoiceEnabled) {
         this.mMemos = memos;
@@ -129,11 +129,11 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     @Override
-    public void updateSelectedList(int pos) {
+    public void updateSelectedList(int pos, SelectableMemo memo) {
         if (mSelectedList.indexOfKey(pos) >= 0) {
             mSelectedList.delete(pos);
         } else {
-            mSelectedList.put(pos, pos);
+            mSelectedList.put(pos, memo);
         }
         if (mSelectedList.size() == 0) {
             mListener.shutDownActionMode();
@@ -155,12 +155,31 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         notifyDataSetChanged();
     }
 
+    public void removeSelectedMemo(SelectableMemo memeToRemove) {
+        mMemos.remove(memeToRemove);
+    }
+
+    public SparseArray<SelectableMemo> getmSelectedList() {
+        return mSelectedList;
+    }
+
+    @Override
+    public int getSelectedListSize() {
+        return mSelectedList.size();
+    }
+
+    @Override
+    public void setEditAndShareButtonVisibility(boolean isVisible) {
+        mListener.setEditAndShareButtonVisibility(isVisible);
+    }
+
     public interface OnItemActionPerformed {
         void onItemSelected(SelectableMemo memo, View view);
         void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
         void showActionMode();
         void shutDownActionMode();
+        void setEditAndShareButtonVisibility(boolean isVisible);
 
         /**
          * Called when a view is requesting a start of a drag.
