@@ -137,16 +137,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
     @Override
-    public void onEditButtonPressed() {
-        SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
-        if (selectedList.size() == 1) {
-            currentSelectedMemo = selectedList.valueAt(0);
-            mListener.onEditButtonPressed(currentSelectedMemo);
-            actionMode.finish();
-        }
-    }
-
-    @Override
     public void onDeleteButtonPressed() {
         SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
         for (int i = 0; i < selectedList.size(); i++) {
@@ -231,15 +221,15 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
     @Override
-    public void setEditAndShareButtonVisibility(boolean isVisible) {
+    public void setShareButtonVisibility(boolean isVisible) {
         if (actionMenu != null) {
-            actionMenu.setEditAndShareButtonVisibility(isVisible);
+            actionMenu.setShareButtonVisibility(isVisible);
         }
     }
 
     @Override
-    public void onItemEditButtonClicker(SelectableMemo mMemo) {
-        mListener.onEditButtonPressed(mMemo);
+    public void onEnterItemEditMode(SelectableMemo mMemo) {
+        mListener.onEnterEditMode(mMemo);
     }
 
     public void setmColumnCount(int mColumnCount) {
@@ -260,7 +250,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
         void onAddButtonPressed();
 
-        void onEditButtonPressed(SelectableMemo memo);
+        void onEnterEditMode(SelectableMemo memo);
 
 
     }

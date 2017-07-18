@@ -31,27 +31,13 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mListener.isMultiChoiceEnabled()) {
-                    mListener.updateSelectedList(mPosition, mMemo);
-                    if (mListener.getSelectedListSize() < 2) {
-                        mListener.setEditAndShareButtonVisibility(true);
-                    } else {
-                        mListener.setEditAndShareButtonVisibility(false);
-                    }
-                } else {
-                    mListener.onItemEditButtonClicked(mMemo);
-                }
+                mListener.onItemClicked(mPosition, mMemo);
             }
         });
         mTextView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                if (!mListener.isMultiChoiceEnabled()) {
-                    mListener.updateSelectedList(mPosition, mMemo);
-                    mListener.showActionMode();
-                    return true;
-                }
-                return false;
+                return mListener.onItemLongClicked(mPosition, mMemo);
             }
         });
     }
@@ -82,22 +68,18 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mMemo = memo;
         mPosition = position;
         mTextView.setText(memoText);
-        setChecked(mMemo.isSelected());
+//        setChecked(mMemo.isSelected());
     }
 
     interface OnItemSelectedListener {
+        void onItemClicked(int mPosition, SelectableMemo mMemo);
+
+        boolean onItemLongClicked(int mPosition, SelectableMemo mMemo);
 
         boolean isMultiChoiceEnabled();
 
         void updateSelectedList(int pos, SelectableMemo memo);
 
-        void showActionMode();
-
-        int getSelectedListSize();
-
-        void setEditAndShareButtonVisibility(boolean isVisible);
-
-        void onItemEditButtonClicked(SelectableMemo mMemo);
     }
 
 }

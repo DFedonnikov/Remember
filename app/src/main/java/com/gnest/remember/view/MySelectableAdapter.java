@@ -61,7 +61,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public int getItemCount() {
-        return mMemos.size();
+        return mMemos != null ? mMemos.size() : 0;
     }
 
     @Override
@@ -114,10 +114,10 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         notifyDataSetChanged();
     }
 
-    @Override
-    public void showActionMode() {
-        mListener.showActionMode();
-    }
+//    @Override
+//    public void showActionMode() {
+//        mListener.showActionMode();
+//    }
 
     public void switchMultiSelect(boolean switchedOn) {
         multiChoiceEnabled = switchedOn;
@@ -137,18 +137,27 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     @Override
-    public int getSelectedListSize() {
-        return mSelectedList.size();
+    public void onItemClicked(int mPosition, SelectableMemo mMemo) {
+        if (isMultiChoiceEnabled()) {
+            updateSelectedList(mPosition, mMemo);
+            if (mSelectedList.size() < 2) {
+                mListener.setShareButtonVisibility(true);
+            } else {
+                mListener.setShareButtonVisibility(false);
+            }
+        } else {
+            mListener.onEnterItemEditMode(mMemo);
+        }
     }
 
     @Override
-    public void setEditAndShareButtonVisibility(boolean isVisible) {
-        mListener.setEditAndShareButtonVisibility(isVisible);
-    }
-
-    @Override
-    public void onItemEditButtonClicked(SelectableMemo mMemo) {
-        mListener.onItemEditButtonClicker(mMemo);
+    public boolean onItemLongClicked(int mPosition, SelectableMemo mMemo) {
+        if (!isMultiChoiceEnabled()) {
+            updateSelectedList(mPosition, mMemo);
+            mListener.showActionMode();
+            return true;
+        }
+        return false;
     }
 
     public interface OnItemActionPerformed {
@@ -156,8 +165,8 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
         void showActionMode();
         void shutDownActionMode();
-        void setEditAndShareButtonVisibility(boolean isVisible);
-        void onItemEditButtonClicker(SelectableMemo mMemo);
+        void setShareButtonVisibility(boolean isVisible);
+        void onEnterItemEditMode(SelectableMemo mMemo);
 
         /**
          * Called when a view is requesting a start of a drag.

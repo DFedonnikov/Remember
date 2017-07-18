@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
     }
 
     @Override
-    public void onEditButtonPressed(SelectableMemo memo) {
+    public void onEnterEditMode(SelectableMemo memo) {
         Bundle bundle = new Bundle();
         bundle.putBinder(EditMemoFragment.MEMO_KEY, memo);
         insertEditFragment(bundle);
