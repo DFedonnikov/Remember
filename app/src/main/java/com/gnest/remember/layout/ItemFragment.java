@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,15 +24,17 @@ import com.gnest.remember.R;
 import com.gnest.remember.data.SelectableMemo;
 import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.helper.ItemTouchHelperCallback;
+import com.gnest.remember.loader.DBLoader;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MySelectableAdapter;
 
 import java.util.List;
 
 
-public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper {
+public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, LoaderManager.LoaderCallbacks<List<SelectableMemo>> {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final int LOADER_ID = 0;
     private int mColumnCount;
     private OnItemListFragmentInteractionListener mListener;
     private MySelectableAdapter adapter;
@@ -67,10 +71,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
         actionMenu = new ActionMenu(this);
-
         databaseAccess.open();
-        this.memos = databaseAccess.getAllMemos();
-        databaseAccess.close();
+
     }
 
     @Override
@@ -85,7 +87,10 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
         adapter = new MySelectableAdapter(memos, this);
+        getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+        getActivity().getSupportLoaderManager().getLoader(LOADER_ID).forceLoad();
         recyclerView.setAdapter(adapter);
+
 
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
@@ -122,6 +127,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         super.onDetach();
         mListener = null;
         memos = null;
+        databaseAccess.close();
     }
 
 
@@ -166,12 +172,9 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
 
     private void deleteCurrentMemoFromDB(List<SelectableMemo> mMemos, int position) {
-        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
-        databaseAccess.open();
         if (currentSelectedMemo != null) {
             databaseAccess.delete(currentSelectedMemo, mMemos, position);
         }
-        databaseAccess.close();
     }
 
     @Override
@@ -185,10 +188,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
     @Override
     public void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to) {
-        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
-        databaseAccess.open();
         databaseAccess.swapMemos(from, to);
-        databaseAccess.close();
     }
 
     @Override
@@ -230,6 +230,24 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     @Override
     public void onEnterItemEditMode(SelectableMemo mMemo) {
         mListener.onEnterEditMode(mMemo);
+    }
+
+
+    @Override
+    public Loader<List<SelectableMemo>> onCreateLoader(int id, Bundle args) {
+        return new DBLoader(this.getContext(), databaseAccess);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<SelectableMemo>> loader, List<SelectableMemo> data) {
+        memos = data;
+        adapter.setmMemos(data);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<SelectableMemo>> loader) {
+
     }
 
     public void setmColumnCount(int mColumnCount) {

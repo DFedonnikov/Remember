@@ -160,6 +160,10 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         return false;
     }
 
+    public void setmMemos(List<SelectableMemo> mMemos) {
+        this.mMemos = mMemos;
+    }
+
     public interface OnItemActionPerformed {
         void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
