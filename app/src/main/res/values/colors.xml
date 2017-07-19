@@ -3,4 +3,8 @@
     <color name="colorPrimary">#ffd673</color>
     <color name="colorPrimaryDark">#006b53</color>
     <color name="colorAccent">#ffd673</color>
+    <color name="memo_yellow">#e6ffff00</color>
+    <color name="memo_blue">#e635a2f0</color>
+    <color name="memo_olive">#e6159129</color>
+    <color name="memo_purple">#e6eb38a8</color>
 </resources>

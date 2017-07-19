@@ -49,6 +49,8 @@ public class DatabaseAccess {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
         values.put("position", currentLastPosition);
+        values.put("textViewBackgroundId", memo.gettextViewBackgroundId());
+        values.put("textViewBackgroundSelectedId", memo.getTextViewBackgroundSelectedId());
         long rowId = database.insert(DatabaseOpenHelper.TABLE, null, values);
         if (rowId != -1) {
             currentLastPosition++;
@@ -58,6 +60,8 @@ public class DatabaseAccess {
     public void update(Memo memo) {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
+        values.put("textViewBackgroundId", memo.gettextViewBackgroundId());
+        values.put("textViewBackgroundSelectedId", memo.getTextViewBackgroundSelectedId());
         int id = memo.getId();
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
     }
@@ -99,8 +103,10 @@ public class DatabaseAccess {
         while (!cursor.isAfterLast()) {
             int id = Integer.valueOf(cursor.getString(0));
             String text = cursor.getString(1);
-            int position = Integer.valueOf(cursor.getString(2));
-            memos.add(new SelectableMemo(id, text, position, false));
+            int position = cursor.getInt(2);
+            int textViewBackgroundId = cursor.getInt(3);
+            int textViewBackgroundSelectedId = cursor.getInt(4);
+            memos.add(new SelectableMemo(id, text, position, textViewBackgroundId, textViewBackgroundSelectedId, false));
             cursor.moveToNext();
         }
         cursor.close();

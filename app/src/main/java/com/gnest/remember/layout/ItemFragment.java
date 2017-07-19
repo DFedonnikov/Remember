@@ -100,7 +100,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.action_bar_menu, menu);
+        inflater.inflate(R.menu.ab_itemfragment, menu);
     }
 
     @Override

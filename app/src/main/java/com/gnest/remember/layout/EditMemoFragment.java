@@ -3,16 +3,25 @@ package com.gnest.remember.layout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.SelectableMemo;
 import com.gnest.remember.db.DatabaseAccess;
+import com.gnest.remember.view.ColorSpinnerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,9 +31,11 @@ import com.gnest.remember.db.DatabaseAccess;
  * Use the {@link EditMemoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EditMemoFragment extends Fragment implements View.OnClickListener {
+public class EditMemoFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     public static final String MEMO_KEY = "memo_param";
     private EditText memoEditTextView;
+    private int textViewBackgroundId = R.drawable.textview_background_yellow;
+    private int textViewBackgroundSelectedId = R.drawable.textview_background_select_yellow;
     private Button saveButton;
     private SelectableMemo memo;
 
@@ -47,6 +58,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             Bundle arguments = getArguments();
             memo = (SelectableMemo) arguments.getBinder(MEMO_KEY);
@@ -81,11 +93,13 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener {
             databaseAccess.open();
             if (memo == null) {
                 // Add new memo
-                Memo temp = new Memo(textToSave);
+                Memo temp = new Memo(textToSave, textViewBackgroundId, textViewBackgroundSelectedId);
                 databaseAccess.save(temp);
             } else {
                 // Update the memo
                 memo.setMemoText(textToSave);
+                memo.setTextViewBackgroundId(textViewBackgroundId);
+                memo.setTextViewBackgroundSelectedId(textViewBackgroundSelectedId);
                 databaseAccess.update(memo);
             }
             databaseAccess.close();
@@ -112,6 +126,26 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener {
         mListener = null;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.ab_editfragment, menu);
+        MenuItem item = menu.findItem(R.id.item_color_choice_spinner);
+        Spinner colorChoiceSpinner = (Spinner) item.getActionView();
+        ColorSpinnerAdapter colorSpinnerAdapter = new ColorSpinnerAdapter(getContext());
+        colorChoiceSpinner.setAdapter(colorSpinnerAdapter);
+        colorChoiceSpinner.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        textViewBackgroundId = ColorSpinnerAdapter.Colors.values()[i].getMemoBackgroundId();
+        textViewBackgroundSelectedId = ColorSpinnerAdapter.Colors.values()[i].getMemoBackgroundSelectedId();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
 
     /**
      * This interface must be implemented by activities that contain this

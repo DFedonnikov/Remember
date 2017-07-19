@@ -20,7 +20,8 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     private int mPosition = 0;
     private TextView mTextView;
     private SelectableMemo mMemo;
-
+    private int textViewBackgroundId;
+    private int textViewBackgroundSelectedId;
     ImageView pin;
 
     SelectableViewHolder(final View itemView, final OnItemSelectedListener onItemSelectedListener) {
@@ -53,13 +54,13 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     @Override
     public void setSelectedBackground() {
-        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), R.drawable.note_select));
+        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), textViewBackgroundSelectedId));
         pin.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDeselectedBackground() {
-        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), R.drawable.sticky_note));
+        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), textViewBackgroundId));
         pin.setVisibility(View.VISIBLE);
     }
 
@@ -68,7 +69,9 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mMemo = memo;
         mPosition = position;
         mTextView.setText(memoText);
-//        setChecked(mMemo.isSelected());
+        textViewBackgroundId = memo.gettextViewBackgroundId();
+        textViewBackgroundSelectedId = memo.getTextViewBackgroundSelectedId();
+        setChecked(memo.isSelected());
     }
 
     interface OnItemSelectedListener {

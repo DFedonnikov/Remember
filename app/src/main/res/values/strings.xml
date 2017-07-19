@@ -7,4 +7,13 @@
     <string name="add_button">Добавить</string>
     <string name="memo_text_hint">Type your memo here</string>
     <string name="pin_descr">pin for sticky note</string>
+    <string name="color_choice_spinner">Color choice spinner</string>
+    <string name="color_name">Color name</string>
+    <string name="memo_color">Memo color</string>
+    <string-array name="memo_colors">
+        <item>Yellow</item>
+        <item>Blue</item>
+        <item>Olive</item>
+        <item>Purple</item>
+    </string-array>
 </resources>

@@ -7,16 +7,21 @@ public class Memo extends Binder {
     private int id;
     private String memoText;
     private int position;
+    private int textViewBackgroundId;
+    private int textViewBackgroundSelectedId;
 
-    public Memo(String memoText) {
+    public Memo(String memoText, int textViewBackgroundId, int textViewBackgroundSelectedId) {
         this.memoText = memoText;
-        position = -1;
+        this.position = -1;
+        this.textViewBackgroundId = textViewBackgroundId;
+        this.textViewBackgroundSelectedId = textViewBackgroundSelectedId;
     }
 
-    Memo(int id, String memoText, int position) {
+    Memo(int id, String memoText, int position, int textViewBackgroundId, int textViewBackgroundSelectedId) {
         this.id = id;
         this.memoText = memoText;
-        this.position = position;
+        this.textViewBackgroundId = textViewBackgroundId;
+        this.textViewBackgroundSelectedId = textViewBackgroundSelectedId;
     }
 
     public int getId() {
@@ -37,6 +42,22 @@ public class Memo extends Binder {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public int gettextViewBackgroundId() {
+        return textViewBackgroundId;
+    }
+
+    public void setTextViewBackgroundId(int textViewBackgroundId) {
+        this.textViewBackgroundId = textViewBackgroundId;
+    }
+
+    public int getTextViewBackgroundSelectedId() {
+        return textViewBackgroundSelectedId;
+    }
+
+    public void setTextViewBackgroundSelectedId(int textViewBackgroundSelectedId) {
+        this.textViewBackgroundSelectedId = textViewBackgroundSelectedId;
     }
 
     @Override
