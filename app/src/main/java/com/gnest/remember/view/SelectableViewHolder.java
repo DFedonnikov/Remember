@@ -69,7 +69,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mMemo = memo;
         mPosition = position;
         mTextView.setText(memoText);
-        textViewBackgroundId = memo.gettextViewBackgroundId();
+        textViewBackgroundId = memo.getTextViewBackgroundId();
         textViewBackgroundSelectedId = memo.getTextViewBackgroundSelectedId();
         setChecked(memo.isSelected());
     }

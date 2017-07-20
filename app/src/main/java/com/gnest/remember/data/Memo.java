@@ -44,7 +44,7 @@ public class Memo extends Binder {
         this.position = position;
     }
 
-    public int gettextViewBackgroundId() {
+    public int getTextViewBackgroundId() {
         return textViewBackgroundId;
     }
 

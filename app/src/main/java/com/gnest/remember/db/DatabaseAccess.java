@@ -49,7 +49,7 @@ public class DatabaseAccess {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
         values.put("position", currentLastPosition);
-        values.put("textViewBackgroundId", memo.gettextViewBackgroundId());
+        values.put("textViewBackgroundId", memo.getTextViewBackgroundId());
         values.put("textViewBackgroundSelectedId", memo.getTextViewBackgroundSelectedId());
         long rowId = database.insert(DatabaseOpenHelper.TABLE, null, values);
         if (rowId != -1) {
@@ -60,7 +60,7 @@ public class DatabaseAccess {
     public void update(Memo memo) {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
-        values.put("textViewBackgroundId", memo.gettextViewBackgroundId());
+        values.put("textViewBackgroundId", memo.getTextViewBackgroundId());
         values.put("textViewBackgroundSelectedId", memo.getTextViewBackgroundSelectedId());
         int id = memo.getId();
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
