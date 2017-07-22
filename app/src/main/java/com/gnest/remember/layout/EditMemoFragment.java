@@ -134,6 +134,9 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         ColorSpinnerAdapter colorSpinnerAdapter = new ColorSpinnerAdapter(getContext());
         colorChoiceSpinner.setAdapter(colorSpinnerAdapter);
         colorChoiceSpinner.setOnItemSelectedListener(this);
+        if (memo != null) {
+            colorChoiceSpinner.setSelection(ColorSpinnerAdapter.Colors.getColorPositionByMemoBackGroundId(memo.getTextViewBackgroundId()));
+        }
     }
 
     @Override

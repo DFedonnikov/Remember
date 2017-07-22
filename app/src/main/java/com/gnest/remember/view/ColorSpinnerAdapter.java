@@ -46,6 +46,21 @@ public class ColorSpinnerAdapter implements SpinnerAdapter {
         public int getMemoBackgroundSelectedId() {
             return memoBackgroundSelectedId;
         }
+
+        public static int getColorPositionByMemoBackGroundId(int memoBackgroundId) {
+            switch (memoBackgroundId) {
+                case R.drawable.textview_background_yellow:
+                    return YELLOW.ordinal();
+                case R.drawable.textview_background_blue:
+                    return BLUE.ordinal();
+                case R.drawable.textview_background_olive:
+                    return OLIVE.ordinal();
+                case R.drawable.textview_background_purple:
+                    return PURPLE.ordinal();
+                default:
+                    return YELLOW.ordinal();
+            }
+        }
     }
 
     private String[] colors;
