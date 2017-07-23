@@ -230,14 +230,13 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         }
     }
 
-    @Override
-    public void onEnterItemEditMode(SelectableMemo mMemo) {
-        mListener.onEnterEditMode(mMemo);
-    }
-
-    @Override
-    public void onExtendMemo(SelectableMemo mMemo) {
-        myGridLayoutManager.openItem(mMemo.getPosition());
+       @Override
+    public void onSingleChoiceMemoClicked(SelectableMemo mMemo) {
+        if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
+            myGridLayoutManager.openItem(mMemo.getPosition());
+        } else {
+            mListener.onEnterEditMode(mMemo);
+        }
     }
 
     @Override

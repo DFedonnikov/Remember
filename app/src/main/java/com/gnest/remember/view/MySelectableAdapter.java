@@ -147,7 +147,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
             }
         } else {
 //            mListener.onEnterItemEditMode(mMemo);
-            mListener.onExtendMemo(mMemo);
+            mListener.onSingleChoiceMemoClicked(mMemo);
         }
     }
 
@@ -171,7 +171,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         void showActionMode();
         void shutDownActionMode();
         void setShareButtonVisibility(boolean isVisible);
-        void onEnterItemEditMode(SelectableMemo mMemo);
 
         /**
          * Called when a view is requesting a start of a drag.
@@ -180,6 +179,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
          */
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
 
-        void onExtendMemo(SelectableMemo mMemo);
+        void onSingleChoiceMemoClicked(SelectableMemo mMemo);
     }
 }
