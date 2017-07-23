@@ -57,7 +57,8 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
     @Override
     public void onBackPressed() {
         if (itemFragment != null && itemFragment.isVisible()) {
-            super.onBackPressed();
+//            super.onBackPressed();
+            itemFragment.onBackButtonPressed();
         } else if (editMemoFragment.isVisible()) {
             insertItemFragment();
         }

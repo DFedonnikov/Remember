@@ -26,6 +26,7 @@ import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.helper.ItemTouchHelperCallback;
 import com.gnest.remember.loader.DBLoader;
 import com.gnest.remember.view.ActionMenu;
+import com.gnest.remember.view.MyGridLayoutManager;
 import com.gnest.remember.view.MySelectableAdapter;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private ActionMenu actionMenu;
     private SelectableMemo currentSelectedMemo;
     private RecyclerView recyclerView;
+    private MyGridLayoutManager myGridLayoutManager;
 
 
     /**
@@ -84,7 +86,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+            myGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
+            recyclerView.setLayoutManager(myGridLayoutManager);
         }
         adapter = new MySelectableAdapter(memos, this);
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
@@ -232,6 +235,10 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         mListener.onEnterEditMode(mMemo);
     }
 
+    @Override
+    public void onExtendMemo(SelectableMemo mMemo) {
+        myGridLayoutManager.openItem(mMemo.getPosition());
+    }
 
     @Override
     public Loader<List<SelectableMemo>> onCreateLoader(int id, Bundle args) {
@@ -252,6 +259,12 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
     public void setmColumnCount(int mColumnCount) {
         this.mColumnCount = mColumnCount;
+    }
+
+    public void onBackButtonPressed() {
+        if (myGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
+            myGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        }
     }
 
     /**

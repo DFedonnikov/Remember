@@ -146,7 +146,8 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
                 mListener.setShareButtonVisibility(false);
             }
         } else {
-            mListener.onEnterItemEditMode(mMemo);
+//            mListener.onEnterItemEditMode(mMemo);
+            mListener.onExtendMemo(mMemo);
         }
     }
 
@@ -178,5 +179,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
          * @param viewHolder The holder of the view to drag.
          */
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
+
+        void onExtendMemo(SelectableMemo mMemo);
     }
 }
