@@ -138,7 +138,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     @Override
-    public void onItemClicked(int mPosition, SelectableMemo mMemo, TextView mTextView) {
+    public void onItemClicked(int mPosition, SelectableMemo mMemo) {
         if (isMultiChoiceEnabled()) {
             updateSelectedList(mPosition, mMemo);
             if (mSelectedList.size() < 2) {
@@ -148,7 +148,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
             }
         } else {
 //            mListener.onEnterItemEditMode(mMemo);
-            mListener.onSingleChoiceMemoClicked(mMemo, mTextView);
+            mListener.onSingleChoiceMemoClicked(mMemo);
         }
     }
 
@@ -180,6 +180,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
          */
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
 
-        void onSingleChoiceMemoClicked(SelectableMemo mMemo, TextView mTextView);
+        void onSingleChoiceMemoClicked(SelectableMemo mMemo);
     }
 }

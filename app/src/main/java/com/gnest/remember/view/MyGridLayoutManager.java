@@ -22,8 +22,8 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     private static final long TRANSITION_DURATION_MS = 300;
     private static final float SCALE_THRESHOLD_PERCENT = 0.66f;
-    public static final int TV_PADDING_TOP_EXTENDED = 70;
-    public static final int TV_PADDING_TOP_UNEXTENDED = 30;
+    private static final int TV_PADDING_TOP_EXTENDED = 110;
+    private static final int TV_PADDING_TOP_UNEXTENDED = 30;
 
     private SparseArray<View> viewCache = new SparseArray<>();
     private int mAncorPos;

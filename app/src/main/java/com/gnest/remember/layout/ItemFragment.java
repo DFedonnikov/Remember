@@ -48,8 +48,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private SelectableMemo currentSelectedMemo;
     private RecyclerView recyclerView;
     private MyGridLayoutManager myGridLayoutManager;
-    private TextView extendedTextView;
-
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -132,7 +130,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         super.onDetach();
         mListener = null;
         memos = null;
-        extendedTextView = null;
         currentSelectedMemo = null;
         databaseAccess.close();
     }
@@ -235,10 +232,9 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
     @Override
-    public void onSingleChoiceMemoClicked(SelectableMemo mMemo, TextView mTextView) {
+    public void onSingleChoiceMemoClicked(SelectableMemo mMemo) {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
             myGridLayoutManager.openItem(mMemo.getPosition());
-            extendedTextView = mTextView;
         } else {
             mListener.onEnterEditMode(mMemo);
         }

@@ -16,6 +16,7 @@ import com.gnest.remember.helper.ItemTouchHelperViewHolder;
 
 public class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
+    private View mView;
     private OnItemSelectedListener mListener;
     private int mPosition = 0;
     private TextView mTextView;
@@ -26,16 +27,17 @@ public class SelectableViewHolder extends RecyclerView.ViewHolder implements Ite
 
     SelectableViewHolder(final View itemView, final OnItemSelectedListener onItemSelectedListener) {
         super(itemView);
+        mView = itemView;
         this.mListener = onItemSelectedListener;
         mTextView = itemView.findViewById(R.id.memo_textView);
         pin = itemView.findViewById(R.id.pin);
-        mTextView.setOnClickListener(new View.OnClickListener() {
+        mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onItemClicked(mPosition, mMemo, mTextView);
+                mListener.onItemClicked(mPosition, mMemo);
             }
         });
-        mTextView.setOnLongClickListener(new View.OnLongClickListener() {
+        mView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 return mListener.onItemLongClicked(mPosition, mMemo);
@@ -54,13 +56,13 @@ public class SelectableViewHolder extends RecyclerView.ViewHolder implements Ite
 
     @Override
     public void setSelectedBackground() {
-        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), textViewBackgroundSelectedId));
+        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), textViewBackgroundSelectedId));
         pin.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDeselectedBackground() {
-        mTextView.setBackground(ContextCompat.getDrawable(mTextView.getContext(), textViewBackgroundId));
+        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), textViewBackgroundId));
         pin.setVisibility(View.VISIBLE);
     }
 
@@ -75,7 +77,7 @@ public class SelectableViewHolder extends RecyclerView.ViewHolder implements Ite
     }
 
     interface OnItemSelectedListener {
-        void onItemClicked(int mPosition, SelectableMemo mMemo, TextView mTextView);
+        void onItemClicked(int mPosition, SelectableMemo mMemo);
 
         boolean onItemLongClicked(int mPosition, SelectableMemo mMemo);
 
