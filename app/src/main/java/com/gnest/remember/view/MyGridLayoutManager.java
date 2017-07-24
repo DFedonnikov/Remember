@@ -38,7 +38,9 @@ public class MyGridLayoutManager extends GridLayoutManager {
         super.setOrientation(orientation);
         currentOrientation = orientation;
         View anchorView = getAnchorView();
-        mAncorPos = anchorView != null ? getPosition(anchorView) : 0;
+        if (anchorView != null) {
+            mAncorPos = getPosition(anchorView);
+        }
         requestLayout();
     }
 
@@ -439,6 +441,10 @@ public class MyGridLayoutManager extends GridLayoutManager {
             }
         }
         return delta;
+    }
+
+    public void setmAncorPos(int mAncorPos) {
+        this.mAncorPos = mAncorPos;
     }
 
     private static class ViewAnimationInfo {

@@ -3,6 +3,7 @@ package com.gnest.remember.layout;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -35,8 +36,14 @@ import java.util.List;
 
 public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, LoaderManager.LoaderCallbacks<List<SelectableMemo>> {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_COLUMN_COUNT = "ColumnCount";
     private static final int LOADER_ID = 0;
+    public static final int LM_HORIZONTAL_ORIENTATION = 0;
+    public static final int LM_VERTICAL_ORIENTATION = 1;
+    public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManagerOrientationKey";
+    public static final String POSITION_KEY = "PositionKey";
+    public static final String BUNDLE_KEY = "BundleKey";
+
     private int mColumnCount;
     private OnItemListFragmentInteractionListener mListener;
     private MySelectableAdapter adapter;
@@ -48,6 +55,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private SelectableMemo currentSelectedMemo;
     private RecyclerView recyclerView;
     private MyGridLayoutManager myGridLayoutManager;
+    private int lastPosition;
+    private int lastOrientation;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,6 +71,15 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            int orientation = savedInstanceState.getInt(LM_SCROLL_ORIENTATION_KEY);
+            myGridLayoutManager.setOrientation(orientation);
+        }
     }
 
     @Override
@@ -94,7 +112,15 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         getActivity().getSupportLoaderManager().getLoader(LOADER_ID).forceLoad();
         recyclerView.setAdapter(adapter);
 
-
+        if (getArguments() != null) {
+            Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
+            if (bundle != null) {
+                lastOrientation = bundle.getInt(LM_SCROLL_ORIENTATION_KEY);
+                lastPosition = bundle.getInt(POSITION_KEY);
+                myGridLayoutManager.setmAncorPos(lastPosition);
+                myGridLayoutManager.setOrientation(lastOrientation);
+            }
+        }
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -134,6 +160,14 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         databaseAccess.close();
     }
 
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        int orientation = myGridLayoutManager.getOrientation();
+        outState.putInt(LM_SCROLL_ORIENTATION_KEY, orientation);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -255,6 +289,10 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     @Override
     public void onLoaderReset(Loader<List<SelectableMemo>> loader) {
 
+    }
+
+    public MyGridLayoutManager getMyGridLayoutManager() {
+        return myGridLayoutManager;
     }
 
     public void setmColumnCount(int mColumnCount) {

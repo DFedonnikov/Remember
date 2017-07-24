@@ -37,21 +37,27 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
                 itemFragment.setmColumnCount(COLUMNS);
             }
         } else {
-            insertItemFragment();
+            insertItemFragment(null);
         }
 
     }
 
-    private void insertItemFragment() {
+    private void insertItemFragment(Bundle bundle) {
         itemFragment = ItemFragment.newInstance(COLUMNS);
+        if (bundle != null) {
+            itemFragment.getArguments().putBundle(ItemFragment.BUNDLE_KEY, bundle);
+        }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.current_fragment, itemFragment, null);
         ft.commit();
     }
 
     @Override
-    public void onSaveEditMemoFragmentInteraction() {
-        insertItemFragment();
+    public void onSaveEditMemoFragmentInteraction(int lmHorizontalOrientation, int position) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, lmHorizontalOrientation);
+        bundle.putInt(ItemFragment.POSITION_KEY, position);
+        insertItemFragment(bundle);
     }
 
     @Override
@@ -60,7 +66,10 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
 //            super.onBackPressed();
             itemFragment.onBackButtonPressed();
         } else if (editMemoFragment.isVisible()) {
-            insertItemFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
+            bundle.putInt(ItemFragment.POSITION_KEY, ((SelectableMemo) editMemoFragment.getArguments().getBinder(EditMemoFragment.MEMO_KEY)).getPosition());
+            insertItemFragment(bundle);
         }
     }
 
