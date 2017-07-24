@@ -238,9 +238,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public void onSingleChoiceMemoClicked(SelectableMemo mMemo, TextView mTextView) {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
             myGridLayoutManager.openItem(mMemo.getPosition());
-            float scale = getResources().getDisplayMetrics().density;
-            int paddingTopInPx = (int) (SelectableViewHolder.TV_PADDING_TOP_EXTENDED * scale + 0.5f);
-            mTextView.setPadding(mTextView.getPaddingLeft(), paddingTopInPx, mTextView.getPaddingRight(), mTextView.getPaddingBottom());
             extendedTextView = mTextView;
         } else {
             mListener.onEnterEditMode(mMemo);
@@ -271,11 +268,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public void onBackButtonPressed() {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
             myGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            if (extendedTextView != null) {
-                float scale = getResources().getDisplayMetrics().density;
-                int paddingTopInPx = (int) (SelectableViewHolder.TV_PADDING_TOP_UNEXTENDED * scale + 0.5f);
-                extendedTextView.setPaddingRelative(extendedTextView.getPaddingStart(), paddingTopInPx, extendedTextView.getPaddingEnd(), extendedTextView.getPaddingBottom());
-            }
         }
     }
 

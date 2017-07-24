@@ -16,9 +16,6 @@ import com.gnest.remember.helper.ItemTouchHelperViewHolder;
 
 public class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
-    public static final int TV_PADDING_TOP_EXTENDED = 70;
-    public static final int TV_PADDING_TOP_UNEXTENDED = 30;
-
     private OnItemSelectedListener mListener;
     private int mPosition = 0;
     private TextView mTextView;

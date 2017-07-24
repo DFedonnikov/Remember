@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.gnest.remember.R;
+
 import java.util.ArrayList;
 
 /**
@@ -20,9 +22,12 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     private static final long TRANSITION_DURATION_MS = 300;
     private static final float SCALE_THRESHOLD_PERCENT = 0.66f;
+    public static final int TV_PADDING_TOP_EXTENDED = 70;
+    public static final int TV_PADDING_TOP_UNEXTENDED = 30;
 
     private SparseArray<View> viewCache = new SparseArray<>();
     private int mAncorPos;
+    private int currentOrientation;
 
     public MyGridLayoutManager(Context context, int spanCount) {
         super(context, spanCount);
@@ -31,8 +36,9 @@ public class MyGridLayoutManager extends GridLayoutManager {
     @Override
     public void setOrientation(int orientation) {
         super.setOrientation(orientation);
-        View ancorView = getAnchorView();
-        mAncorPos = ancorView != null ? getPosition(ancorView) : 0;
+        currentOrientation = orientation;
+        View anchorView = getAnchorView();
+        mAncorPos = anchorView != null ? getPosition(anchorView) : 0;
         requestLayout();
     }
 
@@ -40,7 +46,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         super.onLayoutChildren(recycler, state);
         detachAndScrapAttachedViews(recycler);
-        mAncorPos = 0;
         fill(recycler);
     }
 
@@ -61,8 +66,9 @@ public class MyGridLayoutManager extends GridLayoutManager {
         }
 
 
-        switch (getOrientation()) {
+        switch (currentOrientation) {
             case VERTICAL:
+                mAncorPos = 0;
                 fillUp(anchorView, recycler);
                 fillDown(anchorView, recycler);
                 break;
@@ -111,6 +117,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
             }
+            adjustTextViewPaddingTop(view);
             viewBottom = getDecoratedTop(view);
             fillUp = (viewBottom > 0);
             pos--;
@@ -140,6 +147,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
             }
+            adjustTextViewPaddingTop(view);
             viewTop = getDecoratedBottom(view);
             fillDown = viewTop <= height;
             pos++;
@@ -180,6 +188,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
             }
+            adjustTextViewPaddingTop(view);
             viewRight = getDecoratedLeft(view);
             fillLeft = (viewRight > 0);
             pos--;
@@ -221,11 +230,24 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
             }
+            adjustTextViewPaddingTop(view);
             viewLeft = getDecoratedRight(view);
             fillRight = viewLeft <= width;
             pos++;
         }
 
+    }
+
+    private void adjustTextViewPaddingTop(View view) {
+        int paddingTopInPx = 0;
+        float scale = view.getContext().getResources().getDisplayMetrics().density;
+        if (currentOrientation == VERTICAL) {
+            paddingTopInPx = (int) (TV_PADDING_TOP_UNEXTENDED * scale + 0.5f);
+        } else {
+            paddingTopInPx = (int) (TV_PADDING_TOP_EXTENDED * scale + 0.5f);
+        }
+        View mTextView = view.findViewById(R.id.memo_textView);
+        mTextView.setPadding(mTextView.getPaddingLeft(), paddingTopInPx, mTextView.getPaddingRight(), mTextView.getPaddingBottom());
     }
 
 
@@ -254,7 +276,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
     }
 
     public void openItem(int pos) {
-        if (getOrientation() == VERTICAL) {
+        if (currentOrientation == VERTICAL) {
             View viewToOpen = null;
             int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
