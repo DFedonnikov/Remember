@@ -29,118 +29,19 @@ public class MyGridLayoutManager extends GridLayoutManager {
     }
 
     @Override
-    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        super.onLayoutChildren(recycler, state);
-        if (getOrientation() == HORIZONTAL) {
-            detachAndScrapAttachedViews(recycler);
-            fill(recycler);
-            mAncorPos = 0;
-        }
+    public void setOrientation(int orientation) {
+        super.setOrientation(orientation);
+        View ancorView = getAnchorView();
+        mAncorPos = ancorView != null ? getPosition(ancorView) : 0;
+        requestLayout();
     }
 
     @Override
-    public void setOrientation(int orientation) {
-        View ancorView = getAnchorView();
-        mAncorPos = ancorView != null ? getPosition(ancorView) : 0;
-        super.setOrientation(orientation);
-    }
-
-    private View getAnchorView() {
-        int childCount = getChildCount();
-        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
-        int maxSquare = 0;
-        View anchorView = null;
-//        HashMap<Integer, View> viewsOnScreen = new HashMap<>();
-        for (int i = 0; i < childCount; i++) {
-            View view = getChildAt(i);
-            int top = getDecoratedTop(view);
-            int bottom = getDecoratedBottom(view);
-            int left = getDecoratedLeft(view);
-            int right = getDecoratedRight(view);
-            Rect viewRect = new Rect(left, top, right, bottom);
-            boolean intersect = viewRect.intersect(mainRect);
-            if (intersect) {
-                int square = viewRect.width() * viewRect.height();
-                if (square > maxSquare) {
-                    anchorView = view;
-                }
-            }
-        }
-        return anchorView;
-    }
-
-
-    public void openItem(int pos) {
-        if (getOrientation() == VERTICAL) {
-            View viewToOpen = null;
-            int childCount = getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                View view = getChildAt(i);
-                int position = getPosition(view);
-                if (position == pos) {
-                    viewToOpen = view;
-                }
-            }
-            if (viewToOpen != null) {
-                openView(viewToOpen);
-            }
-        }
-    }
-
-    private void openView(final View viewToOpen) {
-        final ArrayList<ViewAnimationInfo> animationInfos = new ArrayList<>();
-        int childCount = getChildCount();
-        int animatedPos = getPosition(viewToOpen);
-        for (int i = 0; i < childCount; i++) {
-            View view = getChildAt(i);
-            int pos = getPosition(view);
-            int posDelta = pos - animatedPos;
-            final ViewAnimationInfo viewAnimationInfo = new ViewAnimationInfo();
-            viewAnimationInfo.startTop = getDecoratedTop(view);
-            viewAnimationInfo.startBottom = getDecoratedBottom(view);
-            viewAnimationInfo.finishTop = getHeight() * posDelta;
-            viewAnimationInfo.finishBottom = getHeight() * posDelta + getHeight();
-            viewAnimationInfo.view = view;
-            animationInfos.add(viewAnimationInfo);
-        }
-
-        ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
-        animator.setDuration(TRANSITION_DURATION_MS);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float animationProgress = (float) animation.getAnimatedValue();
-                for (ViewAnimationInfo animationInfo : animationInfos) {
-                    int top = (int) (animationInfo.startTop + animationProgress * (animationInfo.finishTop - animationInfo.startTop));
-                    int bottom = (int) (animationInfo.startBottom + animationProgress * (animationInfo.finishBottom - animationInfo.startBottom));
-                    layoutDecorated(animationInfo.view, 0, top, getWidth(), bottom);
-                }
-                updateViewScale();
-            }
-        });
-
-        animator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                setOrientation(HORIZONTAL);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        animator.start();
+    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        super.onLayoutChildren(recycler, state);
+        detachAndScrapAttachedViews(recycler);
+        mAncorPos = 0;
+        fill(recycler);
     }
 
     private void fill(RecyclerView.Recycler recycler) {
@@ -160,8 +61,16 @@ public class MyGridLayoutManager extends GridLayoutManager {
         }
 
 
-        fillLeft(anchorView, recycler);
-        fillRight(anchorView, recycler);
+        switch (getOrientation()) {
+            case VERTICAL:
+                fillUp(anchorView, recycler);
+                fillDown(anchorView, recycler);
+                break;
+            case HORIZONTAL:
+                fillLeft(anchorView, recycler);
+                fillRight(anchorView, recycler);
+                break;
+        }
 
 
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
@@ -172,6 +81,69 @@ public class MyGridLayoutManager extends GridLayoutManager {
         }
 
         updateViewScale();
+    }
+
+    private void fillUp(@Nullable View anchorView, RecyclerView.Recycler recycler) {
+        int anchorPos;
+        if (anchorView != null) {
+            anchorPos = getPosition(anchorView);
+        } else {
+            anchorPos = mAncorPos;
+        }
+
+        boolean fillUp = true;
+        int pos = anchorPos - 1;
+        int viewBottom;
+
+
+        while (fillUp && pos >= 0) {
+            View view = viewCache.get(pos); //проверяем кэш
+            if (view == null) {
+                //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
+                view = recycler.getViewForPosition(pos);
+                addView(view, 0);
+//                measureChildWithDecorationsAndMargin(view, widthSpec, heigthSpec);
+//                int decoratedMeasuredWidth = getDecoratedMeasuredWidth(view);
+//                layoutDecorated(view, 0, viewBottom - viewHeight, decoratedMeasuredWidth, viewBottom);
+            } else {
+                //если вьюшка есть в кэше - просто аттачим её обратно
+                //нет необходимости проводить measure/layout цикл.
+                attachView(view);
+                viewCache.remove(pos);
+            }
+            viewBottom = getDecoratedTop(view);
+            fillUp = (viewBottom > 0);
+            pos--;
+        }
+    }
+
+    private void fillDown(@Nullable View anchorView, RecyclerView.Recycler recycler) {
+        int anchorPos;
+        if (anchorView != null) {
+            anchorPos = getPosition(anchorView);
+        } else {
+            anchorPos = mAncorPos;
+        }
+
+        int pos = anchorPos;
+        boolean fillDown = true;
+        int height = getHeight();
+        int viewTop;
+        int itemCount = getItemCount();
+
+        while (fillDown && pos < itemCount) {
+            View view = viewCache.get(pos);
+            if (view == null) {
+                view = recycler.getViewForPosition(pos);
+                addView(view);
+            } else {
+                attachView(view);
+                viewCache.remove(pos);
+            }
+            viewTop = getDecoratedBottom(view);
+            fillDown = viewTop <= height;
+            pos++;
+        }
     }
 
     private void fillLeft(@Nullable View anchorView, RecyclerView.Recycler recycler) {
@@ -254,6 +226,104 @@ public class MyGridLayoutManager extends GridLayoutManager {
             pos++;
         }
 
+    }
+
+
+    private View getAnchorView() {
+        int childCount = getChildCount();
+        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
+        int maxSquare = 0;
+        View anchorView = null;
+//        HashMap<Integer, View> viewsOnScreen = new HashMap<>();
+        for (int i = 0; i < childCount; i++) {
+            View view = getChildAt(i);
+            int top = getDecoratedTop(view);
+            int bottom = getDecoratedBottom(view);
+            int left = getDecoratedLeft(view);
+            int right = getDecoratedRight(view);
+            Rect viewRect = new Rect(left, top, right, bottom);
+            boolean intersect = viewRect.intersect(mainRect);
+            if (intersect) {
+                int square = viewRect.width() * viewRect.height();
+                if (square > maxSquare) {
+                    anchorView = view;
+                }
+            }
+        }
+        return anchorView;
+    }
+
+    public void openItem(int pos) {
+        if (getOrientation() == VERTICAL) {
+            View viewToOpen = null;
+            int childCount = getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View view = getChildAt(i);
+                int position = getPosition(view);
+                if (position == pos) {
+                    viewToOpen = view;
+                }
+            }
+            if (viewToOpen != null) {
+                openView(viewToOpen);
+            }
+        }
+    }
+
+    private void openView(final View viewToOpen) {
+        final ArrayList<ViewAnimationInfo> animationInfos = new ArrayList<>();
+        int childCount = getChildCount();
+        int animatedPos = getPosition(viewToOpen);
+        for (int i = 0; i < childCount; i++) {
+            View view = getChildAt(i);
+            int pos = getPosition(view);
+            int posDelta = pos - animatedPos;
+            final ViewAnimationInfo viewAnimationInfo = new ViewAnimationInfo();
+            viewAnimationInfo.startTop = getDecoratedTop(view);
+            viewAnimationInfo.startBottom = getDecoratedBottom(view);
+            viewAnimationInfo.finishTop = getHeight() * posDelta;
+            viewAnimationInfo.finishBottom = getHeight() * posDelta + getHeight();
+            viewAnimationInfo.view = view;
+            animationInfos.add(viewAnimationInfo);
+        }
+
+        ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
+        animator.setDuration(TRANSITION_DURATION_MS);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float animationProgress = (float) animation.getAnimatedValue();
+                for (ViewAnimationInfo animationInfo : animationInfos) {
+                    int top = (int) (animationInfo.startTop + animationProgress * (animationInfo.finishTop - animationInfo.startTop));
+                    int bottom = (int) (animationInfo.startBottom + animationProgress * (animationInfo.finishBottom - animationInfo.startBottom));
+                    layoutDecorated(animationInfo.view, 0, top, getWidth(), bottom);
+                }
+                updateViewScale();
+            }
+        });
+
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                setOrientation(HORIZONTAL);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animator.start();
     }
 
     private void measureChildWithDecorationsAndMargin(View child, int widthSpec, int heightSpec) {

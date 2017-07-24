@@ -20,6 +20,7 @@ public class Memo extends Binder {
     Memo(int id, String memoText, int position, int textViewBackgroundId, int textViewBackgroundSelectedId) {
         this.id = id;
         this.memoText = memoText;
+        this.position = position;
         this.textViewBackgroundId = textViewBackgroundId;
         this.textViewBackgroundSelectedId = textViewBackgroundSelectedId;
     }

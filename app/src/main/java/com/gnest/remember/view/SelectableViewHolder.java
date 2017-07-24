@@ -14,7 +14,10 @@ import com.gnest.remember.helper.ItemTouchHelperViewHolder;
  * Created by DFedonnikov on 08.07.2017.
  */
 
-class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
+public class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
+
+    public static final int TV_PADDING_TOP_EXTENDED = 70;
+    public static final int TV_PADDING_TOP_UNEXTENDED = 30;
 
     private OnItemSelectedListener mListener;
     private int mPosition = 0;
@@ -32,7 +35,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onItemClicked(mPosition, mMemo);
+                mListener.onItemClicked(mPosition, mMemo, mTextView);
             }
         });
         mTextView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -75,7 +78,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     }
 
     interface OnItemSelectedListener {
-        void onItemClicked(int mPosition, SelectableMemo mMemo);
+        void onItemClicked(int mPosition, SelectableMemo mMemo, TextView mTextView);
 
         boolean onItemLongClicked(int mPosition, SelectableMemo mMemo);
 

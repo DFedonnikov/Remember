@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -18,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.gnest.remember.R;
 
@@ -28,6 +28,7 @@ import com.gnest.remember.loader.DBLoader;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MyGridLayoutManager;
 import com.gnest.remember.view.MySelectableAdapter;
+import com.gnest.remember.view.SelectableViewHolder;
 
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private SelectableMemo currentSelectedMemo;
     private RecyclerView recyclerView;
     private MyGridLayoutManager myGridLayoutManager;
+    private TextView extendedTextView;
 
 
     /**
@@ -130,6 +132,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         super.onDetach();
         mListener = null;
         memos = null;
+        extendedTextView = null;
+        currentSelectedMemo = null;
         databaseAccess.close();
     }
 
@@ -230,10 +234,14 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         }
     }
 
-       @Override
-    public void onSingleChoiceMemoClicked(SelectableMemo mMemo) {
+    @Override
+    public void onSingleChoiceMemoClicked(SelectableMemo mMemo, TextView mTextView) {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
             myGridLayoutManager.openItem(mMemo.getPosition());
+            float scale = getResources().getDisplayMetrics().density;
+            int paddingTopInPx = (int) (SelectableViewHolder.TV_PADDING_TOP_EXTENDED * scale + 0.5f);
+            mTextView.setPadding(mTextView.getPaddingLeft(), paddingTopInPx, mTextView.getPaddingRight(), mTextView.getPaddingBottom());
+            extendedTextView = mTextView;
         } else {
             mListener.onEnterEditMode(mMemo);
         }
@@ -263,6 +271,11 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public void onBackButtonPressed() {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
             myGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            if (extendedTextView != null) {
+                float scale = getResources().getDisplayMetrics().density;
+                int paddingTopInPx = (int) (SelectableViewHolder.TV_PADDING_TOP_UNEXTENDED * scale + 0.5f);
+                extendedTextView.setPaddingRelative(extendedTextView.getPaddingStart(), paddingTopInPx, extendedTextView.getPaddingEnd(), extendedTextView.getPaddingBottom());
+            }
         }
     }
 

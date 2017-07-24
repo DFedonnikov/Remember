@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.SelectableMemo;
@@ -137,7 +138,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     @Override
-    public void onItemClicked(int mPosition, SelectableMemo mMemo) {
+    public void onItemClicked(int mPosition, SelectableMemo mMemo, TextView mTextView) {
         if (isMultiChoiceEnabled()) {
             updateSelectedList(mPosition, mMemo);
             if (mSelectedList.size() < 2) {
@@ -147,7 +148,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
             }
         } else {
 //            mListener.onEnterItemEditMode(mMemo);
-            mListener.onSingleChoiceMemoClicked(mMemo);
+            mListener.onSingleChoiceMemoClicked(mMemo, mTextView);
         }
     }
 
@@ -179,6 +180,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
          */
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
 
-        void onSingleChoiceMemoClicked(SelectableMemo mMemo);
+        void onSingleChoiceMemoClicked(SelectableMemo mMemo, TextView mTextView);
     }
 }
