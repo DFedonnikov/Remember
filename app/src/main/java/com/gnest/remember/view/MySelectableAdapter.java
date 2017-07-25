@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.SelectableMemo;
@@ -91,10 +90,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public void onItemDismiss(int position) {
-        SelectableMemo memoToDelete = mMemos.get(position);
-        mListener.onUpdateDBUponSwipeDismiss(memoToDelete, mMemos, position);
-        mMemos.remove(position);
-        notifyItemRemoved(position);
+        mListener.onPerformSwipeDismiss(mMemos.get(position));
     }
 
     @Override
@@ -155,7 +151,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     @Override
     public boolean onItemLongClicked(int mPosition, SelectableMemo mMemo) {
         if (!isMultiChoiceEnabled()) {
-            updateSelectedList(mPosition, mMemo);
+            updateSelectedList(mMemo.getPosition(), mMemo);
             mListener.showActionMode();
             return true;
         }
@@ -167,7 +163,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     public interface OnItemActionPerformed {
-        void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position);
+        void onPerformSwipeDismiss(SelectableMemo memoToDelete);
         void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to);
         void showActionMode();
         void shutDownActionMode();
