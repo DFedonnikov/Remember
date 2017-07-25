@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class MyGridLayoutManager extends GridLayoutManager {
 
     private static final long TRANSITION_DURATION_MS = 300;
-    private static final float SCALE_THRESHOLD_PERCENT = 0.66f;
+    private static final float SCALE_THRESHOLD_PERCENT = 1f;
     private static final int TV_PADDING_TOP_EXTENDED = 110;
     private static final int TV_PADDING_TOP_UNEXTENDED = 30;
 
