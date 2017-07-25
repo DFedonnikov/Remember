@@ -18,7 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.gnest.remember.R;
 
@@ -29,7 +28,6 @@ import com.gnest.remember.loader.DBLoader;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MyGridLayoutManager;
 import com.gnest.remember.view.MySelectableAdapter;
-import com.gnest.remember.view.SelectableViewHolder;
 
 import java.util.List;
 
@@ -161,7 +159,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -184,13 +181,33 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public void onDeleteButtonPressed() {
         SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
         for (int i = 0; i < selectedList.size(); i++) {
-            currentSelectedMemo = selectedList.valueAt(i);
-            deleteCurrentMemoFromDB(memos, currentSelectedMemo.getPosition());
-            adapter.removeSelectedMemo(currentSelectedMemo);
+            performDelete(selectedList.valueAt(i));
         }
         adapter.notifyDataSetChanged();
         actionMode.finish();
     }
+
+    @Override
+    public void onPerformSwipeDismiss(SelectableMemo memoToDelete) {
+        performDelete(memoToDelete);
+        adapter.notifyItemRemoved(memoToDelete.getPosition());
+        if (actionMode != null) {
+            actionMode.finish();
+        }
+    }
+
+    public void performDelete(SelectableMemo memo) {
+        currentSelectedMemo = memo;
+        deleteCurrentMemoFromDB(memos, currentSelectedMemo.getPosition());
+        adapter.removeSelectedMemo(currentSelectedMemo);
+    }
+
+    private void deleteCurrentMemoFromDB(List<SelectableMemo> mMemos, int position) {
+        if (currentSelectedMemo != null) {
+            databaseAccess.delete(currentSelectedMemo, mMemos, position);
+        }
+    }
+
 
     @Override
     public void onShareButtonPressed() {
@@ -206,22 +223,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         }
 
 
-    }
-
-
-    private void deleteCurrentMemoFromDB(List<SelectableMemo> mMemos, int position) {
-        if (currentSelectedMemo != null) {
-            databaseAccess.delete(currentSelectedMemo, mMemos, position);
-        }
-    }
-
-    @Override
-    public void onUpdateDBUponSwipeDismiss(SelectableMemo memoToDelete, List<SelectableMemo> mMemos, int position) {
-        currentSelectedMemo = memoToDelete;
-        deleteCurrentMemoFromDB(mMemos, position);
-        if (actionMode != null) {
-            actionMode.finish();
-        }
     }
 
     @Override
