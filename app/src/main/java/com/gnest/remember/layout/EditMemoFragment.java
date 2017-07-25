@@ -105,8 +105,13 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             databaseAccess.close();
         }
         if (mListener != null) {
-
-            mListener.onSaveEditMemoFragmentInteraction(ItemFragment.LM_HORIZONTAL_ORIENTATION, memo.getPosition());
+            Bundle bundle = null;
+            if (memo != null) {
+                bundle = new Bundle();
+                bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
+                bundle.putInt(ItemFragment.POSITION_KEY, memo.getPosition());
+            }
+            mListener.onSaveEditMemoFragmentInteraction(bundle);
         }
     }
 
@@ -162,6 +167,6 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnEditMemoFragmentInteractionListener {
-        void onSaveEditMemoFragmentInteraction(int lmHorizontalOrientation, int position);
+        void onSaveEditMemoFragmentInteraction(Bundle bundle);
     }
 }

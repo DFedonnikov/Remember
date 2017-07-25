@@ -53,10 +53,7 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
     }
 
     @Override
-    public void onSaveEditMemoFragmentInteraction(int lmHorizontalOrientation, int position) {
-        Bundle bundle = new Bundle();
-        bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, lmHorizontalOrientation);
-        bundle.putInt(ItemFragment.POSITION_KEY, position);
+    public void onSaveEditMemoFragmentInteraction(Bundle bundle) {
         insertItemFragment(bundle);
     }
 
