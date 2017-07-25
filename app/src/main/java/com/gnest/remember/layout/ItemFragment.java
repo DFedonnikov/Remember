@@ -185,8 +185,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
         for (int i = 0; i < selectedList.size(); i++) {
             currentSelectedMemo = selectedList.valueAt(i);
-            adapter.removeSelectedMemo(currentSelectedMemo);
             deleteCurrentMemoFromDB(memos, currentSelectedMemo.getPosition());
+            adapter.removeSelectedMemo(currentSelectedMemo);
         }
         adapter.notifyDataSetChanged();
         actionMode.finish();

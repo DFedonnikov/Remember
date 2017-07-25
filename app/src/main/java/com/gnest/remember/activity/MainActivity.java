@@ -1,5 +1,6 @@
 package com.gnest.remember.activity;
 
+import android.os.Binder;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -63,9 +64,13 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
 //            super.onBackPressed();
             itemFragment.onBackButtonPressed();
         } else if (editMemoFragment.isVisible()) {
-            Bundle bundle = new Bundle();
-            bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
-            bundle.putInt(ItemFragment.POSITION_KEY, ((SelectableMemo) editMemoFragment.getArguments().getBinder(EditMemoFragment.MEMO_KEY)).getPosition());
+            Bundle bundle = null;
+            Bundle editMemoFragmentBinder = editMemoFragment.getArguments();
+            if (editMemoFragmentBinder != null) {
+                bundle = new Bundle();
+                bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
+                bundle.putInt(ItemFragment.POSITION_KEY, ((SelectableMemo) editMemoFragment.getArguments().getBinder(EditMemoFragment.MEMO_KEY)).getPosition());
+            }
             insertItemFragment(bundle);
         }
     }
