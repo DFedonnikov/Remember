@@ -69,6 +69,7 @@ public class SelectableViewHolder extends RecyclerView.ViewHolder implements Ite
     void bind(SelectableMemo memo, int position) {
         String memoText = memo.getMemoText();
         mMemo = memo;
+        mMemo.setPosition(position);
         mPosition = position;
         mTextView.setText(memoText);
         textViewBackgroundId = memo.getTextViewBackgroundId();
