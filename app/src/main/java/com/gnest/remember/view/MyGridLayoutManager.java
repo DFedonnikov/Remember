@@ -45,6 +45,11 @@ public class MyGridLayoutManager extends GridLayoutManager {
     }
 
     @Override
+    public RecyclerView.LayoutParams generateDefaultLayoutParams() {
+        return new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.MATCH_PARENT);
+    }
+
+    @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
         super.onLayoutChildren(recycler, state);
         detachAndScrapAttachedViews(recycler);
@@ -101,8 +106,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
         boolean fillUp = true;
         int pos = anchorPos - 1;
-        int viewBottom;
-
 
         while (fillUp && pos >= 0) {
             View view = viewCache.get(pos); //проверяем кэш
@@ -110,9 +113,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
                 view = recycler.getViewForPosition(pos);
                 addView(view, 0);
-//                measureChildWithDecorationsAndMargin(view, widthSpec, heigthSpec);
-//                int decoratedMeasuredWidth = getDecoratedMeasuredWidth(view);
-//                layoutDecorated(view, 0, viewBottom - viewHeight, decoratedMeasuredWidth, viewBottom);
             } else {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
@@ -120,7 +120,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 viewCache.remove(pos);
             }
             adjustTextViewPaddingTop(view);
-            viewBottom = getDecoratedTop(view);
+            int viewBottom = getDecoratedTop(view);
             fillUp = (viewBottom > 0);
             pos--;
         }
@@ -137,7 +137,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
         int pos = anchorPos;
         boolean fillDown = true;
         int height = getHeight();
-        int viewTop;
         int itemCount = getItemCount();
 
         while (fillDown && pos < itemCount) {
@@ -148,12 +147,21 @@ public class MyGridLayoutManager extends GridLayoutManager {
             } else {
                 attachView(view);
                 viewCache.remove(pos);
+
             }
             adjustTextViewPaddingTop(view);
-            viewTop = getDecoratedBottom(view);
-            fillDown = viewTop <= height;
+            int viewTop = getDecoratedBottom(view);
+
+            //If view is rightmost we should check if we need to layout next row of elements
+            if (isViewRightmost(view, pos)) {
+                fillDown = viewTop <= height;
+            }
             pos++;
         }
+    }
+
+    private boolean isViewRightmost(View view, int viewPosition) {
+        return (viewPosition + 1) % getSpanCount() == 0;
     }
 
     private void fillLeft(@Nullable View anchorView, RecyclerView.Recycler recycler) {
@@ -278,7 +286,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
     }
 
     public void openItem(int pos) {
-        if (currentOrientation == VERTICAL) {
+        if (getOrientation() == VERTICAL) {
             View viewToOpen = null;
             int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
