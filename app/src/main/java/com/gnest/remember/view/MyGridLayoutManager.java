@@ -28,6 +28,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
     private SparseArray<View> viewCache = new SparseArray<>();
     private int mAncorPos;
     private int currentOrientation;
+    private int lastPosition;
 
     public MyGridLayoutManager(Context context, int spanCount) {
         super(context, spanCount);
@@ -181,7 +182,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
         int height = getHeight();
         final int widthSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
         final int heigthSpec = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY);
-
         while (fillLeft && pos >= 0) {
             View view = viewCache.get(pos); //проверяем кэш
             if (view == null) {
@@ -223,7 +223,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
         int height = getHeight();
         final int widthSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
         final int heigthSpec = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY);
-
         while (fillRight && pos < itemCount) {
             View view = viewCache.get(pos); //проверяем кэш
             if (view == null) {
@@ -243,6 +242,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
             adjustTextViewPaddingTop(view);
             viewLeft = getDecoratedRight(view);
             fillRight = viewLeft <= width;
+//            lastPosition = pos;
             pos++;
         }
 
@@ -254,7 +254,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         if (currentOrientation == VERTICAL) {
             paddingTopInPx = (int) (TV_PADDING_TOP_UNEXTENDED * scale + 0.5f);
         } else {
-            paddingTopInPx = (int) (TV_PADDING_TOP_EXTENDED * scale + 0.5f);
+            paddingTopInPx = (int) (TV_PADDING_TOP_UNEXTENDED * scale + 0.5f);
         }
         View mTextView = view.findViewById(R.id.memo_textView);
         mTextView.setPadding(mTextView.getPaddingLeft(), paddingTopInPx, mTextView.getPaddingRight(), mTextView.getPaddingBottom());
@@ -453,6 +453,10 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     public void setmAncorPos(int mAncorPos) {
         this.mAncorPos = mAncorPos;
+    }
+
+    public int getLastPosition() {
+        return lastPosition;
     }
 
     private static class ViewAnimationInfo {
