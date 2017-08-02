@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
                 bundle = new Bundle();
                 bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
                 bundle.putInt(ItemFragment.POSITION_KEY, ((ClickableMemo) editMemoFragment.getArguments().getBinder(EditMemoFragment.MEMO_KEY)).getPosition());
+                bundle.putBoolean(ItemFragment.EXPANDED_KEY, true);
             }
             insertItemFragment(bundle);
         }

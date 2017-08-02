@@ -38,8 +38,9 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public static final int LM_HORIZONTAL_ORIENTATION = 0;
     public static final int LM_VERTICAL_ORIENTATION = 1;
     public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManagerOrientationKey";
-    public static final String POSITION_KEY = "PositionKey";
-    public static final String BUNDLE_KEY = "BundleKey";
+    public static final String POSITION_KEY = "POSITiON_KEY";
+    public static final String BUNDLE_KEY = "BUNDLE_KEY";
+    public static final String EXPANDED_KEY = "EXPANDED_KEY";
 
     private int mColumnCount;
     private OnItemListFragmentInteractionListener mListener;
@@ -107,6 +108,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
                 lastPosition = bundle.getInt(POSITION_KEY);
                 myGridLayoutManager.setmAncorPos(lastPosition);
                 myGridLayoutManager.setOrientation(lastOrientation);
+                adapter.setItemsExpanded(bundle.getBoolean(EXPANDED_KEY));
             }
         }
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
@@ -158,6 +160,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         }
         bundle.putInt(LM_SCROLL_ORIENTATION_KEY, myGridLayoutManager.getOrientation());
         bundle.putInt(POSITION_KEY, myGridLayoutManager.getLastPosition());
+        bundle.putBoolean(EXPANDED_KEY, adapter.isItemsExpanded());
         getArguments().putBundle(BUNDLE_KEY, bundle);
     }
 
@@ -266,9 +269,9 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
             myGridLayoutManager.openItem(mMemo.getPosition());
             adapter.setItemsExpanded(true);
+            databaseAccess.updateExpandedColumn(adapter.isItemsExpanded());
         } else {
             mListener.onEnterEditMode(mMemo);
-            databaseAccess.updateExpandedColumn(adapter.isItemsExpanded());
         }
     }
 

@@ -105,6 +105,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
                 bundle = new Bundle();
                 bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
                 bundle.putInt(ItemFragment.POSITION_KEY, mMemo.getPosition());
+                bundle.putBoolean(ItemFragment.EXPANDED_KEY, true);
             }
             mListener.onSaveEditMemoFragmentInteraction(bundle);
         }
