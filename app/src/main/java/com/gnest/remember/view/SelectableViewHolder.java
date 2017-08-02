@@ -7,22 +7,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gnest.remember.R;
-import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.helper.ItemTouchHelperViewHolder;
 
 /**
  * Created by DFedonnikov on 08.07.2017.
  */
 
-public class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
+class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
     private View mView;
     private OnItemSelectedListener mListener;
     private int mPosition = 0;
     private TextView mTextView;
-    private SelectableMemo mMemo;
-    private int textViewBackgroundId;
-    private int textViewBackgroundSelectedId;
+    private ClickableMemo mMemo;
+    private int mTextViewBackgroundId;
+    private int mTextViewBackgroundSelectedId;
+    private int mTextViewBackgroundExpandedId;
     ImageView pin;
 
     SelectableViewHolder(final View itemView, final OnItemSelectedListener onItemSelectedListener) {
@@ -56,35 +57,44 @@ public class SelectableViewHolder extends RecyclerView.ViewHolder implements Ite
 
     @Override
     public void setSelectedBackground() {
-        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), textViewBackgroundSelectedId));
+        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundSelectedId));
         pin.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDeselectedBackground() {
-        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), textViewBackgroundId));
-        pin.setVisibility(View.VISIBLE);
+        if (mMemo.isExpanded()) {
+            mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundExpandedId));
+            pin.setVisibility(View.INVISIBLE);
+        } else {
+            mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundId));
+            pin.setVisibility(View.VISIBLE);
+        }
+
     }
 
-    void bind(SelectableMemo memo, int position) {
+    void bind(ClickableMemo memo, int position, boolean isExpanded) {
         String memoText = memo.getMemoText();
         mMemo = memo;
         mMemo.setPosition(position);
+        mMemo.setExpanded(isExpanded);
         mPosition = position;
         mTextView.setText(memoText);
-        textViewBackgroundId = memo.getTextViewBackgroundId();
-        textViewBackgroundSelectedId = memo.getTextViewBackgroundSelectedId();
+        ColorSpinnerAdapter.Colors color = ColorSpinnerAdapter.Colors.valueOf(memo.getColor());
+        mTextViewBackgroundId = color.getMemoBackgroundId();
+        mTextViewBackgroundSelectedId = color.getMemoBackgroundSelectedId();
+        mTextViewBackgroundExpandedId = color.getMemoBackgroundExpandedId();
         setChecked(memo.isSelected());
     }
 
     interface OnItemSelectedListener {
-        void onItemClicked(int mPosition, SelectableMemo mMemo);
+        void onItemClicked(int mPosition, ClickableMemo mMemo);
 
-        boolean onItemLongClicked(int mPosition, SelectableMemo mMemo);
+        boolean onItemLongClicked(int mPosition, ClickableMemo mMemo);
 
         boolean isMultiChoiceEnabled();
 
-        void updateSelectedList(int pos, SelectableMemo memo);
+        void updateSelectedList(int pos, ClickableMemo memo);
 
     }
 

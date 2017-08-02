@@ -3,9 +3,6 @@ package com.gnest.remember.layout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,7 +16,7 @@ import android.widget.Spinner;
 
 import com.gnest.remember.R;
 import com.gnest.remember.data.Memo;
-import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.view.ColorSpinnerAdapter;
 
@@ -33,11 +30,10 @@ import com.gnest.remember.view.ColorSpinnerAdapter;
  */
 public class EditMemoFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     public static final String MEMO_KEY = "memo_param";
-    private EditText memoEditTextView;
-    private int textViewBackgroundId = R.drawable.textview_background_yellow;
-    private int textViewBackgroundSelectedId = R.drawable.textview_background_select_yellow;
-    private Button saveButton;
-    private SelectableMemo memo;
+    private EditText mMemoEditTextView;
+    private String mColor = ColorSpinnerAdapter.Colors.values()[0].toString();
+    private Button mSaveButton;
+    private ClickableMemo mMemo;
 
     private OnEditMemoFragmentInteractionListener mListener;
 
@@ -61,7 +57,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             Bundle arguments = getArguments();
-            memo = (SelectableMemo) arguments.getBinder(MEMO_KEY);
+            mMemo = (ClickableMemo) arguments.getBinder(MEMO_KEY);
         }
     }
 
@@ -69,11 +65,11 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_memo, container, false);
-        saveButton = view.findViewById(R.id.save_memo_button);
-        saveButton.setOnClickListener(this);
-        memoEditTextView = view.findViewById(R.id.editTextMemo);
-        if (memo != null) {
-            memoEditTextView.setText(memo.getMemoText());
+        mSaveButton = view.findViewById(R.id.save_memo_button);
+        mSaveButton.setOnClickListener(this);
+        mMemoEditTextView = view.findViewById(R.id.editTextMemo);
+        if (mMemo != null) {
+            mMemoEditTextView.setText(mMemo.getMemoText());
         }
         return view;
     }
@@ -87,29 +83,28 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     }
 
     public void onSaveButtonPressed() {
-        String textToSave = memoEditTextView.getText().toString();
+        String textToSave = mMemoEditTextView.getText().toString();
         if (!textToSave.isEmpty()) {
             DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
             databaseAccess.open();
-            if (memo == null) {
-                // Add new memo
-                Memo temp = new Memo(textToSave, textViewBackgroundId, textViewBackgroundSelectedId);
+            if (mMemo == null) {
+                // Add new mMemo
+                Memo temp = new Memo(textToSave, mColor);
                 databaseAccess.save(temp);
             } else {
-                // Update the memo
-                memo.setMemoText(textToSave);
-                memo.setTextViewBackgroundId(textViewBackgroundId);
-                memo.setTextViewBackgroundSelectedId(textViewBackgroundSelectedId);
-                databaseAccess.update(memo);
+                // Update the mMemo
+                mMemo.setMemoText(textToSave);
+                mMemo.setColor(mColor);
+                databaseAccess.update(mMemo);
             }
             databaseAccess.close();
         }
         if (mListener != null) {
             Bundle bundle = null;
-            if (memo != null) {
+            if (mMemo != null) {
                 bundle = new Bundle();
                 bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
-                bundle.putInt(ItemFragment.POSITION_KEY, memo.getPosition());
+                bundle.putInt(ItemFragment.POSITION_KEY, mMemo.getPosition());
             }
             mListener.onSaveEditMemoFragmentInteraction(bundle);
         }
@@ -140,15 +135,14 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         ColorSpinnerAdapter colorSpinnerAdapter = new ColorSpinnerAdapter(getContext());
         colorChoiceSpinner.setAdapter(colorSpinnerAdapter);
         colorChoiceSpinner.setOnItemSelectedListener(this);
-        if (memo != null) {
-            colorChoiceSpinner.setSelection(ColorSpinnerAdapter.Colors.getColorPositionByMemoBackGroundId(memo.getTextViewBackgroundId()));
+        if (mMemo != null) {
+            colorChoiceSpinner.setSelection(ColorSpinnerAdapter.Colors.valueOf(mMemo.getColor()).ordinal());
         }
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        textViewBackgroundId = ColorSpinnerAdapter.Colors.values()[i].getMemoBackgroundId();
-        textViewBackgroundSelectedId = ColorSpinnerAdapter.Colors.values()[i].getMemoBackgroundSelectedId();
+        mColor = ColorSpinnerAdapter.Colors.values()[i].name();
     }
 
     @Override

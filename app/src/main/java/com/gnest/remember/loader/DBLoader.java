@@ -3,7 +3,7 @@ package com.gnest.remember.loader;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.db.DatabaseAccess;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.List;
  * Created by DFedonnikov on 19.07.2017.
  */
 
-public class DBLoader extends AsyncTaskLoader<List<SelectableMemo>> {
+public class DBLoader extends AsyncTaskLoader<List<ClickableMemo>> {
 
     private DatabaseAccess db;
 
@@ -23,7 +23,7 @@ public class DBLoader extends AsyncTaskLoader<List<SelectableMemo>> {
     }
 
     @Override
-    public List<SelectableMemo> loadInBackground() {
+    public List<ClickableMemo> loadInBackground() {
         if (db != null) {
             return db.getAllMemos();
         }

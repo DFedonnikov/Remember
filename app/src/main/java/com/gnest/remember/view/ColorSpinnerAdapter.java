@@ -20,46 +20,42 @@ import com.gnest.remember.R;
 public class ColorSpinnerAdapter implements SpinnerAdapter {
 
     public enum Colors {
-        YELLOW(R.color.memo_yellow, R.drawable.textview_background_yellow, R.drawable.textview_background_select_yellow),
-        BLUE(R.color.memo_blue, R.drawable.textview_background_blue, R.drawable.textview_background_select_blue),
-        OLIVE(R.color.memo_olive, R.drawable.textview_background_olive, R.drawable.textview_background_select_olive),
-        PURPLE(R.color.memo_purple, R.drawable.textview_background_purple, R.drawable.textview_background_select_purple);
+        YELLOW(R.color.memo_yellow, R.drawable.textview_background_yellow, R.drawable.textview_background_select_yellow, R.drawable.textview_background_yellow_expanded),
+        BLUE(R.color.memo_blue, R.drawable.textview_background_blue, R.drawable.textview_background_select_blue, R.drawable.textview_background_blue_expanded),
+        OLIVE(R.color.memo_olive, R.drawable.textview_background_olive, R.drawable.textview_background_select_olive, R.drawable.textview_background_olive_expanded),
+        PURPLE(R.color.memo_purple, R.drawable.textview_background_purple, R.drawable.textview_background_select_purple, R.drawable.textview_background_purple_expanded);
 
-        int colorId;
-        int memoBackgroundId;
-        int memoBackgroundSelectedId;
+        private int mColorId;
+        private int mMemoBackgroundId;
+        private int mMemoBackgroundSelectedId;
+        private int mMemoBackgroundExpandedId;
 
-        Colors(int colorId, int memoBackgroundId, int memoBackgroundSelectedId) {
-            this.colorId = colorId;
-            this.memoBackgroundId = memoBackgroundId;
-            this.memoBackgroundSelectedId = memoBackgroundSelectedId;
+        Colors(int colorId, int memoBackgroundId, int memoBackgroundSelectedId, int memoBackgroundExpandedId) {
+            this.mColorId = colorId;
+            this.mMemoBackgroundId = memoBackgroundId;
+            this.mMemoBackgroundSelectedId = memoBackgroundSelectedId;
+            this.mMemoBackgroundExpandedId = memoBackgroundExpandedId;
         }
 
         public int getColorId() {
-            return colorId;
+            return mColorId;
         }
 
         public int getMemoBackgroundId() {
-            return memoBackgroundId;
+            return mMemoBackgroundId;
         }
 
         public int getMemoBackgroundSelectedId() {
-            return memoBackgroundSelectedId;
+            return mMemoBackgroundSelectedId;
         }
 
-        public static int getColorPositionByMemoBackGroundId(int memoBackgroundId) {
-            switch (memoBackgroundId) {
-                case R.drawable.textview_background_yellow:
-                    return YELLOW.ordinal();
-                case R.drawable.textview_background_blue:
-                    return BLUE.ordinal();
-                case R.drawable.textview_background_olive:
-                    return OLIVE.ordinal();
-                case R.drawable.textview_background_purple:
-                    return PURPLE.ordinal();
-                default:
-                    return YELLOW.ordinal();
-            }
+        public int getMemoBackgroundExpandedId() {
+            return mMemoBackgroundExpandedId;
+        }
+
+        @Override
+        public String toString() {
+            return this.name();
         }
     }
 

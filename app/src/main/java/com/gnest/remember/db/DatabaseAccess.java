@@ -6,7 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.gnest.remember.data.Memo;
-import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.data.ClickableMemo;
+import com.gnest.remember.db.dbtasks.UpdateExpandColumnTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,24 +50,23 @@ public class DatabaseAccess {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
         values.put("position", currentLastPosition);
-        values.put("textViewBackgroundId", memo.getTextViewBackgroundId());
-        values.put("textViewBackgroundSelectedId", memo.getTextViewBackgroundSelectedId());
+        values.put("color", memo.getColor());
         long rowId = database.insert(DatabaseOpenHelper.TABLE, null, values);
         if (rowId != -1) {
             currentLastPosition++;
         }
     }
 
-    public void update(Memo memo) {
+    public void update(ClickableMemo memo) {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
-        values.put("textViewBackgroundId", memo.getTextViewBackgroundId());
-        values.put("textViewBackgroundSelectedId", memo.getTextViewBackgroundSelectedId());
+        values.put("color", memo.getColor());
+        values.put("expanded", memo.isExpanded() ? 1 : 0);
         int id = memo.getId();
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
     }
 
-    public void delete(Memo memo, List<SelectableMemo> mMemos, int position) {
+    public void delete(ClickableMemo memo, List<ClickableMemo> mMemos, int position) {
         int id = memo.getId();
         int rows = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(id)});
         if (rows != 0) {
@@ -75,17 +75,22 @@ public class DatabaseAccess {
         updatePositionAfterDelete(mMemos, position);
     }
 
-    private void updatePositionAfterDelete(List<SelectableMemo> mMemos, int position) {
+    private void updatePositionAfterDelete(List<ClickableMemo> mMemos, int position) {
         ContentValues values = new ContentValues();
         for (int i = position + 1; i < mMemos.size(); i++) {
-            SelectableMemo memoToUpdate = mMemos.get(i);
+            ClickableMemo memoToUpdate = mMemos.get(i);
             values.put("position", i - 1);
             int id = memoToUpdate.getId();
             database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
         }
     }
 
-    public void swapMemos(SelectableMemo from, SelectableMemo to) {
+    public void updateExpandedColumn(boolean itemsExpanded) {
+        new UpdateExpandColumnTask(database, DatabaseOpenHelper.TABLE).execute(itemsExpanded);
+    }
+
+
+    public void swapMemos(ClickableMemo from, ClickableMemo to) {
         ContentValues values = new ContentValues();
         values.put("position", to.getPosition());
         int fromId = from.getId();
@@ -95,18 +100,17 @@ public class DatabaseAccess {
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(toId)});
     }
 
-
-    public List<SelectableMemo> getAllMemos() {
-        List<SelectableMemo> memos = new ArrayList<>();
+    public List<ClickableMemo> getAllMemos() {
+        List<ClickableMemo> memos = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT * From memos ORDER BY position", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             int id = Integer.valueOf(cursor.getString(0));
             String text = cursor.getString(1);
             int position = cursor.getInt(2);
-            int textViewBackgroundId = cursor.getInt(3);
-            int textViewBackgroundSelectedId = cursor.getInt(4);
-            memos.add(new SelectableMemo(id, text, position, textViewBackgroundId, textViewBackgroundSelectedId, false));
+            String color = cursor.getString(3);
+            boolean expanded = cursor.getInt(4) == 1;
+            memos.add(new ClickableMemo(id, text, position, color, false, expanded));
             cursor.moveToNext();
         }
         cursor.close();

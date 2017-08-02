@@ -3,7 +3,6 @@ package com.gnest.remember.layout;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -21,7 +20,7 @@ import android.view.ViewGroup;
 
 import com.gnest.remember.R;
 
-import com.gnest.remember.data.SelectableMemo;
+import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.helper.ItemTouchHelperCallback;
 import com.gnest.remember.loader.DBLoader;
@@ -32,7 +31,7 @@ import com.gnest.remember.view.MySelectableAdapter;
 import java.util.List;
 
 
-public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, LoaderManager.LoaderCallbacks<List<SelectableMemo>> {
+public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, LoaderManager.LoaderCallbacks<List<ClickableMemo>> {
 
     private static final String ARG_COLUMN_COUNT = "ColumnCount";
     private static final int LOADER_ID = 0;
@@ -47,10 +46,10 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     private MySelectableAdapter adapter;
     private ItemTouchHelper itemTouchHelper;
     private DatabaseAccess databaseAccess;
-    private List<SelectableMemo> memos;
+    private List<ClickableMemo> memos;
     private ActionMode actionMode;
     private ActionMenu actionMenu;
-    private SelectableMemo currentSelectedMemo;
+    private ClickableMemo currentClickedMemo;
     private RecyclerView recyclerView;
     private MyGridLayoutManager myGridLayoutManager;
     private int lastPosition;
@@ -69,15 +68,6 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            int orientation = savedInstanceState.getInt(LM_SCROLL_ORIENTATION_KEY);
-            myGridLayoutManager.setOrientation(orientation);
-        }
     }
 
     @Override
@@ -154,7 +144,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         super.onDetach();
         mListener = null;
         memos = null;
-        currentSelectedMemo = null;
+        currentClickedMemo = null;
         databaseAccess.close();
     }
 
@@ -162,8 +152,13 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        int orientation = myGridLayoutManager.getOrientation();
-        outState.putInt(LM_SCROLL_ORIENTATION_KEY, orientation);
+        Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
+        if (bundle == null) {
+            bundle = new Bundle();
+        }
+        bundle.putInt(LM_SCROLL_ORIENTATION_KEY, myGridLayoutManager.getOrientation());
+        bundle.putInt(POSITION_KEY, myGridLayoutManager.getLastPosition());
+        getArguments().putBundle(BUNDLE_KEY, bundle);
     }
 
     @Override
@@ -179,7 +174,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
     @Override
     public void onDeleteButtonPressed() {
-        SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
+        SparseArray<ClickableMemo> selectedList = adapter.getmSelectedList();
         for (int i = 0; i < selectedList.size(); i++) {
             performDelete(selectedList.valueAt(i));
         }
@@ -188,7 +183,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
     @Override
-    public void onPerformSwipeDismiss(SelectableMemo memoToDelete) {
+    public void onPerformSwipeDismiss(ClickableMemo memoToDelete) {
         performDelete(memoToDelete);
         adapter.notifyItemRemoved(memoToDelete.getPosition());
         if (actionMode != null) {
@@ -196,27 +191,27 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
         }
     }
 
-    public void performDelete(SelectableMemo memo) {
-        currentSelectedMemo = memo;
-        deleteCurrentMemoFromDB(memos, currentSelectedMemo.getPosition());
-        adapter.removeSelectedMemo(currentSelectedMemo);
+    public void performDelete(ClickableMemo memo) {
+        currentClickedMemo = memo;
+        deleteCurrentMemoFromDB(memos, currentClickedMemo.getPosition());
+        adapter.removeSelectedMemo(currentClickedMemo);
     }
 
-    private void deleteCurrentMemoFromDB(List<SelectableMemo> mMemos, int position) {
-        if (currentSelectedMemo != null) {
-            databaseAccess.delete(currentSelectedMemo, mMemos, position);
+    private void deleteCurrentMemoFromDB(List<ClickableMemo> mMemos, int position) {
+        if (currentClickedMemo != null) {
+            databaseAccess.delete(currentClickedMemo, mMemos, position);
         }
     }
 
 
     @Override
     public void onShareButtonPressed() {
-        SparseArray<SelectableMemo> selectedList = adapter.getmSelectedList();
+        SparseArray<ClickableMemo> selectedList = adapter.getmSelectedList();
         if (selectedList.size() == 1) {
-            currentSelectedMemo = selectedList.valueAt(0);
+            currentClickedMemo = selectedList.valueAt(0);
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, currentSelectedMemo.getMemoText());
+            intent.putExtra(Intent.EXTRA_TEXT, currentClickedMemo.getMemoText());
             Intent chooserIntent = Intent.createChooser(intent, "Send Memo...");
             startActivity(chooserIntent);
             actionMode.finish();
@@ -226,7 +221,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
     @Override
-    public void onUpdateDBUponElementsSwap(SelectableMemo from, SelectableMemo to) {
+    public void onUpdateDBUponElementsSwap(ClickableMemo from, ClickableMemo to) {
         databaseAccess.swapMemos(from, to);
     }
 
@@ -267,28 +262,30 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     }
 
     @Override
-    public void onSingleChoiceMemoClicked(SelectableMemo mMemo) {
+    public void onSingleChoiceMemoClicked(ClickableMemo mMemo) {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
             myGridLayoutManager.openItem(mMemo.getPosition());
+            adapter.setItemsExpanded(true);
         } else {
             mListener.onEnterEditMode(mMemo);
+            databaseAccess.updateExpandedColumn(adapter.isItemsExpanded());
         }
     }
 
     @Override
-    public Loader<List<SelectableMemo>> onCreateLoader(int id, Bundle args) {
+    public Loader<List<ClickableMemo>> onCreateLoader(int id, Bundle args) {
         return new DBLoader(this.getContext(), databaseAccess);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<SelectableMemo>> loader, List<SelectableMemo> data) {
+    public void onLoadFinished(Loader<List<ClickableMemo>> loader, List<ClickableMemo> data) {
         memos = data;
         adapter.setmMemos(data);
         adapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onLoaderReset(Loader<List<SelectableMemo>> loader) {
+    public void onLoaderReset(Loader<List<ClickableMemo>> loader) {
 
     }
 
@@ -303,6 +300,8 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
     public void onBackButtonPressed() {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
             myGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            adapter.setItemsExpanded(false);
+            databaseAccess.updateExpandedColumn(adapter.isItemsExpanded());
         }
     }
 
@@ -320,7 +319,7 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
 
         void onAddButtonPressed();
 
-        void onEnterEditMode(SelectableMemo memo);
+        void onEnterEditMode(ClickableMemo memo);
 
 
     }
