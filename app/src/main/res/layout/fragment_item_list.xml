@@ -15,7 +15,6 @@
         android:name="com.gnest.remember.layout.ItemFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
         android:layout_gravity="center"
         app:layoutManager="GridLayoutManager"
         app:layout_constraintHorizontal_bias="0.0"

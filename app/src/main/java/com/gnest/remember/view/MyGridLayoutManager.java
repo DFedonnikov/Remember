@@ -10,8 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.gnest.remember.R;
-
 import java.util.ArrayList;
 
 /**
@@ -184,7 +182,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
                 view = recycler.getViewForPosition(pos);
                 addView(view, 0);
-                measureChildWithDecorationsAndMargin(view, widthSpec, heigthSpec);
+                measureChildWithDecorations(view, widthSpec, heigthSpec);
                 int decoratedMeasuredWidth = getDecoratedMeasuredWidth(view);
                 int decoratedMeasuredHeight = getDecoratedMeasuredHeight(view);
                 layoutDecorated(view, viewRight - decoratedMeasuredWidth, 0, viewRight, decoratedMeasuredHeight);
@@ -224,7 +222,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
                 view = recycler.getViewForPosition(pos);
                 addView(view);
-                measureChildWithDecorationsAndMargin(view, widthSpec, heigthSpec);
+                measureChildWithDecorations(view, widthSpec, heigthSpec);
                 int decoratedMeasuredWidth = getDecoratedMeasuredWidth(view);
                 int decoratedMeasuredHeight = getDecoratedMeasuredHeight(view);
                 layoutDecorated(view, viewLeft, 0, viewLeft + decoratedMeasuredWidth, decoratedMeasuredHeight);
@@ -339,28 +337,11 @@ public class MyGridLayoutManager extends GridLayoutManager {
         animator.start();
     }
 
-    private void measureChildWithDecorationsAndMargin(View child, int widthSpec, int heightSpec) {
+    private void measureChildWithDecorations(View child, int widthSpec, int heightSpec) {
         Rect decorRect = new Rect();
         calculateItemDecorationsForChild(child, decorRect);
-        RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) child.getLayoutParams();
-        widthSpec = updateSpecWithExtra(widthSpec, lp.leftMargin + decorRect.left, lp.rightMargin + decorRect.right);
-        heightSpec = updateSpecWithExtra(heightSpec, lp.topMargin + decorRect.top, lp.bottomMargin + decorRect.bottom);
         child.measure(widthSpec, heightSpec);
     }
-
-
-    private int updateSpecWithExtra(int spec, int startInset, int endInset) {
-        if (startInset == 0 && endInset == 0) {
-            return spec;
-        }
-
-        final int mode = View.MeasureSpec.getMode(spec);
-        if (mode == View.MeasureSpec.AT_MOST || mode == View.MeasureSpec.EXACTLY) {
-            return View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(spec) - startInset - endInset, mode);
-        }
-        return spec;
-    }
-
 
     private void updateViewScale() {
         int childCount = getChildCount();
