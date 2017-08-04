@@ -22,8 +22,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     private static final long TRANSITION_DURATION_MS = 300;
     private static final float SCALE_THRESHOLD_PERCENT = 1f;
-    private static final int TV_PADDING_TOP_EXTENDED = 110;
-    private static final int TV_PADDING_TOP_UNEXTENDED = 30;
 
     private SparseArray<View> viewCache = new SparseArray<>();
     private int mAncorPos;
@@ -120,7 +118,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
             }
-            adjustTextViewPaddingTop(view);
             int viewBottom = getDecoratedTop(view);
             fillUp = (viewBottom > 0);
             pos--;
@@ -150,7 +147,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 viewCache.remove(pos);
 
             }
-            adjustTextViewPaddingTop(view);
             int viewTop = getDecoratedBottom(view);
 
             //If view is rightmost we should check if we need to layout next row of elements
@@ -198,7 +194,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
             }
-            adjustTextViewPaddingTop(view);
             viewRight = getDecoratedLeft(view);
             fillLeft = (viewRight > 0);
             pos--;
@@ -239,7 +234,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 attachView(view);
                 viewCache.remove(pos);
             }
-            adjustTextViewPaddingTop(view);
             viewLeft = getDecoratedRight(view);
             fillRight = viewLeft <= width;
 //            lastPosition = pos;
@@ -247,19 +241,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
         }
 
     }
-
-    private void adjustTextViewPaddingTop(View view) {
-        int paddingTopInPx = 0;
-        float scale = view.getContext().getResources().getDisplayMetrics().density;
-        if (currentOrientation == VERTICAL) {
-            paddingTopInPx = (int) (TV_PADDING_TOP_UNEXTENDED * scale + 0.5f);
-        } else {
-            paddingTopInPx = (int) (TV_PADDING_TOP_UNEXTENDED * scale + 0.5f);
-        }
-        View mTextView = view.findViewById(R.id.memo_textView);
-        mTextView.setPadding(mTextView.getPaddingLeft(), paddingTopInPx, mTextView.getPaddingRight(), mTextView.getPaddingBottom());
-    }
-
 
     private View getAnchorView() {
         int childCount = getChildCount();
