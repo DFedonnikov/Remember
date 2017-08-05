@@ -60,7 +60,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
             if (viewHolder instanceof ItemTouchHelperViewHolder) {
                 ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-                itemViewHolder.setSelectedBackground();
+                itemViewHolder.setSelectedState();
             }
         }
         super.onSelectedChanged(viewHolder, actionState);
@@ -71,8 +71,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
         if (viewHolder instanceof ItemTouchHelperViewHolder) {
             ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-            itemViewHolder.setSelectedBackground();
-            itemViewHolder.setDeselectedBackground();
+            itemViewHolder.setSelectedState();
+            itemViewHolder.setDeselectedState();
         }
         super.clearView(recyclerView, viewHolder);
     }

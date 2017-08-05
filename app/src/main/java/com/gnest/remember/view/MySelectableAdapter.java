@@ -151,7 +151,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public boolean onItemLongClicked(int mPosition, ClickableMemo mMemo) {
-        if (!isMultiChoiceEnabled()) {
+        if (!isMultiChoiceEnabled() && !mItemsExpanded) {
             updateSelectedList(mMemo.getPosition(), mMemo);
             mListener.showActionMode();
             return true;

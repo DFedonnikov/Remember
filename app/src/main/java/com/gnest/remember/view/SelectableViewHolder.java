@@ -4,6 +4,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.gnest.remember.R;
@@ -21,6 +22,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     private int mPosition = 0;
     private TextView mTextView;
     private ClickableMemo mMemo;
+    private ScrollView mScrollView;
     private int mTextViewBackgroundId;
     private int mTextViewBackgroundSelectedId;
     private int mTextViewBackgroundExpandedId;
@@ -32,13 +34,14 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         this.mListener = onItemSelectedListener;
         mTextView = itemView.findViewById(R.id.memo_textView);
         pin = itemView.findViewById(R.id.pin);
-        mView.setOnClickListener(new View.OnClickListener() {
+        mScrollView = itemView.findViewById(R.id.textScrollView);
+        mTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mListener.onItemClicked(mPosition, mMemo);
             }
         });
-        mView.setOnLongClickListener(new View.OnLongClickListener() {
+        mTextView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
                 return mListener.onItemLongClicked(mPosition, mMemo);
@@ -48,27 +51,31 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     void setChecked(boolean value) {
         if (value) {
-            setSelectedBackground();
+            setSelectedState();
         } else {
-            setDeselectedBackground();
+            setDeselectedState();
         }
         mMemo.setSelected(value);
     }
 
     @Override
-    public void setSelectedBackground() {
+    public void setSelectedState() {
         mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundSelectedId));
         pin.setVisibility(View.INVISIBLE);
     }
 
     @Override
-    public void setDeselectedBackground() {
+    public void setDeselectedState() {
         if (mMemo.isExpanded()) {
             mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundExpandedId));
             pin.setVisibility(View.INVISIBLE);
+            mTextView.setMaxLines(Integer.MAX_VALUE);
+            mScrollView.setEnabled(true);
         } else {
             mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundId));
             pin.setVisibility(View.VISIBLE);
+            mTextView.setMaxLines(5);
+            mScrollView.setEnabled(false);
         }
 
     }
