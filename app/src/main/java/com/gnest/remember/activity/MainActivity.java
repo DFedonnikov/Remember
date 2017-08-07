@@ -8,15 +8,15 @@ import android.os.Bundle;
 import com.gnest.remember.R;
 import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.layout.EditMemoFragment;
-import com.gnest.remember.layout.ItemFragment;
+import com.gnest.remember.layout.ListItemFragment;
 
 
-public class MainActivity extends AppCompatActivity implements EditMemoFragment.OnEditMemoFragmentInteractionListener, ItemFragment.OnItemListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements EditMemoFragment.OnEditMemoFragmentInteractionListener, ListItemFragment.OnItemListFragmentInteractionListener {
     private static final String EDIT_FRAG_VISIBILITY_KEY = "edit_frag_visibility_key";
     private static final String EDIT_FRAMENT_NAME = "edit_fragment";
     private static final String ITEM_FRAMENT_NAME = "item_fragment";
     private static final int MEMO_WIDTH = 175;
-    private ItemFragment itemFragment;
+    private ListItemFragment itemFragment;
     private EditMemoFragment editMemoFragment;
     private boolean isEditFragVisible;
     private static int COLUMNS = 1;
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
             if (isEditFragVisible) {
                 editMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAMENT_NAME);
             } else {
-                itemFragment = (ItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAMENT_NAME);
+                itemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAMENT_NAME);
                 itemFragment.setmColumnCount(COLUMNS);
             }
         } else {
@@ -43,9 +43,9 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
     }
 
     private void insertItemFragment(Bundle bundle) {
-        itemFragment = ItemFragment.newInstance(COLUMNS);
+        itemFragment = ListItemFragment.newInstance(COLUMNS);
         if (bundle != null) {
-            itemFragment.getArguments().putBundle(ItemFragment.BUNDLE_KEY, bundle);
+            itemFragment.getArguments().putBundle(ListItemFragment.BUNDLE_KEY, bundle);
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.current_fragment, itemFragment, null);
@@ -67,9 +67,9 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
             Bundle editMemoFragmentBinder = editMemoFragment.getArguments();
             if (editMemoFragmentBinder != null) {
                 bundle = new Bundle();
-                bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
-                bundle.putInt(ItemFragment.POSITION_KEY, ((ClickableMemo) editMemoFragment.getArguments().getBinder(EditMemoFragment.MEMO_KEY)).getPosition());
-                bundle.putBoolean(ItemFragment.EXPANDED_KEY, true);
+                bundle.putInt(ListItemFragment.LM_SCROLL_ORIENTATION_KEY, ListItemFragment.LM_HORIZONTAL_ORIENTATION);
+                bundle.putInt(ListItemFragment.POSITION_KEY, ((ClickableMemo) editMemoFragment.getArguments().getBinder(EditMemoFragment.MEMO_KEY)).getPosition());
+                bundle.putBoolean(ListItemFragment.EXPANDED_KEY, true);
             }
             insertItemFragment(bundle);
         }

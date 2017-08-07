@@ -2,7 +2,14 @@ package com.gnest.remember.layout;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,13 +19,22 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
+import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.gnest.remember.R;
 import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.view.ColorSpinnerAdapter;
+
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,10 +46,21 @@ import com.gnest.remember.view.ColorSpinnerAdapter;
  */
 public class EditMemoFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     public static final String MEMO_KEY = "memo_param";
+
+    private static Calendar selectedDate;
+
+    private View view;
     private EditText mMemoEditTextView;
     private String mColor = ColorSpinnerAdapter.Colors.values()[0].toString();
     private Button mSaveButton;
     private ClickableMemo mMemo;
+
+    private String selectedDateFormatted;
+
+    private AppBarLayout mAppBarLayout;
+
+
+    private CompactCalendarView mCompactCalendarView;
 
     private OnEditMemoFragmentInteractionListener mListener;
 
@@ -64,7 +91,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_edit_memo, container, false);
+        view = inflater.inflate(R.layout.fragment_edit_memo, container, false);
         mSaveButton = view.findViewById(R.id.save_memo_button);
         mSaveButton.setOnClickListener(this);
         mMemoEditTextView = view.findViewById(R.id.editTextMemo);
@@ -72,6 +99,74 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             mMemoEditTextView.setText(mMemo.getMemoText());
         }
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        AppCompatActivity activity = ((AppCompatActivity) getActivity());
+        activity.setSupportActionBar(toolbar);
+
+        mAppBarLayout = view.findViewById(R.id.app_bar_layout);
+
+        // Set up the CompactCalendarView
+
+
+        mCompactCalendarView = view.findViewById(R.id.compactcalendar_view);
+
+        // Force English
+        mCompactCalendarView.setLocale(TimeZone.getDefault(), /*Locale.getDefault()*/Locale.ENGLISH);
+
+        mCompactCalendarView.setShouldDrawDaysHeader(true);
+
+//        mCompactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+//            @Override
+//            public void onDayClick(Date dateClicked) {
+//                selectedDate = Calendar.getInstance();
+//                selectedDate.setTime(dateClicked);
+//                setSubtitle(calendarDateFormat.format(dateClicked));
+//                selectedDateFormatted = calendarDateFormat.format(dateClicked);
+//                isExpanded = !isExpanded;
+//                mAppBarLayout.setExpanded(isExpanded, true);
+//                DialogFragment timePickFragment = new TimePickerFragment();
+//                timePickFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
+//            }
+//
+//            @Override
+//            public void onMonthScroll(Date firstDayOfNewMonth) {
+//                setSubtitle(calendarDateFormat.format(firstDayOfNewMonth));
+//            }
+//        });
+//
+//        if (memo == null) {
+//            setCurrentDate(new Date());
+//        } else {
+//            try {
+//                setCurrentDate(calendarDateFormat.parse(memo.getDate()));
+//            } catch (ParseException e) {
+//                Log.d(DATE_PARSE_EXC_TAG, "date parse exception");
+//            }
+//        }
+
+
+        final ImageView arrow = view.findViewById(R.id.date_picker_arrow);
+
+        RelativeLayout datePickerButton = view.findViewById(R.id.date_picker_button);
+
+//        datePickerButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (isExpanded) {
+//                    ViewCompat.animate(arrow).rotation(0).start();
+//                } else {
+//                    ViewCompat.animate(arrow).rotation(180).start();
+//                }
+//
+//                isExpanded = !isExpanded;
+//                mAppBarLayout.setExpanded(isExpanded, true);
+//            }
+//        });
     }
 
     @Override
@@ -89,12 +184,13 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             databaseAccess.open();
             if (mMemo == null) {
                 // Add new mMemo
-                Memo temp = new Memo(textToSave, mColor);
+                Memo temp = new Memo(textToSave, mColor, selectedDateFormatted);
                 databaseAccess.save(temp);
             } else {
                 // Update the mMemo
                 mMemo.setMemoText(textToSave);
                 mMemo.setColor(mColor);
+                mMemo.setDate(selectedDateFormatted);
                 databaseAccess.update(mMemo);
             }
             databaseAccess.close();
@@ -103,9 +199,9 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             Bundle bundle = null;
             if (mMemo != null) {
                 bundle = new Bundle();
-                bundle.putInt(ItemFragment.LM_SCROLL_ORIENTATION_KEY, ItemFragment.LM_HORIZONTAL_ORIENTATION);
-                bundle.putInt(ItemFragment.POSITION_KEY, mMemo.getPosition());
-                bundle.putBoolean(ItemFragment.EXPANDED_KEY, true);
+                bundle.putInt(ListItemFragment.LM_SCROLL_ORIENTATION_KEY, ListItemFragment.LM_HORIZONTAL_ORIENTATION);
+                bundle.putInt(ListItemFragment.POSITION_KEY, mMemo.getPosition());
+                bundle.putBoolean(ListItemFragment.EXPANDED_KEY, true);
             }
             mListener.onSaveEditMemoFragmentInteraction(bundle);
         }

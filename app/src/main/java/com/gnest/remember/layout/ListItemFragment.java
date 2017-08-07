@@ -31,7 +31,7 @@ import com.gnest.remember.view.MySelectableAdapter;
 import java.util.List;
 
 
-public class ItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, LoaderManager.LoaderCallbacks<List<ClickableMemo>> {
+public class ListItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, LoaderManager.LoaderCallbacks<List<ClickableMemo>> {
 
     private static final String ARG_COLUMN_COUNT = "ColumnCount";
     private static final int LOADER_ID = 0;
@@ -60,11 +60,11 @@ public class ItemFragment extends Fragment implements MySelectableAdapter.OnItem
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemFragment() {
+    public ListItemFragment() {
     }
 
-    public static ItemFragment newInstance(int columnCount) {
-        ItemFragment fragment = new ItemFragment();
+    public static ListItemFragment newInstance(int columnCount) {
+        ListItemFragment fragment = new ListItemFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
