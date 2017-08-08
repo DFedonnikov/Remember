@@ -3,11 +3,14 @@ package com.gnest.remember.layout;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.SparseArray;
 import android.view.ActionMode;
@@ -45,6 +48,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     private int mColumnCount;
     private OnItemListFragmentInteractionListener mListener;
     private MySelectableAdapter adapter;
+    private View mView;
     private ItemTouchHelper itemTouchHelper;
     private DatabaseAccess databaseAccess;
     private List<ClickableMemo> memos;
@@ -87,9 +91,9 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
-        recyclerView = view.findViewById(R.id.memo_list);
-        Context context = view.getContext();
+        mView = inflater.inflate(R.layout.fragment_item_list, container, false);
+        recyclerView = mView.findViewById(R.id.memo_list);
+        Context context = mView.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
@@ -114,7 +118,15 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        return view;
+        return mView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Toolbar toolbar = mView.findViewById(R.id.ItemFragmentToolbar);
+        AppCompatActivity activity = ((AppCompatActivity)getActivity());
+        activity.setSupportActionBar(toolbar);
     }
 
     @Override

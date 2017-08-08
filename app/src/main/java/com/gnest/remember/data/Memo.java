@@ -8,22 +8,19 @@ public class Memo extends Binder {
     private String memoText;
     private int mPosition;
     private String mColor;
-    private String mDate;
 
 
-    public Memo(String memoText, String color, String date) {
+    public Memo(String memoText, String color) {
         this.memoText = memoText;
         this.mPosition = -1;
         this.mColor = color;
-        this.mDate = date;
     }
 
-    Memo(int id, String memoText, int position, String color, String date) {
+    Memo(int id, String memoText, int position, String color) {
         this.mId = id;
         this.memoText = memoText;
         this.mPosition = position;
         this.mColor = color;
-        this.mDate = date;
     }
 
     public int getId() {
@@ -52,14 +49,6 @@ public class Memo extends Binder {
 
     public void setColor(String mColor) {
         this.mColor = mColor;
-    }
-
-    public String getDate() {
-        return mDate;
-    }
-
-    public void setDate(String mDate) {
-        this.mDate = mDate;
     }
 
     @Override

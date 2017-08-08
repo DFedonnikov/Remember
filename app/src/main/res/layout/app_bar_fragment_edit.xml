@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay"
-        app:expanded="false"
-        app:layout_behavior="com.gnest.remember.ScrollingCalendarBehavior">
+        app:expanded="false">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbarLayout"
@@ -54,41 +53,58 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
-                <RelativeLayout
-                    android:id="@+id/date_picker_button"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
-                    android:background="?android:selectableItemBackground"
-                    android:clickable="true"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/date_picker_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"
-                        android:textColor="@android:color/black" />
+                    <RelativeLayout
+                        android:id="@+id/date_picker_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?android:selectableItemBackground"
+                        android:clickable="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/date_picker_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle"
+                            android:textColor="@android:color/black" />
+
+                        <ImageView
+                            android:id="@+id/date_picker_arrow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBottom="@id/date_picker_text_view"
+                            android:layout_toRightOf="@id/date_picker_text_view"
+                            app:srcCompat="@drawable/ic_arrow_drop_down_black"
+                            tools:ignore="ContentDescription,RtlHardcoded" />
+
+                    </RelativeLayout>
 
                     <ImageView
-                        android:id="@+id/date_picker_arrow"
+                        android:id="@+id/bt_add_alert"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignBottom="@id/date_picker_text_view"
-                        android:layout_toRightOf="@id/date_picker_text_view"
-                        app:srcCompat="@drawable/ic_arrow_drop_down_black"
-                        tools:ignore="ContentDescription,RtlHardcoded" />
+                        android:layout_gravity="center"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@string/btn_add_alert"
+                        app:srcCompat="@drawable/ic_add_alarm_black" />
 
-                </RelativeLayout>
+                </LinearLayout>
+
+
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include
-        layout="@layout/content_fragment_edit" />
+    <include layout="@layout/content_fragment_edit" />
 
 </android.support.design.widget.CoordinatorLayout>

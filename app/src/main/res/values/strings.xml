@@ -10,6 +10,7 @@
     <string name="color_choice_spinner">Color choice spinner</string>
     <string name="color_name">Color name</string>
     <string name="memo_color">Memo color</string>
+    <string name="btn_add_alert">Add alert to memo button</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>
