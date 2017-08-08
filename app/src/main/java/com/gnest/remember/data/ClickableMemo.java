@@ -8,8 +8,8 @@ public class ClickableMemo extends Memo {
     private boolean mSelected = false;
     private boolean mExpanded = false;
 
-    public ClickableMemo(int id, String memoText, int position, String color, boolean isSelected, boolean isExpanded) {
-        super(id, memoText, position, color);
+    public ClickableMemo(int id, String memoText, int position, String color, String date, boolean isSelected, boolean isExpanded) {
+        super(id, memoText, position, color, date);
         this.mSelected = isSelected;
         this.mExpanded = isExpanded;
     }

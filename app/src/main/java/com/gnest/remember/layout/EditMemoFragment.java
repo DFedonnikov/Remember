@@ -1,5 +1,7 @@
 package com.gnest.remember.layout;
 
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +25,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.gnest.remember.R;
@@ -31,6 +37,7 @@ import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.view.ColorSpinnerAdapter;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -46,6 +53,7 @@ import java.util.TimeZone;
  */
 public class EditMemoFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     public static final String MEMO_KEY = "memo_param";
+    private static final String DATE_PARSE_EXC_TAG = "date_parse_exc_tag";
 
     private static Calendar selectedDate;
 
@@ -55,9 +63,13 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     private Button mSaveButton;
     private ClickableMemo mMemo;
 
+    private SimpleDateFormat calendarDateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
+
     private String selectedDateFormatted;
 
     private AppBarLayout mAppBarLayout;
+
+    private boolean isCalendarExpanded = false;
 
 
     private CompactCalendarView mCompactCalendarView;
@@ -120,54 +132,79 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
 
         mCompactCalendarView.setShouldDrawDaysHeader(true);
 
-//        mCompactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
-//            @Override
-//            public void onDayClick(Date dateClicked) {
-//                selectedDate = Calendar.getInstance();
-//                selectedDate.setTime(dateClicked);
-//                setSubtitle(calendarDateFormat.format(dateClicked));
-//                selectedDateFormatted = calendarDateFormat.format(dateClicked);
-//                isExpanded = !isExpanded;
-//                mAppBarLayout.setExpanded(isExpanded, true);
-//                DialogFragment timePickFragment = new TimePickerFragment();
-//                timePickFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
-//            }
-//
-//            @Override
-//            public void onMonthScroll(Date firstDayOfNewMonth) {
-//                setSubtitle(calendarDateFormat.format(firstDayOfNewMonth));
-//            }
-//        });
-//
-//        if (memo == null) {
-//            setCurrentDate(new Date());
-//        } else {
-//            try {
-//                setCurrentDate(calendarDateFormat.parse(memo.getDate()));
-//            } catch (ParseException e) {
-//                Log.d(DATE_PARSE_EXC_TAG, "date parse exception");
-//            }
-//        }
+        mCompactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+            @Override
+            public void onDayClick(Date dateClicked) {
+                selectedDate = Calendar.getInstance();
+                selectedDate.setTime(dateClicked);
+                setSubtitle(calendarDateFormat.format(dateClicked));
+                selectedDateFormatted = calendarDateFormat.format(dateClicked);
+                isCalendarExpanded = !isCalendarExpanded;
+                mAppBarLayout.setExpanded(isCalendarExpanded, true);
+                DialogFragment timePickFragment = new TimePickerFragment();
+                timePickFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
+            }
+
+            @Override
+            public void onMonthScroll(Date firstDayOfNewMonth) {
+                setSubtitle(calendarDateFormat.format(firstDayOfNewMonth));
+            }
+        });
+
+        if (mMemo == null) {
+            setCurrentDate(new Date());
+        } else {
+            try {
+                setCurrentDate(calendarDateFormat.parse(mMemo.getDate()));
+            } catch (ParseException e) {
+                Log.d(DATE_PARSE_EXC_TAG, "date parse exception");
+            }
+        }
 
 
         final ImageView arrow = view.findViewById(R.id.date_picker_arrow);
 
         RelativeLayout datePickerButton = view.findViewById(R.id.date_picker_button);
 
-//        datePickerButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (isExpanded) {
-//                    ViewCompat.animate(arrow).rotation(0).start();
-//                } else {
-//                    ViewCompat.animate(arrow).rotation(180).start();
-//                }
-//
-//                isExpanded = !isExpanded;
-//                mAppBarLayout.setExpanded(isExpanded, true);
-//            }
-//        });
+        datePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isCalendarExpanded) {
+                    ViewCompat.animate(arrow).rotation(0).start();
+                } else {
+                    ViewCompat.animate(arrow).rotation(180).start();
+                }
+
+                isCalendarExpanded = !isCalendarExpanded;
+                mAppBarLayout.setExpanded(isCalendarExpanded, true);
+            }
+        });
     }
+
+
+    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            final Calendar c = selectedDate;
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            // Do something with the time chosen by the user
+            selectedDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            selectedDate.set(Calendar.MINUTE, minute);
+            Toast.makeText(getContext(), selectedDate.getTime().toString(), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -246,6 +283,26 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
+    public void setSubtitle(String subtitle) {
+        TextView datePickerTextView = view.findViewById(R.id.date_picker_text_view);
+
+        if (datePickerTextView != null) {
+            datePickerTextView.setText(subtitle);
+        }
+    }
+
+    public void setCurrentDate(Date date) {
+        String currentDate = calendarDateFormat.format(date);
+        selectedDateFormatted = currentDate;
+        setSubtitle(currentDate);
+        if (mCompactCalendarView != null) {
+            mCompactCalendarView.setCurrentDate(date);
+        }
+    }
+
+
+
 
     /**
      * This interface must be implemented by activities that contain this
