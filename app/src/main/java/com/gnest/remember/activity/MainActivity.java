@@ -1,17 +1,25 @@
 package com.gnest.remember.activity;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.gnest.remember.R;
+import com.gnest.remember.asynctasks.OpenMemoFromNotificationTask;
 import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.layout.EditMemoFragment;
 import com.gnest.remember.layout.ListItemFragment;
+import com.gnest.remember.services.AlarmService;
 
 
-public class MainActivity extends AppCompatActivity implements EditMemoFragment.OnEditMemoFragmentInteractionListener, ListItemFragment.OnItemListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements
+        EditMemoFragment.OnEditMemoFragmentInteractionListener,
+        ListItemFragment.OnItemListFragmentInteractionListener,
+        OpenMemoFromNotificationTask.NotificationOpenerHelper {
     private static final String EDIT_FRAG_VISIBILITY_KEY = "edit_frag_visibility_key";
     private static final String EDIT_FRAMENT_NAME = "edit_fragment";
     private static final String ITEM_FRAMENT_NAME = "item_fragment";
@@ -38,6 +46,20 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
             }
         } else {
             insertItemFragment(null);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //To be executed if activity launched from notification
+        Intent intent = getIntent();
+        if (intent != null) {
+            if (itemFragment != null) {
+                OpenMemoFromNotificationTask task = new OpenMemoFromNotificationTask(this, itemFragment.getAdapter());
+                task.execute(intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1));
+            }
         }
 
     }
@@ -110,5 +132,12 @@ public class MainActivity extends AppCompatActivity implements EditMemoFragment.
             manager.putFragment(outState, ITEM_FRAMENT_NAME, itemFragment);
         }
         outState.putBoolean(EDIT_FRAG_VISIBILITY_KEY, isEditFragmentVisible);
+    }
+
+    @Override
+    public void openMemoFromNotification(int position, int notificationId) {
+        itemFragment.openClickedItem(position);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(notificationId);
     }
 }

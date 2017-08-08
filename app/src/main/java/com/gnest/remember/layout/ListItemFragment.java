@@ -279,12 +279,16 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     @Override
     public void onSingleChoiceMemoClicked(ClickableMemo mMemo) {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
-            myGridLayoutManager.openItem(mMemo.getPosition());
-            adapter.setItemsExpanded(true);
-            databaseAccess.updateExpandedColumn(adapter.isItemsExpanded());
+           openClickedItem(mMemo.getPosition());
         } else {
             mListener.onEnterEditMode(mMemo);
         }
+    }
+
+    public void openClickedItem(int position) {
+        myGridLayoutManager.openItem(position);
+        adapter.setItemsExpanded(true);
+        databaseAccess.startUpdateExpandedColumnTask(adapter.isItemsExpanded());
     }
 
     @Override
@@ -295,7 +299,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     @Override
     public void onLoadFinished(Loader<List<ClickableMemo>> loader, List<ClickableMemo> data) {
         memos = data;
-        adapter.setmMemos(data);
+        adapter.setMemos(data);
         adapter.notifyDataSetChanged();
     }
 
@@ -316,8 +320,12 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
             myGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             adapter.setItemsExpanded(false);
-            databaseAccess.updateExpandedColumn(adapter.isItemsExpanded());
+            databaseAccess.startUpdateExpandedColumnTask(adapter.isItemsExpanded());
         }
+    }
+
+    public MySelectableAdapter getAdapter() {
+        return adapter;
     }
 
     /**

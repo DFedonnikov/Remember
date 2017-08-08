@@ -159,7 +159,11 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         return false;
     }
 
-    public void setmMemos(List<ClickableMemo> mMemos) {
+    public List<ClickableMemo> getMemos() {
+        return mMemos;
+    }
+
+    public void setMemos(List<ClickableMemo> mMemos) {
         this.mMemos = mMemos;
     }
 

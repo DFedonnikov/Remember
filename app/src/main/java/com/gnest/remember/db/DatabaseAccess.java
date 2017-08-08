@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.db.dbtasks.UpdateExpandColumnTask;
+import com.gnest.remember.asynctasks.UpdateExpandColumnTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class DatabaseAccess {
         }
     }
 
-    public void save(Memo memo) {
+    public long save(Memo memo) {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
         values.put("position", currentLastPosition);
@@ -54,7 +54,9 @@ public class DatabaseAccess {
         long rowId = database.insert(DatabaseOpenHelper.TABLE, null, values);
         if (rowId != -1) {
             currentLastPosition++;
+            return rowId;
         }
+        return -1;
     }
 
     public void update(ClickableMemo memo) {
@@ -85,10 +87,20 @@ public class DatabaseAccess {
         }
     }
 
-    public void updateExpandedColumn(boolean itemsExpanded) {
-        new UpdateExpandColumnTask(database, DatabaseOpenHelper.TABLE).execute(itemsExpanded);
+    public void startUpdateExpandedColumnTask(boolean itemsExpanded) {
+        new UpdateExpandColumnTask(this).execute(itemsExpanded);
     }
 
+
+    public void updateExpandedColumns(Boolean expanded) {
+        if (!database.isOpen()) {
+            open();
+        }
+        ContentValues values = new ContentValues();
+        int flag = expanded ? 1 : 0;
+        values.put("expanded", flag);
+        database.update(DatabaseOpenHelper.TABLE, values, null, null);
+    }
 
     public void swapMemos(ClickableMemo from, ClickableMemo to) {
         ContentValues values = new ContentValues();

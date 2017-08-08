@@ -1,8 +1,11 @@
 package com.gnest.remember.layout;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,6 +37,7 @@ import com.gnest.remember.R;
 import com.gnest.remember.data.Memo;
 import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.db.DatabaseAccess;
+import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.ColorSpinnerAdapter;
 
 import java.text.SimpleDateFormat;
@@ -54,6 +58,8 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     public static final String MEMO_KEY = "memo_param";
 
     private static Calendar selectedDate = Calendar.getInstance();
+    private AppCompatActivity activity;
+    private static boolean isAlarmSet;
 
     private View mView;
     private EditText mMemoEditTextView;
@@ -114,7 +120,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         super.onActivityCreated(savedInstanceState);
         Toolbar toolbar = mView.findViewById(R.id.toolbar);
         toolbar.setTitle("");
-        AppCompatActivity activity = ((AppCompatActivity) getActivity());
+        activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
 
         mAppBarLayout = mView.findViewById(R.id.app_bar_layout);
@@ -152,7 +158,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             @Override
             public void onClick(View view) {
                 DialogFragment timePickFragment = new TimePickerFragment();
-                timePickFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
+                timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
             }
         });
 
@@ -197,7 +203,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             selectedDate.set(Calendar.MINUTE, minute);
             Calendar now = Calendar.getInstance();
             if (selectedDate.after(now)) {
-                Toast.makeText(getContext(), selectedDate.getTime().toString(), Toast.LENGTH_SHORT).show();
+                isAlarmSet = true;
             }
         }
 
@@ -213,21 +219,37 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
 
     public void onSaveButtonPressed() {
         String textToSave = mMemoEditTextView.getText().toString();
+        long savedId = -1;
         if (!textToSave.isEmpty()) {
             DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
             databaseAccess.open();
             if (mMemo == null) {
                 // Add new mMemo
                 Memo temp = new Memo(textToSave, mColor);
-                databaseAccess.save(temp);
+                savedId = databaseAccess.save(temp);
             } else {
                 // Update the mMemo
                 mMemo.setMemoText(textToSave);
                 mMemo.setColor(mColor);
                 databaseAccess.update(mMemo);
+                savedId = mMemo.getId();
             }
             databaseAccess.close();
         }
+
+        if (isAlarmSet) {
+            AlarmManager manager = (AlarmManager)activity.getSystemService(Context.ALARM_SERVICE);
+            String notificationText = textToSave;
+            if (notificationText.length() > 10) {
+                notificationText = notificationText.substring(0, 10).concat("...");
+            }
+            Intent intent = AlarmService.getServiceIntent(activity, notificationText, savedId);
+            PendingIntent pendingIntent = PendingIntent.getService(activity, (int) savedId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            manager.set(AlarmManager.RTC_WAKEUP, selectedDate.getTimeInMillis(), pendingIntent);
+            Toast.makeText(activity, selectedDate.getTime().toString(), Toast.LENGTH_SHORT).show();
+            isAlarmSet = false;
+        }
+
         if (mListener != null) {
             Bundle bundle = null;
             if (mMemo != null) {
