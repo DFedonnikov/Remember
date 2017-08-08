@@ -246,7 +246,6 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             Intent intent = AlarmService.getServiceIntent(activity, notificationText, savedId);
             PendingIntent pendingIntent = PendingIntent.getService(activity, (int) savedId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             manager.set(AlarmManager.RTC_WAKEUP, selectedDate.getTimeInMillis(), pendingIntent);
-            Toast.makeText(activity, selectedDate.getTime().toString(), Toast.LENGTH_SHORT).show();
             isAlarmSet = false;
         }
 
