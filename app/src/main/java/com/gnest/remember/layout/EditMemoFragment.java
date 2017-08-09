@@ -74,6 +74,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     private OnEditMemoFragmentInteractionListener mListener;
 
     private SimpleDateFormat mCalendarDateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
+    private SimpleDateFormat mCalendarAlarmSetFormat = new SimpleDateFormat("d MMMM yyyy hh:mm");
 
 
     private String selectedDateFormatted;
@@ -247,6 +248,12 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             PendingIntent pendingIntent = PendingIntent.getService(activity, (int) savedId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             manager.set(AlarmManager.RTC_WAKEUP, selectedDate.getTimeInMillis(), pendingIntent);
             isAlarmSet = false;
+            StringBuilder alarmSetToast = new StringBuilder();
+            alarmSetToast
+                    .append(getString(R.string.alarm_set_text))
+                    .append(" ")
+                    .append(mCalendarAlarmSetFormat.format(selectedDate.getTime()));
+            Toast.makeText(getActivity(), alarmSetToast, Toast.LENGTH_LONG).show();
         }
 
         if (mListener != null) {
