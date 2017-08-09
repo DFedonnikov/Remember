@@ -96,6 +96,16 @@
                         android:contentDescription="@string/btn_add_alert"
                         app:srcCompat="@drawable/ic_add_alarm_black" />
 
+                    <ImageView
+                        android:id="@+id/bt_remove_alert"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="16dp"
+                        android:contentDescription="@string/remove_memo_alert_button"
+                        android:visibility="invisible"
+                        app:srcCompat="@drawable/ic_alarm_off_black" />
+
                 </LinearLayout>
 
 

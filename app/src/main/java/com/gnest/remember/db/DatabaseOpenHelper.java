@@ -16,6 +16,7 @@ class DatabaseOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE memos(_id INTEGER PRIMARY KEY AUTOINCREMENT, memo TEXT, position INTEGER, color TEXT, " +
+                "alarmSet INTEGER DEFAULT 0 CHECK (alarmSet IN (0,1)), " +
                 "expanded INTEGER DEFAULT 0 CHECK (expanded IN (0,1)));");
     }
 

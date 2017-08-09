@@ -11,7 +11,9 @@
     <string name="color_name">Color name</string>
     <string name="memo_color">Memo color</string>
     <string name="btn_add_alert">Add alert to memo button</string>
+    <string name="btn_remove_alert">Remove memo alert button</string>
     <string name="alarm_set_text">Note alarm set to</string>
+    <string name="alarm_remove_text">Alarm was removed</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>

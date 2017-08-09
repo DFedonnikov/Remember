@@ -1,10 +1,13 @@
 package com.gnest.remember.layout;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +30,7 @@ import com.gnest.remember.data.ClickableMemo;
 import com.gnest.remember.db.DatabaseAccess;
 import com.gnest.remember.helper.ItemTouchHelperCallback;
 import com.gnest.remember.loader.DBLoader;
+import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MyGridLayoutManager;
 import com.gnest.remember.view.MySelectableAdapter;
@@ -211,6 +215,13 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         currentClickedMemo = memo;
         deleteCurrentMemoFromDB(memos, currentClickedMemo.getPosition());
         adapter.removeSelectedMemo(currentClickedMemo);
+        if (memo.isAlarmSet()) {
+            FragmentActivity activity = getActivity();
+            AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+            Intent intent = AlarmService.getServiceIntent(activity, null, memo.getId());
+            PendingIntent pendingIntent = PendingIntent.getService(activity, memo.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            manager.cancel(pendingIntent);
+        }
     }
 
     private void deleteCurrentMemoFromDB(List<ClickableMemo> mMemos, int position) {
@@ -288,6 +299,13 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
 
     public void openClickedItem(int position) {
         myGridLayoutManager.openItem(position);
+    }
+
+    public void updateMemoAlarm(int position) {
+        ClickableMemo memo = memos.get(position);
+        databaseAccess.setMemoAlarmFalse(memo.getId());
+        memo.setAlarmSet(false);
+        adapter.notifyItemChanged(position);
     }
 
     @Override

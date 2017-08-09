@@ -51,6 +51,7 @@ public class DatabaseAccess {
         values.put("memo", memo.getMemoText());
         values.put("position", currentLastPosition);
         values.put("color", memo.getColor());
+        values.put("alarmSet", memo.isAlarmSet() ? 1 : 0);
         long rowId = database.insert(DatabaseOpenHelper.TABLE, null, values);
         if (rowId != -1) {
             currentLastPosition++;
@@ -63,12 +64,16 @@ public class DatabaseAccess {
         ContentValues values = new ContentValues();
         values.put("memo", memo.getMemoText());
         values.put("color", memo.getColor());
+        values.put("alarmSet", memo.isAlarmSet() ? 1 : 0);
         values.put("expanded", memo.isExpanded() ? 1 : 0);
         int id = memo.getId();
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
     }
 
     public void delete(ClickableMemo memo, List<ClickableMemo> mMemos, int position) {
+        if (!database.isOpen()) {
+            open();
+        }
         int id = memo.getId();
         int rows = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(id)});
         if (rows != 0) {
@@ -87,10 +92,16 @@ public class DatabaseAccess {
         }
     }
 
+    public void setMemoAlarmFalse(int id) {
+        ContentValues values = new ContentValues();
+        values.put("alarmSet", 0);
+        database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
+    }
+
+
     public void startUpdateExpandedColumnTask(boolean itemsExpanded) {
         new UpdateExpandColumnTask(this).execute(itemsExpanded);
     }
-
 
     public void updateExpandedColumns(Boolean expanded) {
         if (!database.isOpen()) {
@@ -121,8 +132,9 @@ public class DatabaseAccess {
             String text = cursor.getString(1);
             int position = cursor.getInt(2);
             String color = cursor.getString(3);
-            boolean expanded = cursor.getInt(4) == 1;
-            memos.add(new ClickableMemo(id, text, position, color, false, expanded));
+            boolean isAlarmSet = cursor.getInt(4) == 1;
+            boolean expanded = cursor.getInt(5) == 1;
+            memos.add(new ClickableMemo(id, text, position, color, isAlarmSet, false, expanded));
             cursor.moveToNext();
         }
         cursor.close();

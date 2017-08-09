@@ -2,6 +2,7 @@ package com.gnest.remember.layout;
 
 import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -64,17 +65,18 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     private View mView;
     private EditText mMemoEditTextView;
     private Button mSaveButton;
-    private ImageView mAddAlert;
+
     private ClickableMemo mMemo;
     private String mColor;
     private AppBarLayout mAppBarLayout;
     private CompactCalendarView mCompactCalendarView;
     private boolean isCalendarExpanded;
+    private boolean wasAlarmSet;
 
     private OnEditMemoFragmentInteractionListener mListener;
 
     private SimpleDateFormat mCalendarDateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
-    private SimpleDateFormat mCalendarAlarmSetFormat = new SimpleDateFormat("d MMMM yyyy hh:mm");
+    private SimpleDateFormat mCalendarAlarmSetFormat = new SimpleDateFormat("d MMMM yyyy hh:mm", Locale.ENGLISH);
 
 
     private String selectedDateFormatted;
@@ -112,6 +114,10 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         mMemoEditTextView = mView.findViewById(R.id.editTextMemo);
         if (mMemo != null) {
             mMemoEditTextView.setText(mMemo.getMemoText());
+            if (mMemo.isAlarmSet()) {
+                mView.findViewById(R.id.bt_remove_alert).setVisibility(View.VISIBLE);
+                wasAlarmSet = mMemo.isAlarmSet();
+            }
         }
         return mView;
     }
@@ -130,7 +136,6 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
 
 
         mCompactCalendarView = mView.findViewById(R.id.compactcalendar_view);
-        mAddAlert = mView.findViewById(R.id.bt_add_alert);
 
         // Force English
         mCompactCalendarView.setLocale(TimeZone.getDefault(), /*Locale.getDefault()*/Locale.ENGLISH);
@@ -155,13 +160,6 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
 
         setCurrentDate(Calendar.getInstance().getTime());
 
-        mAddAlert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogFragment timePickFragment = new TimePickerFragment();
-                timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
-            }
-        });
 
         final ImageView arrow = mView.findViewById(R.id.date_picker_arrow);
 
@@ -180,6 +178,32 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
                 mAppBarLayout.setExpanded(isCalendarExpanded, true);
             }
         });
+
+        ImageView addAlert = mView.findViewById(R.id.bt_add_alert);
+        addAlert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment timePickFragment = new TimePickerFragment();
+                timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
+            }
+        });
+        if (mMemo != null) {
+            final ImageView removeAlert = mView.findViewById(R.id.bt_remove_alert);
+            removeAlert.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+                    Intent intent = AlarmService.getServiceIntent(activity, null, mMemo.getId());
+                    PendingIntent pendingIntent = PendingIntent.getService(activity, mMemo.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    manager.cancel(pendingIntent);
+                    removeAlert.setVisibility(View.INVISIBLE);
+                    wasAlarmSet = isAlarmSet = false;
+                    String alarmRemovedText = getString(R.string.alarm_remove_text);
+                    Toast.makeText(getContext(), alarmRemovedText, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
     }
 
 
@@ -226,12 +250,13 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             databaseAccess.open();
             if (mMemo == null) {
                 // Add new mMemo
-                Memo temp = new Memo(textToSave, mColor);
+                Memo temp = new Memo(textToSave, mColor, isAlarmSet);
                 savedId = databaseAccess.save(temp);
             } else {
                 // Update the mMemo
                 mMemo.setMemoText(textToSave);
                 mMemo.setColor(mColor);
+                mMemo.setAlarmSet(isAlarmSet || wasAlarmSet);
                 databaseAccess.update(mMemo);
                 savedId = mMemo.getId();
             }
@@ -239,7 +264,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         }
 
         if (isAlarmSet) {
-            AlarmManager manager = (AlarmManager)activity.getSystemService(Context.ALARM_SERVICE);
+            AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
             String notificationText = textToSave;
             if (notificationText.length() > 10) {
                 notificationText = notificationText.substring(0, 10).concat("...");
@@ -247,13 +272,14 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             Intent intent = AlarmService.getServiceIntent(activity, notificationText, savedId);
             PendingIntent pendingIntent = PendingIntent.getService(activity, (int) savedId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             manager.set(AlarmManager.RTC_WAKEUP, selectedDate.getTimeInMillis(), pendingIntent);
+
             isAlarmSet = false;
             StringBuilder alarmSetToast = new StringBuilder();
             alarmSetToast
                     .append(getString(R.string.alarm_set_text))
                     .append(" ")
                     .append(mCalendarAlarmSetFormat.format(selectedDate.getTime()));
-            Toast.makeText(getActivity(), alarmSetToast, Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, alarmSetToast, Toast.LENGTH_LONG).show();
         }
 
         if (mListener != null) {

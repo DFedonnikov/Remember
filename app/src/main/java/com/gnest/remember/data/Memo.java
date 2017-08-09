@@ -8,19 +8,22 @@ public class Memo extends Binder {
     private String memoText;
     private int mPosition;
     private String mColor;
+    private boolean mIsAlarmSet;
 
 
-    public Memo(String memoText, String color) {
+    public Memo(String memoText, String color, boolean alarmSet) {
         this.memoText = memoText;
         this.mPosition = -1;
         this.mColor = color;
+        this.mIsAlarmSet = alarmSet;
     }
 
-    Memo(int id, String memoText, int position, String color) {
+    Memo(int id, String memoText, int position, String color, boolean alarmSet) {
         this.mId = id;
         this.memoText = memoText;
         this.mPosition = position;
         this.mColor = color;
+        this.mIsAlarmSet = alarmSet;
     }
 
     public int getId() {
@@ -49,6 +52,14 @@ public class Memo extends Binder {
 
     public void setColor(String mColor) {
         this.mColor = mColor;
+    }
+
+    public boolean isAlarmSet() {
+        return mIsAlarmSet;
+    }
+
+    public void setAlarmSet(boolean alarmSet) {
+        mIsAlarmSet = alarmSet;
     }
 
     @Override
