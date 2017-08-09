@@ -101,6 +101,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
             recyclerView.setLayoutManager(myGridLayoutManager);
         }
         adapter = new MySelectableAdapter(memos, this);
+        myGridLayoutManager.setExpandListener(adapter);
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().getLoader(LOADER_ID).forceLoad();
         recyclerView.setAdapter(adapter);
@@ -287,8 +288,6 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
 
     public void openClickedItem(int position) {
         myGridLayoutManager.openItem(position);
-        adapter.setItemsExpanded(true);
-        databaseAccess.startUpdateExpandedColumnTask(adapter.isItemsExpanded());
     }
 
     @Override

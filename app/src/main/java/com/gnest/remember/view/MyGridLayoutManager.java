@@ -25,9 +25,15 @@ public class MyGridLayoutManager extends GridLayoutManager {
     private int mAncorPos;
     private int currentOrientation;
     private int lastPosition;
+    private ExpandListener expandListener;
 
     public MyGridLayoutManager(Context context, int spanCount) {
         super(context, spanCount);
+    }
+
+    @Override
+    public void onItemsChanged(RecyclerView recyclerView) {
+        super.onItemsChanged(recyclerView);
     }
 
     @Override
@@ -322,6 +328,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
             @Override
             public void onAnimationEnd(Animator animation) {
                 setOrientation(HORIZONTAL);
+                expandListener.expandItems();
             }
 
             @Override
@@ -421,11 +428,20 @@ public class MyGridLayoutManager extends GridLayoutManager {
         return lastPosition;
     }
 
+    public void setExpandListener(ExpandListener expandListener) {
+        this.expandListener = expandListener;
+    }
+
+
     private static class ViewAnimationInfo {
         int startTop;
         int startBottom;
         int finishTop;
         int finishBottom;
         View view;
+    }
+
+    interface ExpandListener {
+        void expandItems();
     }
 }

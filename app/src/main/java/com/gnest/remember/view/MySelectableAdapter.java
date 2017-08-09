@@ -19,7 +19,7 @@ import java.util.List;
  * Created by DFedonnikov on 08.07.2017.
  */
 
-public class MySelectableAdapter extends RecyclerView.Adapter implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter {
+public class MySelectableAdapter extends RecyclerView.Adapter implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
     private List<ClickableMemo> mMemos;
     private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
@@ -171,6 +171,11 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         return mItemsExpanded;
     }
 
+    @Override
+    public void expandItems() {
+        setItemsExpanded(true);
+    }
+
     public void setItemsExpanded(boolean itemsExpanded) {
         this.mItemsExpanded = itemsExpanded;
         notifyDataSetChanged();
@@ -178,9 +183,13 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     public interface OnItemActionPerformed {
         void onPerformSwipeDismiss(ClickableMemo memoToDelete);
+
         void onUpdateDBUponElementsSwap(ClickableMemo from, ClickableMemo to);
+
         void showActionMode();
+
         void shutDownActionMode();
+
         void setShareButtonVisibility(boolean isVisible);
 
         /**
