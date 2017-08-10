@@ -103,6 +103,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             Bundle arguments = getArguments();
             mMemo = (ClickableMemo) arguments.getBinder(MEMO_KEY);
         }
+        isAlarmSet = false;
     }
 
     @Override
