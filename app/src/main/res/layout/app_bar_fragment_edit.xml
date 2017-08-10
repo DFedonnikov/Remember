@@ -88,15 +88,6 @@
                     </RelativeLayout>
 
                     <ImageView
-                        android:id="@+id/bt_add_alert"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="8dp"
-                        android:contentDescription="@string/btn_add_alert"
-                        app:srcCompat="@drawable/ic_add_alarm_black" />
-
-                    <ImageView
                         android:id="@+id/bt_remove_alert"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

@@ -2,12 +2,10 @@ package com.gnest.remember.layout;
 
 import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -66,7 +64,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
 
     private View mView;
     private EditText mMemoEditTextView;
-    private Button mSaveButton;
+    private ImageView mRemoveAlert;
 
     private ClickableMemo mMemo;
     private String mColor;
@@ -111,13 +109,21 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_edit_memo, container, false);
-        mSaveButton = mView.findViewById(R.id.save_memo_button);
-        mSaveButton.setOnClickListener(this);
         mMemoEditTextView = mView.findViewById(R.id.editTextMemo);
+        mRemoveAlert = mView.findViewById(R.id.bt_remove_alert);
+        mRemoveAlert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int id = mMemo != null ? mMemo.getId() : -1;
+                removeAlarm(id);
+                mRemoveAlert.setVisibility(View.INVISIBLE);
+            }
+        });
+
         if (mMemo != null) {
             mMemoEditTextView.setText(mMemo.getMemoText());
             if (mMemo.isAlarmSet()) {
-                mView.findViewById(R.id.bt_remove_alert).setVisibility(View.VISIBLE);
+                mRemoveAlert.setVisibility(View.VISIBLE);
                 wasAlarmSet = mMemo.isAlarmSet();
             }
         }
@@ -152,7 +158,11 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
                 selectedDateFormatted = mCalendarDateFormat.format(dateClicked);
                 isCalendarExpanded = !isCalendarExpanded;
                 mAppBarLayout.setExpanded(isCalendarExpanded, true);
+                DialogFragment timePickFragment = new TimePickerFragment();
+                timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
             }
+
+
 
             @Override
             public void onMonthScroll(Date firstDayOfNewMonth) {
@@ -180,32 +190,6 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
                 mAppBarLayout.setExpanded(isCalendarExpanded, true);
             }
         });
-
-        ImageView addAlert = mView.findViewById(R.id.bt_add_alert);
-        addAlert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogFragment timePickFragment = new TimePickerFragment();
-                timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
-            }
-        });
-        if (mMemo != null) {
-            final ImageView removeAlert = mView.findViewById(R.id.bt_remove_alert);
-            removeAlert.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-                    Intent intent = AlarmService.getServiceIntent(activity, null, mMemo.getId());
-                    PendingIntent pendingIntent = PendingIntent.getService(activity, mMemo.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    manager.cancel(pendingIntent);
-                    removeAlert.setVisibility(View.INVISIBLE);
-                    wasAlarmSet = isAlarmSet = false;
-                    String alarmRemovedText = getString(R.string.alarm_remove_text);
-                    Toast.makeText(getContext(), alarmRemovedText, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
     }
 
 
@@ -231,57 +215,42 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             Calendar now = Calendar.getInstance();
             if (selectedDate.after(now)) {
                 isAlarmSet = true;
+                getActivity().findViewById(R.id.bt_remove_alert).setVisibility(View.VISIBLE);
             }
+
         }
 
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.save_memo_button:
-                onSaveButtonPressed();
-        }
     }
 
-    public void onSaveButtonPressed() {
+    public void onBackButtonPressed() {
+        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
+        databaseAccess.open();
+
         String textToSave = mMemoEditTextView.getText().toString();
-        long savedId = -1;
-        if (!textToSave.isEmpty()) {
-            DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
-            databaseAccess.open();
-            if (mMemo == null) {
-                // Add new mMemo
+        int savedId = -1;
+        if (mMemo == null) {
+            // Add new mMemo
+            if (!textToSave.isEmpty()) {
                 Memo temp = new Memo(textToSave, mColor, isAlarmSet);
-                savedId = databaseAccess.save(temp);
-            } else {
-                // Update the mMemo
-                mMemo.setMemoText(textToSave);
-                mMemo.setColor(mColor);
-                mMemo.setAlarmSet(isAlarmSet || wasAlarmSet);
-                databaseAccess.update(mMemo);
-                savedId = mMemo.getId();
+                savedId = (int) databaseAccess.save(temp);
             }
-            databaseAccess.close();
+        } else {
+            // Update the mMemo
+            mMemo.setMemoText(textToSave);
+            mMemo.setColor(mColor);
+            mMemo.setAlarmSet(isAlarmSet || wasAlarmSet);
+            databaseAccess.update(mMemo);
+            savedId = mMemo.getId();
         }
 
-        if (isAlarmSet) {
-            AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-            String notificationText = textToSave;
-            if (notificationText.length() > 10) {
-                notificationText = notificationText.substring(0, 10).concat("...");
-            }
-            Intent intent = AlarmService.getServiceIntent(activity, notificationText, savedId);
-            PendingIntent pendingIntent = PendingIntent.getService(activity, (int) savedId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            manager.set(AlarmManager.RTC_WAKEUP, selectedDate.getTimeInMillis(), pendingIntent);
+        databaseAccess.close();
 
-            isAlarmSet = false;
-            StringBuilder alarmSetToast = new StringBuilder();
-            alarmSetToast
-                    .append(getString(R.string.alarm_set_text))
-                    .append(" ")
-                    .append(mCalendarAlarmSetFormat.format(selectedDate.getTime()));
-            Toast.makeText(activity, alarmSetToast, Toast.LENGTH_LONG).show();
+        if (isAlarmSet) {
+            setAlarm(textToSave, savedId);
         }
 
         if (mListener != null) {
@@ -294,6 +263,53 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             }
             mListener.onSaveEditMemoFragmentInteraction(bundle);
         }
+    }
+
+    private void setAlarm(String notificationText, int id) {
+        if (id != -1) {
+            setNotification(true, notificationText, id);
+
+            StringBuilder alarmSetToast = new StringBuilder();
+            alarmSetToast
+                    .append(getString(R.string.alarm_set_text))
+                    .append(" ")
+                    .append(mCalendarAlarmSetFormat.format(selectedDate.getTime()));
+            showAlarmToast(alarmSetToast.toString());
+        }
+    }
+
+    private void removeAlarm(int id) {
+        if (id != -1) {
+            setNotification(false, null, id);
+        }
+
+        StringBuilder alarmSetToast = new StringBuilder();
+        alarmSetToast.append(getString(R.string.alarm_remove_text));
+        showAlarmToast(alarmSetToast.toString());
+
+        wasAlarmSet = isAlarmSet = false;
+    }
+
+    private void setNotification(boolean isSet, String notificationText, int id) {
+        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+        if (notificationText != null) {
+            if (notificationText.length() > 10) {
+                notificationText.substring(0, 10).concat("...");
+            }
+        }
+
+        Intent intent = AlarmService.getServiceIntent(activity, notificationText, id);
+        PendingIntent pendingIntent = PendingIntent.getService(activity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (isSet) {
+            manager.set(AlarmManager.RTC_WAKEUP, selectedDate.getTimeInMillis(), pendingIntent);
+        } else {
+            manager.cancel(pendingIntent);
+        }
+    }
+
+    private void showAlarmToast(String toastText) {
+        Toast.makeText(activity, toastText, Toast.LENGTH_LONG).show();
     }
 
     @Override
