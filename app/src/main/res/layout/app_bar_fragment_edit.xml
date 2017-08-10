@@ -102,7 +102,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginStart="16dp"
-                        android:contentDescription="@string/remove_memo_alert_button"
+                        android:contentDescription="@string/btn_remove_alert"
                         android:visibility="invisible"
                         app:srcCompat="@drawable/ic_alarm_off_black" />
 

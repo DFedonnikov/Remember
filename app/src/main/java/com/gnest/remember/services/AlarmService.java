@@ -3,13 +3,15 @@ package com.gnest.remember.services;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
+
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.app.NotificationCompat;
 
 import com.gnest.remember.R;
 import com.gnest.remember.activity.MainActivity;
@@ -38,8 +40,8 @@ public class AlarmService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null) {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                    .setSmallIcon(R.drawable.ic_note_black)
+            NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.ic_note)
                     .setContentTitle(NOTIFICATION_TITLE)
                     .setContentText(intent.getStringExtra(NOTIFICATION_TEXT));
 
