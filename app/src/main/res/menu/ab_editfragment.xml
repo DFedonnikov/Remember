@@ -4,7 +4,7 @@
     <item
         android:id="@+id/item_color_choice_spinner"
         android:title="@string/color_choice_spinner"
-        app:actionViewClass="android.widget.Spinner"
+        app:actionViewClass="android.support.v7.widget.AppCompatSpinner"
         app:showAsAction="always" />
 
 </menu>

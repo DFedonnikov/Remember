@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:background="@color/colorAccent"
     android:padding="4dp">
 
     <ImageView
@@ -11,14 +12,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="6dp"
-        android:contentDescription="Spinner list item color image"
+        android:contentDescription="@string/spinner_list_item_color_image"
         app:srcCompat="@drawable/color_spinner_list_item_image" />
 
     <TextView
         android:id="@+id/color_text_list_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="12dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:text="@string/color_name"
         android:textSize="24sp" />
 </LinearLayout>

@@ -7,4 +7,5 @@
     <color name="memo_blue">#e635a2f0</color>
     <color name="memo_olive">#e6159129</color>
     <color name="memo_purple">#e6eb38a8</color>
+    <color name="spinnerTint">#000000</color>
 </resources>
