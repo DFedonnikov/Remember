@@ -1,7 +1,7 @@
 package com.gnest.remember.view;
 
 
-import android.view.ActionMode;
+import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -28,6 +28,8 @@ public class ActionMenu implements ActionMode.Callback {
         shareButton = menu.findItem(R.id.share);
         return true;
     }
+
+
 
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {

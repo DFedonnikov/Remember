@@ -8,4 +8,5 @@
     <color name="memo_olive">#e6159129</color>
     <color name="memo_purple">#e6eb38a8</color>
     <color name="spinnerTint">#000000</color>
+    <color name="toolbarColorPrimary">#FF80CBC4</color>
 </resources>

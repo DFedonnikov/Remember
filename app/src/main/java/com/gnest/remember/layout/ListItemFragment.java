@@ -56,7 +56,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     private ItemTouchHelper itemTouchHelper;
     private DatabaseAccess databaseAccess;
     private List<ClickableMemo> memos;
-    private ActionMode actionMode;
+    private android.support.v7.view.ActionMode actionMode;
     private ActionMenu actionMenu;
     private ClickableMemo currentClickedMemo;
     private RecyclerView recyclerView;
@@ -260,7 +260,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     @Override
     public void showActionMode() {
         if (actionMenu != null) {
-            actionMode = getActivity().startActionMode(actionMenu);
+            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionMenu);
         }
     }
 

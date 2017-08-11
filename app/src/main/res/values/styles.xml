@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -21,7 +22,10 @@
         <!-- android:actionMenuTextColor is the color of the text of action (menu) items in the Toolbar, at least in the
         Theme.AppCompat theme. For some reason, they already get the textColorPrimary when running on API 21, but not on older versions of
         Android, so this is only necessary to support older Android versions. -->
-        <item name="actionMenuTextColor">@android:color/black</item>
+        <item name="android:colorBackground">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="colorPrimary">@color/toolbarColorPrimary</item>
+        <item name="colorButtonNormal">@color/toolbarColorPrimary</item>
     </style>
 
     <style name="ToolbarStyle">
