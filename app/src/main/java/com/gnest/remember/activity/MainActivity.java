@@ -82,23 +82,16 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         if (itemFragment != null && itemFragment.isVisible()) {
-//            super.onBackPressed();
             itemFragment.onBackButtonPressed();
         } else if (editMemoFragment != null && editMemoFragment.isVisible()) {
             editMemoFragment.onBackButtonPressed();
-
-//            Bundle bundle = null;
-//            Bundle editMemoFragmentBinder = editMemoFragment.getArguments();
-//            if (editMemoFragmentBinder != null) {
-//                bundle = new Bundle();
-//                bundle.putInt(ListItemFragment.LM_SCROLL_ORIENTATION_KEY, ListItemFragment.LM_HORIZONTAL_ORIENTATION);
-//                bundle.putInt(ListItemFragment.POSITION_KEY, ((ClickableMemo) editMemoFragment.getArguments().getBinder(EditMemoFragment.MEMO_KEY)).getPosition());
-//                bundle.putBoolean(ListItemFragment.EXPANDED_KEY, true);
-//            }
-//            insertItemFragment(bundle);
         }
     }
 
+    @Override
+    public void onBackButtonPressed() {
+        super.onBackPressed();
+    }
 
     @Override
     public void onAddButtonPressed() {

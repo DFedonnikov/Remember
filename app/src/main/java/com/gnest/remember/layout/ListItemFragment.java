@@ -130,7 +130,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Toolbar toolbar = mView.findViewById(R.id.ItemFragmentToolbar);
-        AppCompatActivity activity = ((AppCompatActivity)getActivity());
+        AppCompatActivity activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
     }
 
@@ -291,7 +291,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     @Override
     public void onSingleChoiceMemoClicked(ClickableMemo mMemo) {
         if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
-           openClickedItem(mMemo.getPosition());
+            openClickedItem(mMemo.getPosition());
         } else {
             mListener.onEnterEditMode(mMemo);
         }
@@ -338,6 +338,8 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
             myGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             adapter.setItemsExpanded(false);
             databaseAccess.startUpdateExpandedColumnTask(adapter.isItemsExpanded());
+        } else {
+            mListener.onBackButtonPressed();
         }
     }
 
@@ -356,11 +358,8 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnItemListFragmentInteractionListener {
-
         void onAddButtonPressed();
-
+        void onBackButtonPressed();
         void onEnterEditMode(ClickableMemo memo);
-
-
     }
 }
