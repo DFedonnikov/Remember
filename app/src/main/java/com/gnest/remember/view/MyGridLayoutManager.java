@@ -7,8 +7,11 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.View;
+
+import com.gnest.remember.App;
 
 import java.util.ArrayList;
 
@@ -20,15 +23,18 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     private static final long TRANSITION_DURATION_MS = 300;
     private static final float SCALE_THRESHOLD_PERCENT = 1f;
+    private static int sScreenWidth;
 
-    private SparseArray<View> viewCache = new SparseArray<>();
+    private SparseArray<View> mViewCache = new SparseArray<>();
     private int mAncorPos;
-    private int currentOrientation;
-    private int lastPosition;
-    private ExpandListener expandListener;
+    private int mCurrentOrientation;
+    private int mLastPosition;
+    private ExpandListener mExpandListener;
 
     public MyGridLayoutManager(Context context, int spanCount) {
         super(context, spanCount);
+        DisplayMetrics metrics = App.self().getResources().getDisplayMetrics();
+        sScreenWidth = metrics.widthPixels;
     }
 
     @Override
@@ -39,7 +45,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
     @Override
     public void setOrientation(int orientation) {
         super.setOrientation(orientation);
-        currentOrientation = orientation;
+        mCurrentOrientation = orientation;
         View anchorView = getAnchorView();
         if (anchorView != null) {
             mAncorPos = getPosition(anchorView);
@@ -61,22 +67,22 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     private void fill(RecyclerView.Recycler recycler) {
         View anchorView = getAnchorView();
-        viewCache.clear();
+        mViewCache.clear();
 
         //Помещаем вьюшки в кэш и...
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             View view = getChildAt(i);
             int pos = getPosition(view);
-            viewCache.put(pos, view);
+            mViewCache.put(pos, view);
         }
 
         //... и удалям из лэйаута
-        for (int i = 0; i < viewCache.size(); i++) {
-            detachView(viewCache.valueAt(i));
+        for (int i = 0; i < mViewCache.size(); i++) {
+            detachView(mViewCache.valueAt(i));
         }
 
 
-        switch (currentOrientation) {
+        switch (mCurrentOrientation) {
             case VERTICAL:
                 mAncorPos = 0;
                 fillUp(anchorView, recycler);
@@ -92,8 +98,8 @@ public class MyGridLayoutManager extends GridLayoutManager {
         //отправляем в корзину всё, что не потребовалось в этом цикле лэйаута
         //эти вьюшки или ушли за экран или не понадобились, потому что соответствующие элементы
         //удалились из адаптера
-        for (int i = 0; i < viewCache.size(); i++) {
-            recycler.recycleView(viewCache.valueAt(i));
+        for (int i = 0; i < mViewCache.size(); i++) {
+            recycler.recycleView(mViewCache.valueAt(i));
         }
 
         updateViewScale();
@@ -111,7 +117,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         int pos = anchorPos - 1;
 
         while (fillUp && pos >= 0) {
-            View view = viewCache.get(pos); //проверяем кэш
+            View view = mViewCache.get(pos); //проверяем кэш
             if (view == null) {
                 //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
                 view = recycler.getViewForPosition(pos);
@@ -120,7 +126,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
                 attachView(view);
-                viewCache.remove(pos);
+                mViewCache.remove(pos);
             }
             int viewBottom = getDecoratedTop(view);
             fillUp = (viewBottom > 0);
@@ -142,13 +148,13 @@ public class MyGridLayoutManager extends GridLayoutManager {
         int itemCount = getItemCount();
 
         while (fillDown && pos < itemCount) {
-            View view = viewCache.get(pos);
+            View view = mViewCache.get(pos);
             if (view == null) {
                 view = recycler.getViewForPosition(pos);
                 addView(view);
             } else {
                 attachView(view);
-                viewCache.remove(pos);
+                mViewCache.remove(pos);
 
             }
             int viewTop = getDecoratedBottom(view);
@@ -183,7 +189,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         final int widthSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
         final int heigthSpec = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY);
         while (fillLeft && pos >= 0) {
-            View view = viewCache.get(pos); //проверяем кэш
+            View view = mViewCache.get(pos); //проверяем кэш
             if (view == null) {
                 //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
                 view = recycler.getViewForPosition(pos);
@@ -196,7 +202,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
                 attachView(view);
-                viewCache.remove(pos);
+                mViewCache.remove(pos);
             }
             viewRight = getDecoratedLeft(view);
             fillLeft = (viewRight > 0);
@@ -223,7 +229,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         final int widthSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY);
         final int heigthSpec = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY);
         while (fillRight && pos < itemCount) {
-            View view = viewCache.get(pos); //проверяем кэш
+            View view = mViewCache.get(pos); //проверяем кэш
             if (view == null) {
                 //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
                 view = recycler.getViewForPosition(pos);
@@ -236,14 +242,37 @@ public class MyGridLayoutManager extends GridLayoutManager {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
                 attachView(view);
-                viewCache.remove(pos);
+                mViewCache.remove(pos);
             }
             viewLeft = getDecoratedRight(view);
             fillRight = viewLeft <= width;
-//            lastPosition = pos;
             pos++;
         }
+        mLastPosition = getLargestSquareViewPosition();
+    }
 
+    private int getLargestSquareViewPosition() {
+        int childCount = getChildCount();
+        int maxSquare = 0;
+        View maxSquareView = null;
+        for (int i = 0; i < childCount; i++) {
+            View view = getChildAt(i);
+            int top = getDecoratedTop(view);
+            int bottom = getDecoratedBottom(view);
+            int left = getDecoratedLeft(view);
+            int right = getDecoratedRight(view);
+            left = left > 0 ? left : 0;
+            right = right <= sScreenWidth ? right : sScreenWidth;
+            Rect viewRect = new Rect(left, top, right, bottom);
+
+            int square = Math.abs(viewRect.height() * viewRect.width());
+            if (square >= maxSquare) {
+                maxSquare = square;
+                maxSquareView = view;
+            }
+        }
+
+        return maxSquareView != null ? getPosition(maxSquareView) : 0;
     }
 
     private View getAnchorView() {
@@ -251,7 +280,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
         Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
         int maxSquare = 0;
         View anchorView = null;
-//        HashMap<Integer, View> viewsOnScreen = new HashMap<>();
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
             int top = getDecoratedTop(view);
@@ -328,7 +356,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
             @Override
             public void onAnimationEnd(Animator animation) {
                 setOrientation(HORIZONTAL);
-                expandListener.expandItems();
+                mExpandListener.expandItems();
             }
 
             @Override
@@ -425,13 +453,12 @@ public class MyGridLayoutManager extends GridLayoutManager {
     }
 
     public int getLastPosition() {
-        return lastPosition;
+        return mLastPosition;
     }
 
     public void setExpandListener(ExpandListener expandListener) {
-        this.expandListener = expandListener;
+        this.mExpandListener = expandListener;
     }
-
 
     private static class ViewAnimationInfo {
         int startTop;

@@ -16,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.SparseArray;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -106,8 +105,10 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         }
         adapter = new MySelectableAdapter(memos, this);
         myGridLayoutManager.setExpandListener(adapter);
+
         getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().getLoader(LOADER_ID).forceLoad();
+
         recyclerView.setAdapter(adapter);
 
         if (getArguments() != null) {
