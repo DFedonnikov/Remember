@@ -1,4 +1,4 @@
-package com.gnest.remember.data;
+package com.gnest.remember.model.data;
 
 import android.os.Binder;
 

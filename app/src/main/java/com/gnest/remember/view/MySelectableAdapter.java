@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gnest.remember.R;
-import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.helper.ItemTouchHelperAdapter;
+import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
 import java.util.Collections;
 import java.util.List;

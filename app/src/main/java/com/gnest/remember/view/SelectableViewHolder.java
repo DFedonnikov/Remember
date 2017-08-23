@@ -8,8 +8,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.gnest.remember.R;
-import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.helper.ItemTouchHelperViewHolder;
+import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
 
 /**
  * Created by DFedonnikov on 08.07.2017.

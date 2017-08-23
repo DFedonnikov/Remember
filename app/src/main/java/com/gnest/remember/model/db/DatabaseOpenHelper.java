@@ -1,4 +1,4 @@
-package com.gnest.remember.db;
+package com.gnest.remember.model.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

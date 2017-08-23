@@ -1,4 +1,4 @@
-package com.gnest.remember.activity;
+package com.gnest.remember.view.activity;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -9,11 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.gnest.remember.R;
-import com.gnest.remember.asynctasks.OpenMemoFromNotificationTask;
-import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.layout.EditMemoFragment;
-import com.gnest.remember.layout.ListItemFragment;
-import com.gnest.remember.services.AlarmService;
+import com.gnest.remember.model.asynctasks.OpenMemoFromNotificationTask;
+import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.view.fragments.EditMemoFragment;
+import com.gnest.remember.view.fragments.ListItemFragment;
+import com.gnest.remember.model.services.AlarmService;
 
 
 public class MainActivity extends AppCompatActivity implements

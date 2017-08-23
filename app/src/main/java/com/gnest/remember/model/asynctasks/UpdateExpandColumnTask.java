@@ -1,9 +1,8 @@
-package com.gnest.remember.asynctasks;
+package com.gnest.remember.model.asynctasks;
 
-import android.content.ContentValues;
 import android.os.AsyncTask;
 
-import com.gnest.remember.db.DatabaseAccess;
+import com.gnest.remember.model.db.DatabaseAccess;
 
 /**
  * Created by DFedonnikov on 02.08.2017.

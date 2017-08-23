@@ -1,13 +1,13 @@
-package com.gnest.remember.db;
+package com.gnest.remember.model.db;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.gnest.remember.data.Memo;
-import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.asynctasks.UpdateExpandColumnTask;
+import com.gnest.remember.model.data.Memo;
+import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.asynctasks.UpdateExpandColumnTask;
 
 import java.util.ArrayList;
 import java.util.List;

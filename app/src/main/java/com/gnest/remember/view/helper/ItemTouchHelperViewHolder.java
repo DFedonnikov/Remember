@@ -1,4 +1,4 @@
-package com.gnest.remember.helper;
+package com.gnest.remember.view.helper;
 
 import android.support.v7.widget.helper.ItemTouchHelper;
 

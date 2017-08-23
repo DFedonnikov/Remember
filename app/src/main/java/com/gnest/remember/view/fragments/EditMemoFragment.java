@@ -1,4 +1,4 @@
-package com.gnest.remember.layout;
+package com.gnest.remember.view.fragments;
 
 import android.app.AlarmManager;
 import android.app.Dialog;
@@ -25,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -35,10 +34,10 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.gnest.remember.R;
-import com.gnest.remember.data.Memo;
-import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.db.DatabaseAccess;
-import com.gnest.remember.services.AlarmService;
+import com.gnest.remember.model.data.Memo;
+import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.db.DatabaseAccess;
+import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.view.ColorSpinnerAdapter;
 
 import java.text.SimpleDateFormat;

@@ -1,10 +1,10 @@
-package com.gnest.remember.loader;
+package com.gnest.remember.model.loader;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.db.DatabaseAccess;
+import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.db.DatabaseAccess;
 
 import java.util.ArrayList;
 import java.util.List;

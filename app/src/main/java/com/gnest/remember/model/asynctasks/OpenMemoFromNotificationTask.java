@@ -1,9 +1,9 @@
-package com.gnest.remember.asynctasks;
+package com.gnest.remember.model.asynctasks;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.gnest.remember.data.ClickableMemo;
+import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.MySelectableAdapter;
 
 

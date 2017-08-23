@@ -1,4 +1,4 @@
-package com.gnest.remember.data;
+package com.gnest.remember.model.data;
 
 /**
  * Created by DFedonnikov on 08.07.2017.

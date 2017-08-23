@@ -1,4 +1,4 @@
-package com.gnest.remember.layout;
+package com.gnest.remember.view.fragments;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -25,11 +25,11 @@ import android.view.ViewGroup;
 
 import com.gnest.remember.R;
 
-import com.gnest.remember.data.ClickableMemo;
-import com.gnest.remember.db.DatabaseAccess;
-import com.gnest.remember.helper.ItemTouchHelperCallback;
-import com.gnest.remember.loader.DBLoader;
-import com.gnest.remember.services.AlarmService;
+import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.db.DatabaseAccess;
+import com.gnest.remember.view.helper.ItemTouchHelperCallback;
+import com.gnest.remember.model.loader.DBLoader;
+import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MyGridLayoutManager;
 import com.gnest.remember.view.MySelectableAdapter;
