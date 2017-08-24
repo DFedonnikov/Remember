@@ -5,8 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -27,24 +27,29 @@ import com.gnest.remember.R;
 
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.model.db.DatabaseAccess;
+import com.gnest.remember.presenter.IPresenter;
+import com.gnest.remember.presenter.Presenter;
+import com.gnest.remember.view.IView;
 import com.gnest.remember.view.helper.ItemTouchHelperCallback;
 import com.gnest.remember.model.loader.DBLoader;
 import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MyGridLayoutManager;
 import com.gnest.remember.view.MySelectableAdapter;
+import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
 import java.util.List;
 
 
-public class ListItemFragment extends Fragment implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, LoaderManager.LoaderCallbacks<List<ClickableMemo>> {
+public class ListItemFragment extends MvpFragment<IView, IPresenter>
+        implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IView {
 
     private static final String ARG_COLUMN_COUNT = "ColumnCount";
-    private static final int LOADER_ID = 0;
+
     public static final int LM_HORIZONTAL_ORIENTATION = 0;
     public static final int LM_VERTICAL_ORIENTATION = 1;
     public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManagerOrientationKey";
-    public static final String POSITION_KEY = "POSITiON_KEY";
+    public static final String POSITION_KEY = "POSITION_KEY";
     public static final String BUNDLE_KEY = "BUNDLE_KEY";
     public static final String EXPANDED_KEY = "EXPANDED_KEY";
 
@@ -82,12 +87,12 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        this.databaseAccess = DatabaseAccess.getInstance(this.getContext());
+//        this.databaseAccess = DatabaseAccess.getInstance(this.getContext());
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
         actionMenu = new ActionMenu(this);
-        databaseAccess.open();
+//        databaseAccess.open();
 
     }
 
@@ -95,6 +100,12 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_item_list, container, false);
+        return mView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         recyclerView = mView.findViewById(R.id.memo_list);
         Context context = mView.getContext();
         if (mColumnCount <= 1) {
@@ -106,8 +117,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         adapter = new MySelectableAdapter(memos, this);
         myGridLayoutManager.setExpandListener(adapter);
 
-        getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-        getActivity().getSupportLoaderManager().getLoader(LOADER_ID).forceLoad();
+
 
         recyclerView.setAdapter(adapter);
 
@@ -124,7 +134,8 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        return mView;
+
+        presenter.loadData();
     }
 
     @Override
@@ -158,7 +169,6 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         super.onPause();
     }
 
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -168,6 +178,20 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         databaseAccess.close();
     }
 
+
+    @Override
+    @NonNull
+    public IPresenter createPresenter() {
+        return new Presenter(getActivity().getSupportLoaderManager());
+    }
+
+
+    @Override
+    public void setData(List<ClickableMemo> data) {
+        memos = data;
+        adapter.setMemos(data);
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -309,22 +333,7 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
         adapter.notifyItemChanged(position);
     }
 
-    @Override
-    public Loader<List<ClickableMemo>> onCreateLoader(int id, Bundle args) {
-        return new DBLoader(this.getContext(), databaseAccess);
-    }
 
-    @Override
-    public void onLoadFinished(Loader<List<ClickableMemo>> loader, List<ClickableMemo> data) {
-        memos = data;
-        adapter.setMemos(data);
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<ClickableMemo>> loader) {
-
-    }
 
     public MyGridLayoutManager getMyGridLayoutManager() {
         return myGridLayoutManager;
@@ -360,7 +369,9 @@ public class ListItemFragment extends Fragment implements MySelectableAdapter.On
      */
     public interface OnItemListFragmentInteractionListener {
         void onAddButtonPressed();
+
         void onBackButtonPressed();
+
         void onEnterEditMode(ClickableMemo memo);
     }
 }

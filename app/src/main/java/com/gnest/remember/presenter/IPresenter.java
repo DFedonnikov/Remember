@@ -8,4 +8,5 @@ import com.hannesdorfmann.mosby.mvp.MvpPresenter;
  */
 
 public interface IPresenter extends MvpPresenter<IView> {
+    void loadData();
 }

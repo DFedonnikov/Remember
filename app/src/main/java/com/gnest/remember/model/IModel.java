@@ -5,4 +5,5 @@ package com.gnest.remember.model;
  */
 
 public interface IModel {
+    void getData();
 }
