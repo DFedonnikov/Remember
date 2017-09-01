@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,7 +29,6 @@ import com.gnest.remember.presenter.IPresenter;
 import com.gnest.remember.presenter.Presenter;
 import com.gnest.remember.view.IView;
 import com.gnest.remember.view.helper.ItemTouchHelperCallback;
-import com.gnest.remember.model.loader.DBLoader;
 import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.view.ActionMenu;
 import com.gnest.remember.view.MyGridLayoutManager;
@@ -175,7 +172,6 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         mListener = null;
         memos = null;
         currentClickedMemo = null;
-        databaseAccess.close();
     }
 
 
@@ -219,46 +215,31 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     public void onDeleteButtonPressed() {
-        SparseArray<ClickableMemo> selectedList = adapter.getmSelectedList();
-        for (int i = 0; i < selectedList.size(); i++) {
-            performDelete(selectedList.valueAt(i));
-        }
-        adapter.notifyDataSetChanged();
+        presenter.deleteSelectedMemos(adapter.getSelectedList(), adapter.getMemos());
+        adapter.removeSelectedMemos(adapter.getSelectedList());
         actionMode.finish();
     }
 
     @Override
-    public void onPerformSwipeDismiss(ClickableMemo memoToDelete) {
-        performDelete(memoToDelete);
-        adapter.notifyItemRemoved(memoToDelete.getPosition());
+    public void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
+        presenter.deleteMemo(memoId, memoPosition, adapter.getMemos(), isAlarmSet);
         if (actionMode != null) {
             actionMode.finish();
         }
     }
 
-    public void performDelete(ClickableMemo memo) {
-        currentClickedMemo = memo;
-        deleteCurrentMemoFromDB(memos, currentClickedMemo.getPosition());
-        adapter.removeSelectedMemo(currentClickedMemo);
-        if (memo.isAlarmSet()) {
-            FragmentActivity activity = getActivity();
-            AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-            Intent intent = AlarmService.getServiceIntent(activity, null, memo.getId());
-            PendingIntent pendingIntent = PendingIntent.getService(activity, memo.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            manager.cancel(pendingIntent);
-        }
+    @Override
+    public void removeAlarm(int memoId) {
+        FragmentActivity activity = getActivity();
+        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = AlarmService.getServiceIntent(activity, null, memoId);
+        PendingIntent pendingIntent = PendingIntent.getService(activity, memoId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        manager.cancel(pendingIntent);
     }
-
-    private void deleteCurrentMemoFromDB(List<ClickableMemo> mMemos, int position) {
-        if (currentClickedMemo != null) {
-            databaseAccess.delete(currentClickedMemo, mMemos, position);
-        }
-    }
-
 
     @Override
     public void onShareButtonPressed() {
-        SparseArray<ClickableMemo> selectedList = adapter.getmSelectedList();
+        SparseArray<ClickableMemo> selectedList = adapter.getSelectedList();
         if (selectedList.size() == 1) {
             currentClickedMemo = selectedList.valueAt(0);
             Intent intent = new Intent(Intent.ACTION_SEND);

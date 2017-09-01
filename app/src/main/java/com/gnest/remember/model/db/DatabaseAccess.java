@@ -70,16 +70,12 @@ public class DatabaseAccess {
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
     }
 
-    public void delete(ClickableMemo memo, List<ClickableMemo> mMemos, int position) {
-        if (!database.isOpen()) {
-            open();
-        }
-        int id = memo.getId();
-        int rows = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(id)});
+    public void delete(int memoId, int memoPosition, List<ClickableMemo> memos) {
+        int rows = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(memoId)});
         if (rows != 0) {
             currentLastPosition--;
         }
-        updatePositionAfterDelete(mMemos, position);
+        updatePositionAfterDelete(memos, memoPosition);
     }
 
     private void updatePositionAfterDelete(List<ClickableMemo> mMemos, int position) {

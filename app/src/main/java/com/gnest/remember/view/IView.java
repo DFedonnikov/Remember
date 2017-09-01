@@ -11,4 +11,6 @@ import java.util.List;
 
 public interface IView extends MvpView {
     void setData(List<ClickableMemo> data);
+
+    void removeAlarm(int memoId);
 }

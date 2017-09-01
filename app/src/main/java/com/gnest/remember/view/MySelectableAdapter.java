@@ -91,7 +91,10 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     @Override
     public void onItemDismiss(int position) {
-        mListener.onPerformSwipeDismiss(mMemos.get(position));
+        ClickableMemo memo = mMemos.get(position);
+        mListener.onPerformSwipeDismiss(memo.getId(), memo.getPosition(), memo.isAlarmSet());
+        mMemos.remove(memo);
+        notifyItemRemoved(position);
     }
 
     @Override
@@ -126,11 +129,14 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         notifyDataSetChanged();
     }
 
-    public void removeSelectedMemo(ClickableMemo memeToRemove) {
-        mMemos.remove(memeToRemove);
+    public void removeSelectedMemos(SparseArray<ClickableMemo> memosToRemove) {
+        for (int i = 0; i < memosToRemove.size(); i++) {
+            mMemos.remove(memosToRemove.valueAt(i));
+        }
+        notifyDataSetChanged();
     }
 
-    public SparseArray<ClickableMemo> getmSelectedList() {
+    public SparseArray<ClickableMemo> getSelectedList() {
         return mSelectedList;
     }
 
@@ -182,7 +188,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     public interface OnItemActionPerformed {
-        void onPerformSwipeDismiss(ClickableMemo memoToDelete);
+        void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet);
 
         void onUpdateDBUponElementsSwap(ClickableMemo from, ClickableMemo to);
 

@@ -29,4 +29,6 @@ public class DBLoader extends AsyncTaskLoader<List<ClickableMemo>> {
         }
         return new ArrayList<>();
     }
+
+
 }

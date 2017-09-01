@@ -27,13 +27,20 @@ public class Model implements IModel, LoaderManager.LoaderCallbacks<List<Clickab
         this.mLoaderManager = supportLoaderManager;
         this.mListener = loadDataListener;
         this.mDatabaseAccess = DatabaseAccess.getInstance(App.self());
+        this.mLoaderManager.initLoader(LOADER_ID, null, this);
     }
 
     @Override
     public void getData() {
         mDatabaseAccess.open();
-        mLoaderManager.initLoader(LOADER_ID, null, this);
         mLoaderManager.getLoader(LOADER_ID).forceLoad();
+    }
+
+    @Override
+    public void deleteMemoFromDB(int memoId, int memoPosition, List<ClickableMemo> memos) {
+        mDatabaseAccess.open();
+        mDatabaseAccess.delete(memoId, memoPosition, memos);
+        mDatabaseAccess.close();
     }
 
     @Override

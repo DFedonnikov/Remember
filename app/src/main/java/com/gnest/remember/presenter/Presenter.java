@@ -1,6 +1,7 @@
 package com.gnest.remember.presenter;
 
 import android.support.v4.app.LoaderManager;
+import android.util.SparseArray;
 
 import com.gnest.remember.model.IModel;
 import com.gnest.remember.model.Model;
@@ -32,6 +33,22 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
     public void dataLoaded(List<ClickableMemo> data) {
         if (isViewAttached()) {
             getView().setData(data);
+        }
+    }
+
+    @Override
+    public void deleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
+        for (int i = 0; i < selectedMemos.size(); i++) {
+            ClickableMemo memo = selectedMemos.valueAt(i);
+            deleteMemo(memo.getId(), memo.getPosition(), memos, memo.isAlarmSet());
+        }
+    }
+
+    @Override
+    public void deleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet) {
+            mModel.deleteMemoFromDB(memoId, memoPosition, memos);
+        if (isAlarmSet) {
+            getView().removeAlarm(memoId);
         }
     }
 }
