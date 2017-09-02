@@ -303,10 +303,8 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         myGridLayoutManager.openItem(position);
     }
 
-    public void updateMemoAlarm(int position) {
-        ClickableMemo memo = memos.get(position);
-        databaseAccess.setMemoAlarmFalse(memo.getId());
-        memo.setAlarmSet(false);
+    public void shutdownMemoAlarm(int position) {
+        presenter.proccessMemoAlarmShutdown(adapter.getMemos().get(position));
         adapter.notifyItemChanged(position);
     }
     

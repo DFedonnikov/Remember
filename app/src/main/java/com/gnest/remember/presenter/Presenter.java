@@ -63,4 +63,10 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
     public void proccessMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
         mModel.swapMemos(fromId, fromPosition, toId, toPosition);
     }
+
+    @Override
+    public void proccessMemoAlarmShutdown(ClickableMemo clickableMemo) {
+        mModel.setMemoAlarmFalse(clickableMemo.getId());
+        clickableMemo.setAlarmSet(false);
+    }
 }

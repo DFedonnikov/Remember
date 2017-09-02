@@ -48,7 +48,13 @@ public class Model implements IModel, LoaderManager.LoaderCallbacks<List<Clickab
         mDatabaseAccess.open();
         mDatabaseAccess.swapMemos(fromId, fromPosition, toId, toPosition);
         mDatabaseAccess.close();
+    }
 
+    @Override
+    public void setMemoAlarmFalse(int id) {
+        mDatabaseAccess.open();
+        mDatabaseAccess.setMemoAlarmFalse(id);
+        mDatabaseAccess.close();
     }
 
     @Override

@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void openMemoFromNotification(int position, int notificationId) {
         itemFragment.openClickedItem(position);
-        itemFragment.updateMemoAlarm(position);
+        itemFragment.shutdownMemoAlarm(position);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(notificationId);
     }
