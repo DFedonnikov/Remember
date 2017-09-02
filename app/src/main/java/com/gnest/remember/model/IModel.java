@@ -12,4 +12,6 @@ public interface IModel {
     void getData();
 
     void deleteMemoFromDB(int memoId, int memoPosition, List<ClickableMemo> memos);
+
+    void swapMemos(int fromId, int fromPosition, int toId, int toPosition);
 }

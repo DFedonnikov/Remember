@@ -20,4 +20,6 @@ public interface IPresenter extends MvpPresenter<IView> {
     void deleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos);
 
     void share(SparseArray<ClickableMemo> selectedList);
+
+    void proccessMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
 }

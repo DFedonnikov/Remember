@@ -83,7 +83,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     private void makeSwap(int from, int to) {
         ClickableMemo memoFrom = mMemos.get(from);
         ClickableMemo memoTo = mMemos.get(to);
-        mListener.onUpdateDBUponElementsSwap(memoFrom, memoTo);
+        mListener.swapMemos(memoFrom.getId(), memoFrom.getPosition(), memoTo.getId(), memoTo.getPosition());
         memoTo.setPosition(from);
         memoFrom.setPosition(to);
         Collections.swap(mMemos, from, to);
@@ -190,7 +190,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     public interface OnItemActionPerformed {
         void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet);
 
-        void onUpdateDBUponElementsSwap(ClickableMemo from, ClickableMemo to);
+        void swapMemos(int fromId, int fromPosition, int toId, int toPosition);
 
         void showActionMode();
 

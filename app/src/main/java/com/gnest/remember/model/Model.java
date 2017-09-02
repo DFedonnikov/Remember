@@ -44,6 +44,14 @@ public class Model implements IModel, LoaderManager.LoaderCallbacks<List<Clickab
     }
 
     @Override
+    public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
+        mDatabaseAccess.open();
+        mDatabaseAccess.swapMemos(fromId, fromPosition, toId, toPosition);
+        mDatabaseAccess.close();
+
+    }
+
+    @Override
     public Loader<List<ClickableMemo>> onCreateLoader(int id, Bundle args) {
         return new DBLoader(App.self(), mDatabaseAccess);
     }

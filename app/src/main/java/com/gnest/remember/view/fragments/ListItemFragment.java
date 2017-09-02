@@ -59,7 +59,6 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     private List<ClickableMemo> memos;
     private android.support.v7.view.ActionMode actionMode;
     private ActionMenu actionMenu;
-    private ClickableMemo currentClickedMemo;
     private RecyclerView recyclerView;
     private MyGridLayoutManager myGridLayoutManager;
     private int lastPosition;
@@ -171,7 +170,6 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         super.onDetach();
         mListener = null;
         memos = null;
-        currentClickedMemo = null;
     }
 
 
@@ -184,7 +182,6 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     public void setData(List<ClickableMemo> data) {
-        memos = data;
         adapter.setMemos(data);
         adapter.notifyDataSetChanged();
     }
@@ -253,8 +250,8 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     }
 
     @Override
-    public void onUpdateDBUponElementsSwap(ClickableMemo from, ClickableMemo to) {
-        databaseAccess.swapMemos(from, to);
+    public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
+        presenter.proccessMemoSwap(fromId, fromPosition, toId, toPosition);
     }
 
     @Override
@@ -312,15 +309,9 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         memo.setAlarmSet(false);
         adapter.notifyItemChanged(position);
     }
-
-
-
-    public MyGridLayoutManager getMyGridLayoutManager() {
-        return myGridLayoutManager;
-    }
-
-    public void setmColumnCount(int mColumnCount) {
-        this.mColumnCount = mColumnCount;
+    
+    public void setColumnCount(int columnCount) {
+        this.mColumnCount = columnCount;
     }
 
     public void onBackButtonPressed() {

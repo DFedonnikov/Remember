@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements
                 editMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAMENT_NAME);
             } else {
                 itemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAMENT_NAME);
-                itemFragment.setmColumnCount(COLUMNS);
+                itemFragment.setColumnCount(COLUMNS);
             }
         } else {
             insertItemFragment(null);

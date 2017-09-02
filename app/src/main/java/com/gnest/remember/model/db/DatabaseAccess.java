@@ -109,13 +109,11 @@ public class DatabaseAccess {
         database.update(DatabaseOpenHelper.TABLE, values, null, null);
     }
 
-    public void swapMemos(ClickableMemo from, ClickableMemo to) {
+    public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
         ContentValues values = new ContentValues();
-        values.put("position", to.getPosition());
-        int fromId = from.getId();
+        values.put("position", toPosition);
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(fromId)});
-        values.put("position", from.getPosition());
-        int toId = to.getId();
+        values.put("position", fromPosition);
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(toId)});
     }
 
