@@ -13,4 +13,7 @@ public interface IView extends MvpView {
     void setData(List<ClickableMemo> data);
 
     void removeAlarm(int memoId);
+
+
+    void shareMemoText(String memoText);
 }

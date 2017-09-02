@@ -51,4 +51,11 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
             getView().removeAlarm(memoId);
         }
     }
+
+    @Override
+    public void share(SparseArray<ClickableMemo> selectedList) {
+        if (selectedList.size() == 1 && isViewAttached()) {
+            getView().shareMemoText(selectedList.valueAt(0).getMemoText());
+        }
+    }
 }

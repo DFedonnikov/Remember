@@ -16,6 +16,7 @@
     <string name="alarm_remove_text">Alarm was removed</string>
     <string name="selected_memo_color">Selected memo color</string>
     <string name="spinner_list_item_color_image">Spinner list item color image</string>
+    <string name="send_memo_intent_title">Send Memo&#8230;,</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>

@@ -18,4 +18,6 @@ public interface IPresenter extends MvpPresenter<IView> {
     void deleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet);
 
     void deleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos);
+
+    void share(SparseArray<ClickableMemo> selectedList);
 }

@@ -239,18 +239,17 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     public void onShareButtonPressed() {
-        SparseArray<ClickableMemo> selectedList = adapter.getSelectedList();
-        if (selectedList.size() == 1) {
-            currentClickedMemo = selectedList.valueAt(0);
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, currentClickedMemo.getMemoText());
-            Intent chooserIntent = Intent.createChooser(intent, "Send Memo...");
-            startActivity(chooserIntent);
-            actionMode.finish();
-        }
+        presenter.share(adapter.getSelectedList());
+    }
 
-
+    @Override
+    public void shareMemoText(String memoText) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, memoText);
+        Intent chooserIntent = Intent.createChooser(intent, getString(R.string.send_memo_intent_title));
+        actionMode.finish();
+        startActivity(chooserIntent);
     }
 
     @Override
