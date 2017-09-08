@@ -1,6 +1,7 @@
 package com.gnest.remember.presenter;
 
 import android.support.v4.app.LoaderManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.SparseArray;
 
 import com.gnest.remember.model.IModel;
@@ -46,7 +47,7 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
 
     @Override
     public void deleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet) {
-            mModel.deleteMemoFromDB(memoId, memoPosition, memos);
+        mModel.deleteMemoFromDB(memoId, memoPosition, memos);
         if (isAlarmSet) {
             getView().removeAlarm(memoId);
         }
@@ -68,5 +69,17 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
     public void proccessMemoAlarmShutdown(ClickableMemo clickableMemo) {
         mModel.setMemoAlarmFalse(clickableMemo.getId());
         clickableMemo.setAlarmSet(false);
+    }
+
+    @Override
+    public void singleChoiceClick(ClickableMemo memo, int verticalOrientationCode) {
+        if (isViewAttached()) {
+            IView view = getView();
+            if (view.getLayoutManager().getOrientation() == verticalOrientationCode) {
+                view.getLayoutManager().openItem(memo.getPosition());
+            } else {
+                view.getInteractionListener().onEnterEditMode(memo);
+            }
+        }
     }
 }

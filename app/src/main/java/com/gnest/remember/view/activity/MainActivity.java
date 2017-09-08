@@ -18,7 +18,7 @@ import com.gnest.remember.model.services.AlarmService;
 
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
-        ListItemFragment.OnItemListFragmentInteractionListener,
+        ListItemFragment.OnListItemFragmentInteractionListener,
         OpenMemoFromNotificationTask.NotificationOpenerHelper {
     private static final String EDIT_FRAG_VISIBILITY_KEY = "edit_frag_visibility_key";
     private static final String EDIT_FRAMENT_NAME = "edit_fragment";
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void openMemoFromNotification(int position, int notificationId) {
-        itemFragment.openClickedItem(position);
+        itemFragment.getLayoutManager().openItem(position);
         itemFragment.shutdownMemoAlarm(position);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(notificationId);

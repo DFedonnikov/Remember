@@ -13,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,7 +50,7 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     public static final String EXPANDED_KEY = "EXPANDED_KEY";
 
     private int mColumnCount;
-    private OnItemListFragmentInteractionListener mListener;
+    private OnListItemFragmentInteractionListener mListener;
     private MySelectableAdapter adapter;
     private View mView;
     private ItemTouchHelper itemTouchHelper;
@@ -60,7 +59,7 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     private android.support.v7.view.ActionMode actionMode;
     private ActionMenu actionMenu;
     private RecyclerView recyclerView;
-    private MyGridLayoutManager myGridLayoutManager;
+    private MyGridLayoutManager mMyGridLayoutManager;
     private int lastPosition;
     private int lastOrientation;
 
@@ -107,12 +106,11 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
-            myGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
-            recyclerView.setLayoutManager(myGridLayoutManager);
+            mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
+            recyclerView.setLayoutManager(mMyGridLayoutManager);
         }
         adapter = new MySelectableAdapter(memos, this);
-        myGridLayoutManager.setExpandListener(adapter);
-
+        mMyGridLayoutManager.setExpandListener(adapter);
 
 
         recyclerView.setAdapter(adapter);
@@ -122,8 +120,8 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
             if (bundle != null) {
                 lastOrientation = bundle.getInt(LM_SCROLL_ORIENTATION_KEY);
                 lastPosition = bundle.getInt(POSITION_KEY);
-                myGridLayoutManager.setmAncorPos(lastPosition);
-                myGridLayoutManager.setOrientation(lastOrientation);
+                mMyGridLayoutManager.setmAncorPos(lastPosition);
+                mMyGridLayoutManager.setOrientation(lastOrientation);
                 adapter.setItemsExpanded(bundle.getBoolean(EXPANDED_KEY));
             }
         }
@@ -150,11 +148,11 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnItemListFragmentInteractionListener) {
-            mListener = (OnItemListFragmentInteractionListener) context;
+        if (context instanceof OnListItemFragmentInteractionListener) {
+            mListener = (OnListItemFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnItemListFragmentInteractionListener");
+                    + " must implement OnListItemFragmentInteractionListener");
         }
 
 
@@ -193,8 +191,8 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         if (bundle == null) {
             bundle = new Bundle();
         }
-        bundle.putInt(LM_SCROLL_ORIENTATION_KEY, myGridLayoutManager.getOrientation());
-        bundle.putInt(POSITION_KEY, myGridLayoutManager.getLastPosition());
+        bundle.putInt(LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
+        bundle.putInt(POSITION_KEY, mMyGridLayoutManager.getLastPosition());
         bundle.putBoolean(EXPANDED_KEY, adapter.isItemsExpanded());
         getArguments().putBundle(BUNDLE_KEY, bundle);
     }
@@ -291,30 +289,22 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     }
 
     @Override
-    public void onSingleChoiceMemoClicked(ClickableMemo mMemo) {
-        if (myGridLayoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
-            openClickedItem(mMemo.getPosition());
-        } else {
-            mListener.onEnterEditMode(mMemo);
-        }
-    }
-
-    public void openClickedItem(int position) {
-        myGridLayoutManager.openItem(position);
+    public void onSingleChoiceMemoClicked(ClickableMemo memo) {
+        presenter.singleChoiceClick(memo, LinearLayoutManager.VERTICAL);
     }
 
     public void shutdownMemoAlarm(int position) {
         presenter.proccessMemoAlarmShutdown(adapter.getMemos().get(position));
         adapter.notifyItemChanged(position);
     }
-    
+
     public void setColumnCount(int columnCount) {
         this.mColumnCount = columnCount;
     }
 
     public void onBackButtonPressed() {
-        if (myGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
-            myGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        if (mMyGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
+            mMyGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             adapter.setItemsExpanded(false);
             databaseAccess.startUpdateExpandedColumnTask(adapter.isItemsExpanded());
         } else {
@@ -324,6 +314,16 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     public MySelectableAdapter getAdapter() {
         return adapter;
+    }
+
+    @Override
+    public MyGridLayoutManager getLayoutManager() {
+        return mMyGridLayoutManager;
+    }
+
+    @Override
+    public OnListItemFragmentInteractionListener getInteractionListener() {
+        return mListener;
     }
 
     /**
@@ -336,7 +336,7 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnItemListFragmentInteractionListener {
+    public interface OnListItemFragmentInteractionListener {
         void onAddButtonPressed();
 
         void onBackButtonPressed();

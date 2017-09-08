@@ -24,4 +24,6 @@ public interface IPresenter extends MvpPresenter<IView> {
     void proccessMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
 
     void proccessMemoAlarmShutdown(ClickableMemo clickableMemo);
+
+    void singleChoiceClick(ClickableMemo mMemo, int verticalOrientationCode);
 }
