@@ -82,4 +82,18 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
             }
         }
     }
+
+    @Override
+    public void pressBackButton(int verticalOrientationCode, int horizontalOrientationCode) {
+        if (isViewAttached()) {
+            IView view = getView();
+            if (view.getLayoutManager().getOrientation() == horizontalOrientationCode) {
+                view.getLayoutManager().setOrientation(verticalOrientationCode);
+                view.getAdapter().setItemsExpanded(false);
+                mModel.updateExpandedColumn(view.getAdapter().isItemsExpanded());
+            } else {
+                view.getInteractionListener().onBackButtonPressed();
+            }
+        }
+    }
 }

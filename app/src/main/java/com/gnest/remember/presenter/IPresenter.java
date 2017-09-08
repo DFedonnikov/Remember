@@ -26,4 +26,6 @@ public interface IPresenter extends MvpPresenter<IView> {
     void proccessMemoAlarmShutdown(ClickableMemo clickableMemo);
 
     void singleChoiceClick(ClickableMemo mMemo, int verticalOrientationCode);
+
+    void pressBackButton(int verticalOrientationCode, int horizontalOrientationCode);
 }

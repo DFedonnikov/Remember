@@ -23,4 +23,6 @@ public interface IView extends MvpView {
     MyGridLayoutManager getLayoutManager();
 
     ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
+
+    MySelectableAdapter getAdapter();
 }

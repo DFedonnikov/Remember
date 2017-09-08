@@ -58,6 +58,11 @@ public class Model implements IModel, LoaderManager.LoaderCallbacks<List<Clickab
     }
 
     @Override
+    public void updateExpandedColumn(boolean itemsExpanded) {
+        mDatabaseAccess.startUpdateExpandedColumnTask(itemsExpanded);
+    }
+
+    @Override
     public Loader<List<ClickableMemo>> onCreateLoader(int id, Bundle args) {
         return new DBLoader(App.self(), mDatabaseAccess);
     }

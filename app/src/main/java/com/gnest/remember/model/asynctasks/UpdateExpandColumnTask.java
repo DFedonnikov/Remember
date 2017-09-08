@@ -17,8 +17,20 @@ public class UpdateExpandColumnTask extends AsyncTask<Boolean, Void, Void> {
     }
 
     @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mDatabaseAccess.open();
+    }
+
+    @Override
     protected Void doInBackground(Boolean... booleans) {
         mDatabaseAccess.updateExpandedColumns(booleans[0]);
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        mDatabaseAccess.close();
     }
 }

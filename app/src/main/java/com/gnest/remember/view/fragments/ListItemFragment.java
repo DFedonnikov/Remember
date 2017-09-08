@@ -51,7 +51,7 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     private int mColumnCount;
     private OnListItemFragmentInteractionListener mListener;
-    private MySelectableAdapter adapter;
+    private MySelectableAdapter mAdapter;
     private View mView;
     private ItemTouchHelper itemTouchHelper;
     private DatabaseAccess databaseAccess;
@@ -109,11 +109,11 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
             mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
             recyclerView.setLayoutManager(mMyGridLayoutManager);
         }
-        adapter = new MySelectableAdapter(memos, this);
-        mMyGridLayoutManager.setExpandListener(adapter);
+        mAdapter = new MySelectableAdapter(memos, this);
+        mMyGridLayoutManager.setExpandListener(mAdapter);
 
 
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(mAdapter);
 
         if (getArguments() != null) {
             Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
@@ -122,10 +122,10 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
                 lastPosition = bundle.getInt(POSITION_KEY);
                 mMyGridLayoutManager.setmAncorPos(lastPosition);
                 mMyGridLayoutManager.setOrientation(lastOrientation);
-                adapter.setItemsExpanded(bundle.getBoolean(EXPANDED_KEY));
+                mAdapter.setItemsExpanded(bundle.getBoolean(EXPANDED_KEY));
             }
         }
-        ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(adapter);
+        ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
@@ -180,8 +180,8 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     public void setData(List<ClickableMemo> data) {
-        adapter.setMemos(data);
-        adapter.notifyDataSetChanged();
+        mAdapter.setMemos(data);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -193,7 +193,7 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         }
         bundle.putInt(LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
         bundle.putInt(POSITION_KEY, mMyGridLayoutManager.getLastPosition());
-        bundle.putBoolean(EXPANDED_KEY, adapter.isItemsExpanded());
+        bundle.putBoolean(EXPANDED_KEY, mAdapter.isItemsExpanded());
         getArguments().putBundle(BUNDLE_KEY, bundle);
     }
 
@@ -210,14 +210,14 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     public void onDeleteButtonPressed() {
-        presenter.deleteSelectedMemos(adapter.getSelectedList(), adapter.getMemos());
-        adapter.removeSelectedMemos(adapter.getSelectedList());
+        presenter.deleteSelectedMemos(mAdapter.getSelectedList(), mAdapter.getMemos());
+        mAdapter.removeSelectedMemos(mAdapter.getSelectedList());
         actionMode.finish();
     }
 
     @Override
     public void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
-        presenter.deleteMemo(memoId, memoPosition, adapter.getMemos(), isAlarmSet);
+        presenter.deleteMemo(memoId, memoPosition, mAdapter.getMemos(), isAlarmSet);
         if (actionMode != null) {
             actionMode.finish();
         }
@@ -234,7 +234,7 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     public void onShareButtonPressed() {
-        presenter.share(adapter.getSelectedList());
+        presenter.share(mAdapter.getSelectedList());
     }
 
     @Override
@@ -273,12 +273,12 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     public void switchMultiSelect(boolean switchedOn) {
-        adapter.switchMultiSelect(switchedOn);
+        mAdapter.switchMultiSelect(switchedOn);
     }
 
     @Override
     public void clearSelection() {
-        adapter.clearSelectedList();
+        mAdapter.clearSelectedList();
     }
 
     @Override
@@ -294,8 +294,8 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     }
 
     public void shutdownMemoAlarm(int position) {
-        presenter.proccessMemoAlarmShutdown(adapter.getMemos().get(position));
-        adapter.notifyItemChanged(position);
+        presenter.proccessMemoAlarmShutdown(mAdapter.getMemos().get(position));
+        mAdapter.notifyItemChanged(position);
     }
 
     public void setColumnCount(int columnCount) {
@@ -303,17 +303,12 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     }
 
     public void onBackButtonPressed() {
-        if (mMyGridLayoutManager.getOrientation() == LinearLayoutManager.HORIZONTAL) {
-            mMyGridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            adapter.setItemsExpanded(false);
-            databaseAccess.startUpdateExpandedColumnTask(adapter.isItemsExpanded());
-        } else {
-            mListener.onBackButtonPressed();
-        }
+        presenter.pressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL);
     }
 
+    @Override
     public MySelectableAdapter getAdapter() {
-        return adapter;
+        return mAdapter;
     }
 
     @Override

@@ -16,4 +16,6 @@ public interface IModel {
     void swapMemos(int fromId, int fromPosition, int toId, int toPosition);
 
     void setMemoAlarmFalse(int id);
+
+    void updateExpandedColumn(boolean itemsExpanded);
 }
