@@ -1,8 +1,5 @@
 package com.gnest.remember.view;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.hannesdorfmann.mosby.mvp.MvpView;
@@ -10,10 +7,10 @@ import com.hannesdorfmann.mosby.mvp.MvpView;
 import java.util.List;
 
 /**
- * Created by DFedonnikov on 23.08.2017.
+ * Created by DFedonnikov on 08.09.2017.
  */
 
-public interface IView extends MvpView {
+public interface IListFragmentView extends MvpView {
     void setData(List<ClickableMemo> data);
 
     void removeAlarm(int memoId);
@@ -25,4 +22,6 @@ public interface IView extends MvpView {
     ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
 
     MySelectableAdapter getAdapter();
+
+
 }

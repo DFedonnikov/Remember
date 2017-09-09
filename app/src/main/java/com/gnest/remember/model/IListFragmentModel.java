@@ -8,7 +8,7 @@ import java.util.List;
  * Created by DFedonnikov on 23.08.2017.
  */
 
-public interface IModel {
+public interface IListFragmentModel {
     void getData();
 
     void deleteMemoFromDB(int memoId, int memoPosition, List<ClickableMemo> memos);

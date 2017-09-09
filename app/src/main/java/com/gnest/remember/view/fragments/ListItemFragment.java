@@ -24,9 +24,10 @@ import com.gnest.remember.R;
 
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.model.db.DatabaseAccess;
-import com.gnest.remember.presenter.IPresenter;
-import com.gnest.remember.presenter.Presenter;
-import com.gnest.remember.view.IView;
+import com.gnest.remember.presenter.IListFragmentPresenter;
+import com.gnest.remember.presenter.ListFragmentPresenter;
+import com.gnest.remember.view.IListFragmentView;
+import com.gnest.remember.view.activity.MainActivity;
 import com.gnest.remember.view.helper.ItemTouchHelperCallback;
 import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.view.ActionMenu;
@@ -37,17 +38,10 @@ import com.hannesdorfmann.mosby.mvp.MvpFragment;
 import java.util.List;
 
 
-public class ListItemFragment extends MvpFragment<IView, IPresenter>
-        implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IView {
+public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragmentPresenter>
+        implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView {
 
     private static final String ARG_COLUMN_COUNT = "ColumnCount";
-
-    public static final int LM_HORIZONTAL_ORIENTATION = 0;
-    public static final int LM_VERTICAL_ORIENTATION = 1;
-    public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManagerOrientationKey";
-    public static final String POSITION_KEY = "POSITION_KEY";
-    public static final String BUNDLE_KEY = "BUNDLE_KEY";
-    public static final String EXPANDED_KEY = "EXPANDED_KEY";
 
     private int mColumnCount;
     private OnListItemFragmentInteractionListener mListener;
@@ -112,17 +106,16 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
         mAdapter = new MySelectableAdapter(memos, this);
         mMyGridLayoutManager.setExpandListener(mAdapter);
 
-
         recyclerView.setAdapter(mAdapter);
 
         if (getArguments() != null) {
-            Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
+            Bundle bundle = getArguments().getBundle(MainActivity.BUNDLE_KEY);
             if (bundle != null) {
-                lastOrientation = bundle.getInt(LM_SCROLL_ORIENTATION_KEY);
-                lastPosition = bundle.getInt(POSITION_KEY);
+                lastOrientation = bundle.getInt(MainActivity.LM_SCROLL_ORIENTATION_KEY);
+                lastPosition = bundle.getInt(MainActivity.POSITION_KEY);
                 mMyGridLayoutManager.setmAncorPos(lastPosition);
                 mMyGridLayoutManager.setOrientation(lastOrientation);
-                mAdapter.setItemsExpanded(bundle.getBoolean(EXPANDED_KEY));
+                mAdapter.setItemsExpanded(bundle.getBoolean(MainActivity.EXPANDED_KEY));
             }
         }
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mAdapter);
@@ -173,8 +166,8 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
 
     @Override
     @NonNull
-    public IPresenter createPresenter() {
-        return new Presenter(getActivity().getSupportLoaderManager());
+    public IListFragmentPresenter createPresenter() {
+        return new ListFragmentPresenter(getActivity().getSupportLoaderManager());
     }
 
 
@@ -187,14 +180,14 @@ public class ListItemFragment extends MvpFragment<IView, IPresenter>
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
+        Bundle bundle = getArguments().getBundle(MainActivity.BUNDLE_KEY);
         if (bundle == null) {
             bundle = new Bundle();
         }
-        bundle.putInt(LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
-        bundle.putInt(POSITION_KEY, mMyGridLayoutManager.getLastPosition());
-        bundle.putBoolean(EXPANDED_KEY, mAdapter.isItemsExpanded());
-        getArguments().putBundle(BUNDLE_KEY, bundle);
+        bundle.putInt(MainActivity.LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
+        bundle.putInt(MainActivity.POSITION_KEY, mMyGridLayoutManager.getLastPosition());
+        bundle.putBoolean(MainActivity.EXPANDED_KEY, mAdapter.isItemsExpanded());
+        getArguments().putBundle(MainActivity.BUNDLE_KEY, bundle);
     }
 
     @Override

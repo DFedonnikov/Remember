@@ -58,7 +58,7 @@ public class Memo extends Binder {
         return mIsAlarmSet;
     }
 
-    public void setAlarmSet(boolean alarmSet) {
+    public void setAlarm(boolean alarmSet) {
         mIsAlarmSet = alarmSet;
     }
 

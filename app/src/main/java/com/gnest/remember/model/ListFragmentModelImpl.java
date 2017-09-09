@@ -15,7 +15,7 @@ import java.util.List;
  * Created by DFedonnikov on 24.08.2017.
  */
 
-public class Model implements IModel, LoaderManager.LoaderCallbacks<List<ClickableMemo>>  {
+public class ListFragmentModelImpl implements IListFragmentModel, LoaderManager.LoaderCallbacks<List<ClickableMemo>>  {
 
     private static final int LOADER_ID = 0;
 
@@ -23,7 +23,7 @@ public class Model implements IModel, LoaderManager.LoaderCallbacks<List<Clickab
     private OnLoadDataListener mListener;
     private DatabaseAccess mDatabaseAccess;
 
-    public Model(LoaderManager supportLoaderManager, OnLoadDataListener loadDataListener) {
+    public ListFragmentModelImpl(LoaderManager supportLoaderManager, OnLoadDataListener loadDataListener) {
         this.mLoaderManager = supportLoaderManager;
         this.mListener = loadDataListener;
         this.mDatabaseAccess = DatabaseAccess.getInstance(App.self());

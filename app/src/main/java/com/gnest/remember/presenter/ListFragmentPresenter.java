@@ -1,13 +1,12 @@
 package com.gnest.remember.presenter;
 
 import android.support.v4.app.LoaderManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.SparseArray;
 
-import com.gnest.remember.model.IModel;
-import com.gnest.remember.model.Model;
+import com.gnest.remember.model.IListFragmentModel;
+import com.gnest.remember.model.ListFragmentModelImpl;
 import com.gnest.remember.model.data.ClickableMemo;
-import com.gnest.remember.view.IView;
+import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.List;
@@ -16,18 +15,17 @@ import java.util.List;
  * Created by DFedonnikov on 23.08.2017.
  */
 
-public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Model.OnLoadDataListener {
+public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter, ListFragmentModelImpl.OnLoadDataListener {
 
-    private IModel mModel;
+    private IListFragmentModel mModel;
 
-    public Presenter(LoaderManager supportLoaderManager) {
-        mModel = new Model(supportLoaderManager, this);
+    public ListFragmentPresenter(LoaderManager supportLoaderManager) {
+        mModel = new ListFragmentModelImpl(supportLoaderManager, this);
     }
 
     @Override
     public void loadData() {
         mModel.getData();
-
     }
 
     @Override
@@ -68,13 +66,13 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
     @Override
     public void proccessMemoAlarmShutdown(ClickableMemo clickableMemo) {
         mModel.setMemoAlarmFalse(clickableMemo.getId());
-        clickableMemo.setAlarmSet(false);
+        clickableMemo.setAlarm(false);
     }
 
     @Override
     public void singleChoiceClick(ClickableMemo memo, int verticalOrientationCode) {
         if (isViewAttached()) {
-            IView view = getView();
+            IListFragmentView view = getView();
             if (view.getLayoutManager().getOrientation() == verticalOrientationCode) {
                 view.getLayoutManager().openItem(memo.getPosition());
             } else {
@@ -86,7 +84,7 @@ public class Presenter extends MvpBasePresenter<IView> implements IPresenter, Mo
     @Override
     public void pressBackButton(int verticalOrientationCode, int horizontalOrientationCode) {
         if (isViewAttached()) {
-            IView view = getView();
+            IListFragmentView view = getView();
             if (view.getLayoutManager().getOrientation() == horizontalOrientationCode) {
                 view.getLayoutManager().setOrientation(verticalOrientationCode);
                 view.getAdapter().setItemsExpanded(false);

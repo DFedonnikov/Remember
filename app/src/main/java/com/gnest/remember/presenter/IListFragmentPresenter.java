@@ -3,16 +3,17 @@ package com.gnest.remember.presenter;
 import android.util.SparseArray;
 
 import com.gnest.remember.model.data.ClickableMemo;
-import com.gnest.remember.view.IView;
+import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
 import java.util.List;
 
 /**
- * Created by DFedonnikov on 23.08.2017.
+ * Created by DFedonnikov on 08.09.2017.
  */
 
-public interface IPresenter extends MvpPresenter<IView> {
+public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> {
+
     void loadData();
 
     void deleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet);

@@ -20,10 +20,19 @@ public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
         ListItemFragment.OnListItemFragmentInteractionListener,
         OpenMemoFromNotificationTask.NotificationOpenerHelper {
+
+    public static final int LM_HORIZONTAL_ORIENTATION = 0;
+    public static final int LM_VERTICAL_ORIENTATION = 1;
+    public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManagerOrientationKey";
+    public static final String POSITION_KEY = "POSITION_KEY";
+    public static final String BUNDLE_KEY = "BUNDLE_KEY";
+    public static final String EXPANDED_KEY = "EXPANDED_KEY";
+
     private static final String EDIT_FRAG_VISIBILITY_KEY = "edit_frag_visibility_key";
     private static final String EDIT_FRAMENT_NAME = "edit_fragment";
     private static final String ITEM_FRAMENT_NAME = "item_fragment";
     private static final int MEMO_WIDTH = 175;
+
     private ListItemFragment itemFragment;
     private EditMemoFragment editMemoFragment;
     private boolean isEditFragVisible;
@@ -67,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
     private void insertItemFragment(Bundle bundle) {
         itemFragment = ListItemFragment.newInstance(COLUMNS);
         if (bundle != null) {
-            itemFragment.getArguments().putBundle(ListItemFragment.BUNDLE_KEY, bundle);
+            itemFragment.getArguments().putBundle(BUNDLE_KEY, bundle);
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.current_fragment, itemFragment, null);

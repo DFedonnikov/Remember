@@ -34,14 +34,16 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.gnest.remember.R;
-import com.gnest.remember.model.data.Memo;
 import com.gnest.remember.model.data.ClickableMemo;
-import com.gnest.remember.model.db.DatabaseAccess;
 import com.gnest.remember.model.services.AlarmService;
+import com.gnest.remember.presenter.EditMemoPresenter;
+import com.gnest.remember.presenter.IEditMemoPresenter;
 import com.gnest.remember.view.ColorSpinnerAdapter;
+import com.gnest.remember.view.IEditMemoView;
+import com.gnest.remember.view.TimeSetListener;
+import com.gnest.remember.view.activity.MainActivity;
+import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -54,31 +56,23 @@ import java.util.TimeZone;
  * Use the {@link EditMemoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EditMemoFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresenter>
+        implements AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener {
     public static final String MEMO_KEY = "memo_param";
 
-    private static Calendar selectedDate = Calendar.getInstance();
     private AppCompatActivity activity;
-    private static boolean isAlarmSet;
 
     private View mView;
     private EditText mMemoEditTextView;
     private ImageView mRemoveAlert;
+    private ImageView arrow;
 
     private ClickableMemo mMemo;
     private String mColor;
     private AppBarLayout mAppBarLayout;
     private CompactCalendarView mCompactCalendarView;
-    private boolean isCalendarExpanded;
-    private boolean wasAlarmSet;
 
     private OnEditMemoFragmentInteractionListener mListener;
-
-    private SimpleDateFormat mCalendarDateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
-    private SimpleDateFormat mCalendarAlarmSetFormat = new SimpleDateFormat("d MMMM yyyy hh:mm", Locale.ENGLISH);
-
-
-    private String selectedDateFormatted;
 
     public EditMemoFragment() {
         // Required empty public constructor
@@ -102,7 +96,6 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
             Bundle arguments = getArguments();
             mMemo = (ClickableMemo) arguments.getBinder(MEMO_KEY);
         }
-        isAlarmSet = false;
     }
 
     @Override
@@ -114,18 +107,14 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         mRemoveAlert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int id = mMemo != null ? mMemo.getId() : -1;
-                removeAlarm(id);
-                mRemoveAlert.setVisibility(View.INVISIBLE);
+                presenter.processRemoveAlarm(getString(R.string.alarm_remove_text));
+                setAlarmVisibility(false);
             }
         });
 
         if (mMemo != null) {
             mMemoEditTextView.setText(mMemo.getMemoText());
-            if (mMemo.isAlarmSet()) {
-                mRemoveAlert.setVisibility(View.VISIBLE);
-                wasAlarmSet = mMemo.isAlarmSet();
-            }
+            setAlarmVisibility(mMemo.isAlarmSet());
         }
         return mView;
     }
@@ -153,164 +142,29 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         mCompactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
-                selectedDate.setTime(dateClicked);
-                setSubtitle(mCalendarDateFormat.format(dateClicked));
-                selectedDateFormatted = mCalendarDateFormat.format(dateClicked);
-                isCalendarExpanded = !isCalendarExpanded;
-                mAppBarLayout.setExpanded(isCalendarExpanded, true);
-                DialogFragment timePickFragment = new TimePickerFragment();
-                timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
+                presenter.processDayClicked(dateClicked);
             }
-
-
 
             @Override
             public void onMonthScroll(Date firstDayOfNewMonth) {
-                setSubtitle(mCalendarDateFormat.format(firstDayOfNewMonth));
+                presenter.processMonthScroll(firstDayOfNewMonth);
             }
         });
 
-        setCurrentDate(Calendar.getInstance().getTime());
+        presenter.processSetCurrentDate();
 
-
-        final ImageView arrow = mView.findViewById(R.id.date_picker_arrow);
+        arrow = mView.findViewById(R.id.date_picker_arrow);
 
         RelativeLayout datePickerButton = mView.findViewById(R.id.date_picker_button);
 
         datePickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isCalendarExpanded) {
-                    ViewCompat.animate(arrow).rotation(0).start();
-                } else {
-                    ViewCompat.animate(arrow).rotation(180).start();
-                }
-
-                isCalendarExpanded = !isCalendarExpanded;
-                mAppBarLayout.setExpanded(isCalendarExpanded, true);
+                presenter.processDatePicker();
             }
         });
     }
 
-
-    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
-            final Calendar c = selectedDate;
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-
-            // Create a new instance of TimePickerDialog and return it
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    DateFormat.is24HourFormat(getActivity()));
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
-            selectedDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            selectedDate.set(Calendar.MINUTE, minute);
-            Calendar now = Calendar.getInstance();
-            if (selectedDate.after(now)) {
-                isAlarmSet = true;
-                getActivity().findViewById(R.id.bt_remove_alert).setVisibility(View.VISIBLE);
-            }
-
-        }
-
-    }
-
-    @Override
-    public void onClick(View view) {
-    }
-
-    public void onBackButtonPressed() {
-        DatabaseAccess databaseAccess = DatabaseAccess.getInstance(this.getContext());
-        databaseAccess.open();
-
-        String textToSave = mMemoEditTextView.getText().toString();
-        int savedId = -1;
-        if (mMemo == null) {
-            // Add new mMemo
-            if (!textToSave.isEmpty()) {
-                Memo temp = new Memo(textToSave, mColor, isAlarmSet);
-                savedId = (int) databaseAccess.save(temp);
-            }
-        } else {
-            // Update the mMemo
-            mMemo.setMemoText(textToSave);
-            mMemo.setColor(mColor);
-            mMemo.setAlarmSet(isAlarmSet || wasAlarmSet);
-            databaseAccess.update(mMemo);
-            savedId = mMemo.getId();
-        }
-
-        databaseAccess.close();
-
-        if (isAlarmSet) {
-            setAlarm(textToSave, savedId);
-        }
-
-        if (mListener != null) {
-            Bundle bundle = null;
-            if (mMemo != null) {
-                bundle = new Bundle();
-                bundle.putInt(ListItemFragment.LM_SCROLL_ORIENTATION_KEY, ListItemFragment.LM_HORIZONTAL_ORIENTATION);
-                bundle.putInt(ListItemFragment.POSITION_KEY, mMemo.getPosition());
-                bundle.putBoolean(ListItemFragment.EXPANDED_KEY, true);
-            }
-            mListener.onSaveEditMemoFragmentInteraction(bundle);
-        }
-    }
-
-    private void setAlarm(String notificationText, int id) {
-        if (id != -1) {
-            setNotification(true, notificationText, id);
-
-            StringBuilder alarmSetToast = new StringBuilder();
-            alarmSetToast
-                    .append(getString(R.string.alarm_set_text))
-                    .append(" ")
-                    .append(mCalendarAlarmSetFormat.format(selectedDate.getTime()));
-            showAlarmToast(alarmSetToast.toString());
-        }
-    }
-
-    private void removeAlarm(int id) {
-        if (id != -1) {
-            setNotification(false, null, id);
-        }
-
-        StringBuilder alarmSetToast = new StringBuilder();
-        alarmSetToast.append(getString(R.string.alarm_remove_text));
-        showAlarmToast(alarmSetToast.toString());
-
-        wasAlarmSet = isAlarmSet = false;
-    }
-
-    private void setNotification(boolean isSet, String notificationText, int id) {
-        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        if (notificationText != null) {
-            if (notificationText.length() > 10) {
-                notificationText.substring(0, 10).concat("...");
-            }
-        }
-
-        Intent intent = AlarmService.getServiceIntent(activity, notificationText, id);
-        PendingIntent pendingIntent = PendingIntent.getService(activity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        if (isSet) {
-            manager.set(AlarmManager.RTC_WAKEUP, selectedDate.getTimeInMillis(), pendingIntent);
-        } else {
-            manager.cancel(pendingIntent);
-        }
-    }
-
-    private void showAlarmToast(String toastText) {
-        Toast.makeText(activity, toastText, Toast.LENGTH_LONG).show();
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -327,6 +181,102 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    @NonNull
+    public IEditMemoPresenter createPresenter() {
+        return new EditMemoPresenter(mMemo);
+    }
+
+    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+
+        public static final String HOUR_KEY = "HOUR_KEY";
+        public static final String MINUTE_KEY = "MINUTE_KEY";
+
+        private TimeSetListener mListener;
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current time as the default values for the picker
+            int hour = 0;
+            int minute = 0;
+            if (getArguments() != null) {
+                hour = getArguments().getInt(HOUR_KEY);
+                minute = getArguments().getInt(MINUTE_KEY);
+            }
+            // Create a new instance of TimePickerDialog and return it
+            return new TimePickerDialog(getActivity(), this, hour, minute,
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            // Do something with the time chosen by the user
+            if (mListener != null) {
+                mListener.onTimeSet(hourOfDay, minute);
+            }
+        }
+
+        public void setTimeSetListener(TimeSetListener listener) {
+            this.mListener = listener;
+        }
+    }
+
+    public void onBackButtonPressed() {
+        presenter.processBackButtonPress(mMemoEditTextView.getText().toString(), mColor, getString(R.string.alarm_set_text));
+    }
+
+    @Override
+    public void memoSavedInteraction(int memoPosition) {
+        if (mListener != null) {
+            Bundle bundle = null;
+            if (memoPosition != -1) {
+                bundle = new Bundle();
+                bundle.putInt(MainActivity.LM_SCROLL_ORIENTATION_KEY, MainActivity.LM_HORIZONTAL_ORIENTATION);
+                bundle.putInt(MainActivity.POSITION_KEY, memoPosition);
+                bundle.putBoolean(MainActivity.EXPANDED_KEY, true);
+            }
+            mListener.onSaveEditMemoFragmentInteraction(bundle);
+        }
+    }
+
+    @Override
+    public AlarmManager getAlarmManager() {
+        return (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+    }
+
+    @Override
+    public PendingIntent getPendingIntent(String notificationText, int id) {
+        Intent intent = AlarmService.getServiceIntent(activity, notificationText, id);
+        return PendingIntent.getService(activity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    @Override
+    public void showAlarmToast(String alarmText) {
+        Toast.makeText(activity, alarmText, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void setCalendarExpanded(boolean isCalendarExpanded) {
+        mAppBarLayout.setExpanded(isCalendarExpanded, true);
+    }
+
+    @Override
+    public void showTimePicker(int hour, int minute) {
+        TimePickerFragment timePickFragment = new TimePickerFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(TimePickerFragment.HOUR_KEY, hour);
+        bundle.putInt(TimePickerFragment.MINUTE_KEY, minute);
+        timePickFragment.setArguments(bundle);
+        timePickFragment.setTimeSetListener(this);
+        timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
+    }
+
+    @Override
+    public void animateArrow(boolean isCalendarExpanded) {
+        int rotation = isCalendarExpanded ? 0 : 180;
+        ViewCompat.animate(arrow).rotation(rotation).start();
     }
 
     @Override
@@ -353,6 +303,7 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
 
     }
 
+    @Override
     public void setSubtitle(String subtitle) {
         TextView datePickerTextView = mView.findViewById(R.id.date_picker_text_view);
 
@@ -361,15 +312,22 @@ public class EditMemoFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    @Override
     public void setCurrentDate(Date date) {
-        selectedDate.setTime(date);
-        String currentDate = mCalendarDateFormat.format(date);
-        setSubtitle(currentDate);
         if (mCompactCalendarView != null) {
             mCompactCalendarView.setCurrentDate(date);
         }
     }
 
+    @Override
+    public void onTimeSet(int hour, int minute) {
+        presenter.processTimeSet(hour, minute);
+    }
+
+    @Override
+    public void setAlarmVisibility(boolean visible) {
+        mRemoveAlert.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+    }
 
     /**
      * This interface must be implemented by activities that contain this
