@@ -108,21 +108,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
         recyclerView.setAdapter(mAdapter);
 
-        if (getArguments() != null) {
-            Bundle bundle = getArguments().getBundle(MainActivity.BUNDLE_KEY);
-            if (bundle != null) {
-                lastOrientation = bundle.getInt(MainActivity.LM_SCROLL_ORIENTATION_KEY);
-                lastPosition = bundle.getInt(MainActivity.POSITION_KEY);
-                mMyGridLayoutManager.setmAncorPos(lastPosition);
-                mMyGridLayoutManager.setOrientation(lastOrientation);
-                mAdapter.setItemsExpanded(bundle.getBoolean(MainActivity.EXPANDED_KEY));
-            }
-        }
+        presenter.loadData();
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        presenter.loadData();
+
     }
 
     @Override
@@ -175,6 +166,16 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void setData(List<ClickableMemo> data) {
         mAdapter.setMemos(data);
         mAdapter.notifyDataSetChanged();
+        if (getArguments() != null) {
+            Bundle bundle = getArguments().getBundle(MainActivity.BUNDLE_KEY);
+            if (bundle != null) {
+                lastOrientation = bundle.getInt(MainActivity.LM_SCROLL_ORIENTATION_KEY);
+                lastPosition = bundle.getInt(MainActivity.POSITION_KEY);
+                mMyGridLayoutManager.setmAncorPos(lastPosition);
+                mMyGridLayoutManager.setOrientation(lastOrientation);
+                mAdapter.setItemsExpanded(bundle.getBoolean(MainActivity.EXPANDED_KEY));
+            }
+        }
     }
 
     @Override
