@@ -81,7 +81,6 @@ public class EditMemoModelImpl implements IEditMemoModel {
             mEditedMemo.setColor(memoColor);
             mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
             mDatabaseAccess.update(mEditedMemo);
-            mEditedMemo.getId();
         }
         mDatabaseAccess.close();
     }
