@@ -1,4 +1,4 @@
-package com.gnest.remember.view;
+package com.gnest.remember.view.menu;
 
 
 import android.support.v7.view.ActionMode;

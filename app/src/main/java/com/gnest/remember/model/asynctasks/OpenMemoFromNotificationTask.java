@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.gnest.remember.model.data.ClickableMemo;
-import com.gnest.remember.view.MySelectableAdapter;
+import com.gnest.remember.view.adapters.MySelectableAdapter;
 
 
 /**

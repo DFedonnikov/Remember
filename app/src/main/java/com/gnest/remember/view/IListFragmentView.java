@@ -1,7 +1,9 @@
 package com.gnest.remember.view;
 
 import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.fragments.ListItemFragment;
+import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby.mvp.MvpView;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.gnest.remember.view;
+package com.gnest.remember.view.adapters;
 
 import android.content.Context;
 import android.database.DataSetObserver;

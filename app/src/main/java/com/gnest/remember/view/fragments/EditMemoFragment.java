@@ -38,9 +38,8 @@ import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.presenter.EditMemoPresenter;
 import com.gnest.remember.presenter.IEditMemoPresenter;
-import com.gnest.remember.view.ColorSpinnerAdapter;
+import com.gnest.remember.view.adapters.ColorSpinnerAdapter;
 import com.gnest.remember.view.IEditMemoView;
-import com.gnest.remember.view.TimeSetListener;
 import com.gnest.remember.view.activity.MainActivity;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 

@@ -1,4 +1,4 @@
-package com.gnest.remember.view;
+package com.gnest.remember.view.adapters;
 
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;

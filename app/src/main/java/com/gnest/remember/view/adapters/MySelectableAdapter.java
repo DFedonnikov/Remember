@@ -1,4 +1,4 @@
-package com.gnest.remember.view;
+package com.gnest.remember.view.adapters;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.gnest.remember.R;
 import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.gnest.remember.view;
+package com.gnest.remember.view.layoutmanagers;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -468,7 +468,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         View view;
     }
 
-    interface ExpandListener {
+    public interface ExpandListener {
         void expandItems();
     }
 }

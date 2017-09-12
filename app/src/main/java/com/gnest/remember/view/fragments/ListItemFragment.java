@@ -29,9 +29,9 @@ import com.gnest.remember.view.IListFragmentView;
 import com.gnest.remember.view.activity.MainActivity;
 import com.gnest.remember.view.helper.ItemTouchHelperCallback;
 import com.gnest.remember.model.services.AlarmService;
-import com.gnest.remember.view.ActionMenu;
-import com.gnest.remember.view.MyGridLayoutManager;
-import com.gnest.remember.view.MySelectableAdapter;
+import com.gnest.remember.view.menu.ActionMenu;
+import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
+import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
 import java.util.List;
