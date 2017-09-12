@@ -69,12 +69,11 @@ public class EditMemoModelImpl implements IEditMemoModel {
     @Override
     public void saveMemoToDB(String memoText, String memoColor) {
         mDatabaseAccess.open();
-        int savedId = -1;
         if (mEditedMemo == null) {
             // Add new mMemo
             if (!memoText.isEmpty()) {
                 Memo temp = new Memo(memoText, memoColor, isAlarmSet);
-                savedId = (int) mDatabaseAccess.save(temp);
+                mDatabaseAccess.save(temp);
             }
         } else {
             // Update the mMemo
@@ -82,7 +81,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
             mEditedMemo.setColor(memoColor);
             mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
             mDatabaseAccess.update(mEditedMemo);
-            savedId = mEditedMemo.getId();
+            mEditedMemo.getId();
         }
         mDatabaseAccess.close();
     }
