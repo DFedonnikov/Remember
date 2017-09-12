@@ -25,7 +25,7 @@ public class OpenMemoFromNotificationTask extends AsyncTask<Long, Void, Integer>
 
     @Override
     protected Integer doInBackground(Long... longs) {
-        while (mAdapter.getMemos() == null) {
+        while (mAdapter.getMemos().isEmpty()) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {

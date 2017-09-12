@@ -37,6 +37,11 @@ public class EditMemoModelImpl implements IEditMemoModel {
     }
 
     @Override
+    public boolean isAlarmSet() {
+        return isAlarmSet;
+    }
+
+    @Override
     public void setWasAlarmSet(boolean isSet) {
         wasAlarmSet = isSet;
     }

@@ -39,7 +39,7 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
         mModel.saveMemoToDB(memoText, memoColor);
         int position = -1;
         if (mModel.getEditedMemo() != null) {
-            if (mModel.getEditedMemo().isAlarmSet()) {
+            if (mModel.isAlarmSet()) {
                 setAlarm(memoText, mModel.getEditedMemo().getId(), alarmSetText);
             }
             position = mModel.getEditedMemo().getPosition();

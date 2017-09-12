@@ -12,6 +12,8 @@ import java.util.Date;
 public interface IEditMemoModel {
     void setIsAlarmSet(boolean isSet);
 
+    boolean isAlarmSet();
+
     void setWasAlarmSet(boolean isSet);
 
     ClickableMemo getEditedMemo();
