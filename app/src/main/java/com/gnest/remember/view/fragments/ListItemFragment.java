@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import com.gnest.remember.R;
 
 import com.gnest.remember.model.data.ClickableMemo;
-import com.gnest.remember.model.db.DatabaseAccess;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 import com.gnest.remember.presenter.ListFragmentPresenter;
 import com.gnest.remember.view.IListFragmentView;
@@ -48,14 +47,9 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private MySelectableAdapter mAdapter;
     private View mView;
     private ItemTouchHelper itemTouchHelper;
-    private DatabaseAccess databaseAccess;
-    private List<ClickableMemo> memos;
     private android.support.v7.view.ActionMode actionMode;
     private ActionMenu actionMenu;
-    private RecyclerView recyclerView;
     private MyGridLayoutManager mMyGridLayoutManager;
-    private int lastPosition;
-    private int lastOrientation;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -76,13 +70,10 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-//        this.databaseAccess = DatabaseAccess.getInstance(this.getContext());
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
         actionMenu = new ActionMenu(this);
-//        databaseAccess.open();
-
     }
 
     @Override
@@ -95,7 +86,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerView = mView.findViewById(R.id.memo_list);
+        RecyclerView recyclerView = mView.findViewById(R.id.memo_list);
         Context context = mView.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -103,17 +94,17 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
             recyclerView.setLayoutManager(mMyGridLayoutManager);
         }
-        mAdapter = new MySelectableAdapter(memos, this);
+        mAdapter = new MySelectableAdapter(this);
         mMyGridLayoutManager.setExpandListener(mAdapter);
 
         recyclerView.setAdapter(mAdapter);
 
-        presenter.loadData();
+
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-
+        presenter.loadData();
     }
 
     @Override
@@ -138,8 +129,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             throw new RuntimeException(context.toString()
                     + " must implement OnListItemFragmentInteractionListener");
         }
-
-
     }
 
     @Override
@@ -151,7 +140,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        memos = null;
     }
 
 
@@ -166,14 +154,17 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void setData(List<ClickableMemo> data) {
         mAdapter.setMemos(data);
         mAdapter.notifyDataSetChanged();
+        returnFromEditMode();
+    }
+
+    private void returnFromEditMode() {
         if (getArguments() != null) {
             Bundle bundle = getArguments().getBundle(MainActivity.BUNDLE_KEY);
             if (bundle != null) {
-                lastOrientation = bundle.getInt(MainActivity.LM_SCROLL_ORIENTATION_KEY);
-                lastPosition = bundle.getInt(MainActivity.POSITION_KEY);
-                mMyGridLayoutManager.setmAncorPos(lastPosition);
-                mMyGridLayoutManager.setOrientation(lastOrientation);
-                mAdapter.setItemsExpanded(bundle.getBoolean(MainActivity.EXPANDED_KEY));
+                int lastPosition = bundle.getInt(MainActivity.POSITION_KEY);
+                int lastOrientation = bundle.getInt(MainActivity.LM_SCROLL_ORIENTATION_KEY);
+                boolean isExpanded = bundle.getBoolean(MainActivity.EXPANDED_KEY);
+                presenter.processReturnFromEditMode(lastPosition, lastOrientation, isExpanded);
             }
         }
     }
@@ -204,14 +195,14 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onDeleteButtonPressed() {
-        presenter.deleteSelectedMemos(mAdapter.getSelectedList(), mAdapter.getMemos());
+        presenter.processDeleteSelectedMemos(mAdapter.getSelectedList(), mAdapter.getMemos());
         mAdapter.removeSelectedMemos(mAdapter.getSelectedList());
         actionMode.finish();
     }
 
     @Override
     public void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
-        presenter.deleteMemo(memoId, memoPosition, mAdapter.getMemos(), isAlarmSet);
+        presenter.processDeleteMemo(memoId, memoPosition, mAdapter.getMemos(), isAlarmSet);
         if (actionMode != null) {
             actionMode.finish();
         }
@@ -228,7 +219,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onShareButtonPressed() {
-        presenter.share(mAdapter.getSelectedList());
+        presenter.processShare(mAdapter.getSelectedList());
     }
 
     @Override
@@ -243,7 +234,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
-        presenter.proccessMemoSwap(fromId, fromPosition, toId, toPosition);
+        presenter.processMemoSwap(fromId, fromPosition, toId, toPosition);
     }
 
     @Override
@@ -284,11 +275,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onSingleChoiceMemoClicked(ClickableMemo memo) {
-        presenter.singleChoiceClick(memo, LinearLayoutManager.VERTICAL);
+        presenter.processSingleChoiceClick(memo, LinearLayoutManager.VERTICAL);
     }
 
     public void shutdownMemoAlarm(int position) {
-        presenter.proccessMemoAlarmShutdown(mAdapter.getMemos().get(position));
+        presenter.processMemoAlarmShutdown(mAdapter.getMemos().get(position));
         mAdapter.notifyItemChanged(position);
     }
 
@@ -297,7 +288,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     public void onBackButtonPressed() {
-        presenter.pressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL);
+        presenter.processPressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL);
     }
 
     @Override

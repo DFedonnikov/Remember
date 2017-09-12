@@ -19,6 +19,8 @@ public interface IEditMemoView extends MvpView {
 
     PendingIntent getPendingIntent(String notificationText, int id);
 
+    void setAlarm(boolean isSet, long alarmDate, String notificationText, int id);
+
     void showAlarmToast(String alarmMessage);
 
     void setSubtitle(String dateFormat);

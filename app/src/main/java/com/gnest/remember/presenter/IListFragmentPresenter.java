@@ -1,5 +1,6 @@
 package com.gnest.remember.presenter;
 
+import android.os.Bundle;
 import android.util.SparseArray;
 
 import com.gnest.remember.model.data.ClickableMemo;
@@ -16,17 +17,19 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
 
     void loadData();
 
-    void deleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet);
+    void processDeleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet);
 
-    void deleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos);
+    void processDeleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos);
 
-    void share(SparseArray<ClickableMemo> selectedList);
+    void processShare(SparseArray<ClickableMemo> selectedList);
 
-    void proccessMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
+    void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
 
-    void proccessMemoAlarmShutdown(ClickableMemo clickableMemo);
+    void processMemoAlarmShutdown(ClickableMemo clickableMemo);
 
-    void singleChoiceClick(ClickableMemo mMemo, int verticalOrientationCode);
+    void processSingleChoiceClick(ClickableMemo mMemo, int verticalOrientationCode);
 
-    void pressBackButton(int verticalOrientationCode, int horizontalOrientationCode);
+    void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode);
+
+    void processReturnFromEditMode(int lastOrientation, int lastPosition, boolean isExpanded);
 }

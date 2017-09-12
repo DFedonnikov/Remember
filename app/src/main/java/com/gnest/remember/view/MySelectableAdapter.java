@@ -12,6 +12,7 @@ import com.gnest.remember.R;
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,9 +27,9 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     private SparseArray<ClickableMemo> mSelectedList = new SparseArray<>();
     private boolean mItemsExpanded;
 
-    public MySelectableAdapter(List<ClickableMemo> memos, OnItemActionPerformed listener) {
-        this.mMemos = memos;
+    public MySelectableAdapter(OnItemActionPerformed listener) {
         this.mListener = listener;
+        this.mMemos = new ArrayList<>();
     }
 
     @Override
@@ -115,11 +116,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         notifyDataSetChanged();
     }
 
-//    @Override
-//    public void showActionMode() {
-//        mListener.showActionMode();
-//    }
-
     public void switchMultiSelect(boolean switchedOn) {
         multiChoiceEnabled = switchedOn;
     }
@@ -150,7 +146,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
                 mListener.setShareButtonVisibility(false);
             }
         } else {
-//            mListener.onEnterItemEditMode(mMemo);
             mListener.onSingleChoiceMemoClicked(mMemo);
         }
     }

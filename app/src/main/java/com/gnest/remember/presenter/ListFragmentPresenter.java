@@ -36,15 +36,27 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void deleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
-        for (int i = 0; i < selectedMemos.size(); i++) {
-            ClickableMemo memo = selectedMemos.valueAt(i);
-            deleteMemo(memo.getId(), memo.getPosition(), memos, memo.isAlarmSet());
+    public void processReturnFromEditMode(int lastPosition, int lastOrientation, boolean isExpanded) {
+        if (isViewAttached()) {
+            IListFragmentView view = getView();
+            if (view != null) {
+                view.getLayoutManager().setmAncorPos(lastPosition);
+                view.getLayoutManager().setOrientation(lastOrientation);
+                view.getAdapter().setItemsExpanded(isExpanded);
+            }
         }
     }
 
     @Override
-    public void deleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet) {
+    public void processDeleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
+        for (int i = 0; i < selectedMemos.size(); i++) {
+            ClickableMemo memo = selectedMemos.valueAt(i);
+            processDeleteMemo(memo.getId(), memo.getPosition(), memos, memo.isAlarmSet());
+        }
+    }
+
+    @Override
+    public void processDeleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet) {
         mModel.deleteMemoFromDB(memoId, memoPosition, memos);
         if (isAlarmSet) {
             getView().removeAlarm(memoId);
@@ -52,25 +64,25 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void share(SparseArray<ClickableMemo> selectedList) {
+    public void processShare(SparseArray<ClickableMemo> selectedList) {
         if (selectedList.size() == 1 && isViewAttached()) {
             getView().shareMemoText(selectedList.valueAt(0).getMemoText());
         }
     }
 
     @Override
-    public void proccessMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
+    public void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
         mModel.swapMemos(fromId, fromPosition, toId, toPosition);
     }
 
     @Override
-    public void proccessMemoAlarmShutdown(ClickableMemo clickableMemo) {
+    public void processMemoAlarmShutdown(ClickableMemo clickableMemo) {
         mModel.setMemoAlarmFalse(clickableMemo.getId());
         clickableMemo.setAlarm(false);
     }
 
     @Override
-    public void singleChoiceClick(ClickableMemo memo, int verticalOrientationCode) {
+    public void processSingleChoiceClick(ClickableMemo memo, int verticalOrientationCode) {
         if (isViewAttached()) {
             IListFragmentView view = getView();
             if (view.getLayoutManager().getOrientation() == verticalOrientationCode) {
@@ -82,7 +94,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void pressBackButton(int verticalOrientationCode, int horizontalOrientationCode) {
+    public void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode) {
         if (isViewAttached()) {
             IListFragmentView view = getView();
             if (view.getLayoutManager().getOrientation() == horizontalOrientationCode) {

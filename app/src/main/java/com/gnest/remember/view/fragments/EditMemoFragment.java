@@ -253,6 +253,17 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     }
 
     @Override
+    public void setAlarm(boolean isSet, long alarmDate, String notificationText, int id) {
+        AlarmManager manager = getAlarmManager();
+        PendingIntent pendingIntent = getPendingIntent(notificationText, id);
+        if (isSet) {
+            manager.set(AlarmManager.RTC_WAKEUP, alarmDate, pendingIntent);
+        } else {
+            manager.cancel(pendingIntent);
+        }
+    }
+
+    @Override
     public void showAlarmToast(String alarmText) {
         Toast.makeText(activity, alarmText, Toast.LENGTH_LONG).show();
     }

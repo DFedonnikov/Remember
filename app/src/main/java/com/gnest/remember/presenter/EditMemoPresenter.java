@@ -1,14 +1,9 @@
 package com.gnest.remember.presenter;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.os.Bundle;
-
 import com.gnest.remember.model.EditMemoModelImpl;
 import com.gnest.remember.model.IEditMemoModel;
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.IEditMemoView;
-import com.gnest.remember.view.activity.MainActivity;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.text.SimpleDateFormat;
@@ -81,18 +76,13 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     }
 
     private void setNotification(boolean isSet, String notificationText, int id) {
-        AlarmManager manager = getView().getAlarmManager();
-        if (notificationText != null) {
-            if (notificationText.length() > 10) {
-                notificationText = notificationText.substring(0, 10).concat("...");
+        if (isViewAttached()) {
+            if (notificationText != null) {
+                if (notificationText.length() > 10) {
+                    notificationText = notificationText.substring(0, 10).concat("...");
+                }
             }
-        }
-        PendingIntent pendingIntent = getView().getPendingIntent(notificationText, id);
-
-        if (isSet) {
-            manager.set(AlarmManager.RTC_WAKEUP, mModel.getSelectedDate().getTimeInMillis(), pendingIntent);
-        } else {
-            manager.cancel(pendingIntent);
+            getView().setAlarm(isSet, mModel.getSelectedDate().getTimeInMillis(), notificationText, id);
         }
     }
 
@@ -101,7 +91,6 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
         if (isViewAttached()) {
             mModel.setDateSelected(dateClicked);
             getView().setSubtitle(mCalendarDateFormat.format(dateClicked));
-//            selectedDateFormatted = mCalendarDateFormat.format(dateClicked);
             isCalendarExpanded = !isCalendarExpanded;
             getView().setCalendarExpanded(isCalendarExpanded);
             getView().showTimePicker(mModel.getSelectedHour(), mModel.getSelectedMinute());

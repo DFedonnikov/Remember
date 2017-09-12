@@ -22,6 +22,4 @@ public interface IListFragmentView extends MvpView {
     ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
 
     MySelectableAdapter getAdapter();
-
-
 }
