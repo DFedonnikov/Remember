@@ -37,11 +37,12 @@ public class DatabaseAccess {
     }
 
     public void open() {
-        this.database = openHelper.getWritableDatabase();
+        if (database == null || !database.isOpen())
+            database = openHelper.getWritableDatabase();
     }
 
     public void close() {
-        if (database != null) {
+        if (database != null && database.isOpen()) {
             this.database.close();
         }
     }

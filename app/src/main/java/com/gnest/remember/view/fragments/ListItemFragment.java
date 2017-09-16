@@ -146,7 +146,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     @NonNull
     public IListFragmentPresenter createPresenter() {
-        return new ListFragmentPresenter(getActivity().getSupportLoaderManager());
+        return new ListFragmentPresenter();
     }
 
 

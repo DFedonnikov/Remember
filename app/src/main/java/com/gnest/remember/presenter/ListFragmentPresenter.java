@@ -1,6 +1,6 @@
 package com.gnest.remember.presenter;
 
-import android.support.v4.app.LoaderManager;
+import android.support.annotation.Nullable;
 import android.util.SparseArray;
 
 import com.gnest.remember.model.IListFragmentModel;
@@ -11,28 +11,51 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.List;
 
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+
+
 /**
  * Created by DFedonnikov on 23.08.2017.
  */
 
-public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter, ListFragmentModelImpl.OnLoadDataListener {
+public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
     private IListFragmentModel mModel;
 
-    public ListFragmentPresenter(LoaderManager supportLoaderManager) {
-        mModel = new ListFragmentModelImpl(supportLoaderManager, this);
+    @Nullable
+    private Subscription subscription;
+
+    public ListFragmentPresenter() {
+        mModel = new ListFragmentModelImpl();
+    }
+
+    @Override
+    public void detachView(boolean retainInstance) {
+        tryToUnsubscribe(subscription);
+        super.detachView(retainInstance);
+    }
+
+    private void tryToUnsubscribe(Subscription subscription) {
+        if (isSubscribed(subscription)) {
+            subscription.unsubscribe();
+        }
+    }
+
+    private boolean isSubscribed(Subscription subscription) {
+        return subscription != null && !subscription.isUnsubscribed();
     }
 
     @Override
     public void loadData() {
-        mModel.getData();
-    }
-
-    @Override
-    public void dataLoaded(List<ClickableMemo> data) {
-        if (isViewAttached()) {
-            getView().setData(data);
-        }
+        subscription = mModel.getData()
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(memos -> !memos.isEmpty())
+                .subscribe(memos -> {
+                    if (isViewAttached()) {
+                        getView().setData(memos);
+                    }
+                });
     }
 
     @Override
