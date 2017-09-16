@@ -1,5 +1,7 @@
 package com.gnest.remember.model;
 
+import android.util.SparseArray;
+
 import com.gnest.remember.App;
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.model.db.DatabaseAccess;
@@ -7,6 +9,7 @@ import com.gnest.remember.model.db.DatabaseAccess;
 import java.util.List;
 
 import rx.Observable;
+import rx.functions.Action0;
 import rx.schedulers.Schedulers;
 
 
@@ -26,16 +29,27 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
     public Observable<List<ClickableMemo>> getData() {
         mDatabaseAccess.open();
         return Observable
-                .just(mDatabaseAccess.getAllMemos())
+                .fromCallable(mDatabaseAccess.getAllMemos())
                 .subscribeOn(Schedulers.computation())
                 .doOnUnsubscribe(() -> mDatabaseAccess.close());
     }
 
     @Override
-    public void deleteMemoFromDB(int memoId, int memoPosition, List<ClickableMemo> memos) {
+    public Observable<List<Integer>> deleteSelectedMemosFromDB(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
         mDatabaseAccess.open();
-        mDatabaseAccess.delete(memoId, memoPosition, memos);
-        mDatabaseAccess.close();
+        return Observable
+                .fromCallable(mDatabaseAccess.deleteSelected(selectedMemos, memos))
+                .subscribeOn(Schedulers.computation())
+                .doOnUnsubscribe(() -> mDatabaseAccess.close());
+    }
+
+    @Override
+    public Observable<Boolean> deleteMemoFromDB(int memoId, int memoPosition, List<ClickableMemo> memos) {
+        mDatabaseAccess.open();
+        return Observable
+                .fromCallable(mDatabaseAccess.delete(memoId, memoPosition, memos))
+                .subscribeOn(Schedulers.computation())
+                .doOnUnsubscribe(() -> mDatabaseAccess.close());
     }
 
     @Override

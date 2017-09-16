@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.SparseArray;
 
 import com.gnest.remember.model.data.Memo;
 import com.gnest.remember.model.data.ClickableMemo;
@@ -11,6 +12,7 @@ import com.gnest.remember.model.asynctasks.UpdateExpandColumnTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class DatabaseAccess {
     private DatabaseOpenHelper openHelper;
@@ -71,12 +73,31 @@ public class DatabaseAccess {
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
     }
 
-    public void delete(int memoId, int memoPosition, List<ClickableMemo> memos) {
-        int rows = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(memoId)});
-        if (rows != 0) {
-            currentLastPosition--;
-        }
-        updatePositionAfterDelete(memos, memoPosition);
+    public Callable<List<Integer>> deleteSelected(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
+        return () -> {
+            List<Integer> deletedIds = new ArrayList<>();
+            for (int i = 0; i < selectedMemos.size(); i++) {
+                ClickableMemo memo = selectedMemos.valueAt(i);
+                int row = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(memo.getId())});
+                if (row != 0) {
+                    deletedIds.add(memo.getId());
+                    currentLastPosition--;
+                    updatePositionAfterDelete(memos, memo.getPosition());
+                }
+            }
+            return deletedIds;
+        };
+    }
+
+    public Callable<Boolean> delete(int memoId, int memoPosition, List<ClickableMemo> memos) {
+        return () -> {
+            int rows = database.delete(DatabaseOpenHelper.TABLE, "_id = ?", new String[]{String.valueOf(memoId)});
+            if (rows != 0) {
+                currentLastPosition--;
+                updatePositionAfterDelete(memos, memoPosition);
+            }
+            return rows > 0;
+        };
     }
 
     private void updatePositionAfterDelete(List<ClickableMemo> mMemos, int position) {
@@ -89,12 +110,12 @@ public class DatabaseAccess {
         }
     }
 
+
     public void setMemoAlarmFalse(int id) {
         ContentValues values = new ContentValues();
         values.put("alarmSet", 0);
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
     }
-
 
     public void startUpdateExpandedColumnTask(boolean itemsExpanded) {
         new UpdateExpandColumnTask(this).execute(itemsExpanded);
@@ -118,21 +139,24 @@ public class DatabaseAccess {
         database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(toId)});
     }
 
-    public List<ClickableMemo> getAllMemos() {
-        List<ClickableMemo> memos = new ArrayList<>();
-        Cursor cursor = database.rawQuery("SELECT * From memos ORDER BY position", null);
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            int id = Integer.valueOf(cursor.getString(0));
-            String text = cursor.getString(1);
-            int position = cursor.getInt(2);
-            String color = cursor.getString(3);
-            boolean isAlarmSet = cursor.getInt(4) == 1;
-            boolean expanded = cursor.getInt(5) == 1;
-            memos.add(new ClickableMemo(id, text, position, color, isAlarmSet, false, expanded));
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return memos;
+    public Callable<List<ClickableMemo>> getAllMemos() {
+        return () -> {
+            List<ClickableMemo> memos = new ArrayList<>();
+            Cursor cursor = database.rawQuery("SELECT * From memos ORDER BY position", null);
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                int id = Integer.valueOf(cursor.getString(0));
+                String text = cursor.getString(1);
+                int position = cursor.getInt(2);
+                String color = cursor.getString(3);
+                boolean isAlarmSet = cursor.getInt(4) == 1;
+                boolean expanded = cursor.getInt(5) == 1;
+                memos.add(new ClickableMemo(id, text, position, color, isAlarmSet, false, expanded));
+                cursor.moveToNext();
+            }
+            cursor.close();
+            return memos;
+        };
+
     }
 }

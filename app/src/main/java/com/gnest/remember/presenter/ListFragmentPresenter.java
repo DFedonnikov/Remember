@@ -24,7 +24,11 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     private IListFragmentModel mModel;
 
     @Nullable
-    private Subscription subscription;
+    private Subscription getDataSubscription;
+    @Nullable
+    private Subscription deleteMemoSubscription;
+    @Nullable
+    private Subscription deleteSelectedSubscription;
 
     public ListFragmentPresenter() {
         mModel = new ListFragmentModelImpl();
@@ -32,7 +36,9 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void detachView(boolean retainInstance) {
-        tryToUnsubscribe(subscription);
+        tryToUnsubscribe(getDataSubscription);
+        tryToUnsubscribe(deleteMemoSubscription);
+        tryToUnsubscribe(deleteSelectedSubscription);
         super.detachView(retainInstance);
     }
 
@@ -48,7 +54,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void loadData() {
-        subscription = mModel.getData()
+        getDataSubscription = mModel.getData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(memos -> !memos.isEmpty())
                 .subscribe(memos -> {
@@ -72,18 +78,32 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void processDeleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
-        for (int i = 0; i < selectedMemos.size(); i++) {
-            ClickableMemo memo = selectedMemos.valueAt(i);
-            processDeleteMemo(memo.getId(), memo.getPosition(), memos, memo.isAlarmSet());
-        }
+        deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedMemos, memos)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(deletedIds -> {
+                    if (isViewAttached()) {
+                        for (int i = 0; i < selectedMemos.size(); i++) {
+                            ClickableMemo selected = selectedMemos.valueAt(i);
+                            if (deletedIds.contains(selected.getId()) && selected.isAlarmSet()) {
+                                getView().removeAlarm(selected.getId());
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
     public void processDeleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet) {
-        mModel.deleteMemoFromDB(memoId, memoPosition, memos);
-        if (isAlarmSet) {
-            getView().removeAlarm(memoId);
-        }
+        deleteMemoSubscription = mModel.deleteMemoFromDB(memoId, memoPosition, memos)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(deleted -> {
+                    if (deleted && isAlarmSet) {
+                        if (isViewAttached()) {
+                            getView().removeAlarm(memoId);
+                        }
+                    }
+                });
+
     }
 
     @Override
