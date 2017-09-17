@@ -13,15 +13,19 @@ import rx.Observable;
  */
 
 public interface IListFragmentModel {
-    Observable<List<ClickableMemo>> getData();
+    Observable<?> getData();
 
     Observable<List<Integer>> deleteSelectedMemosFromDB(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos);
 
     Observable<Boolean> deleteMemoFromDB(int memoId, int memoPosition, List<ClickableMemo> memos);
 
-    void swapMemos(int fromId, int fromPosition, int toId, int toPosition);
+    Observable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition);
 
-    void setMemoAlarmFalse(int id);
+    Observable<Void> setMemoAlarmFalse(int id);
 
-    void updateExpandedColumn(boolean itemsExpanded);
+    Observable<Void> updateExpandedColumn(boolean itemsExpanded);
+
+    void openDB();
+
+    void closeDB();
 }

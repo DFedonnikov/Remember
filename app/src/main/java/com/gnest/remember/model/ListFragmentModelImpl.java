@@ -7,6 +7,7 @@ import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.model.db.DatabaseAccess;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import rx.Observable;
 import rx.functions.Action0;
@@ -26,48 +27,49 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
     }
 
     @Override
-    public Observable<List<ClickableMemo>> getData() {
+    public void openDB() {
         mDatabaseAccess.open();
+    }
+
+    @Override
+    public void closeDB() {
+        mDatabaseAccess.close();
+    }
+
+    private <T> Observable<T> getObservableFromCallable(Callable<T> callable) {
         return Observable
-                .fromCallable(mDatabaseAccess.getAllMemos())
-                .subscribeOn(Schedulers.computation())
-                .doOnUnsubscribe(() -> mDatabaseAccess.close());
+                .fromCallable(callable)
+                .subscribeOn(Schedulers.computation());
+    }
+
+
+    @Override
+    public Observable<List<ClickableMemo>> getData() {
+        return getObservableFromCallable(mDatabaseAccess.getAllMemos());
     }
 
     @Override
     public Observable<List<Integer>> deleteSelectedMemosFromDB(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
-        mDatabaseAccess.open();
-        return Observable
-                .fromCallable(mDatabaseAccess.deleteSelected(selectedMemos, memos))
-                .subscribeOn(Schedulers.computation())
-                .doOnUnsubscribe(() -> mDatabaseAccess.close());
+        return getObservableFromCallable(mDatabaseAccess.deleteSelected(selectedMemos, memos));
     }
 
     @Override
     public Observable<Boolean> deleteMemoFromDB(int memoId, int memoPosition, List<ClickableMemo> memos) {
-        mDatabaseAccess.open();
-        return Observable
-                .fromCallable(mDatabaseAccess.delete(memoId, memoPosition, memos))
-                .subscribeOn(Schedulers.computation())
-                .doOnUnsubscribe(() -> mDatabaseAccess.close());
+        return getObservableFromCallable(mDatabaseAccess.delete(memoId, memoPosition, memos));
     }
 
     @Override
-    public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
-        mDatabaseAccess.open();
-        mDatabaseAccess.swapMemos(fromId, fromPosition, toId, toPosition);
-        mDatabaseAccess.close();
+    public Observable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
+        return getObservableFromCallable(mDatabaseAccess.swapMemos(fromId, fromPosition, toId, toPosition));
     }
 
     @Override
-    public void setMemoAlarmFalse(int id) {
-        mDatabaseAccess.open();
-        mDatabaseAccess.setMemoAlarmFalse(id);
-        mDatabaseAccess.close();
+    public Observable<Void> setMemoAlarmFalse(int id) {
+       return getObservableFromCallable(mDatabaseAccess.setMemoAlarmFalse(id));
     }
 
     @Override
-    public void updateExpandedColumn(boolean itemsExpanded) {
-        mDatabaseAccess.startUpdateExpandedColumnTask(itemsExpanded);
+    public Observable<Void> updateExpandedColumn(boolean itemsExpanded) {
+        return getObservableFromCallable(mDatabaseAccess.updateExpandedColumns(itemsExpanded));
     }
 }

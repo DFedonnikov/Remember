@@ -111,32 +111,41 @@ public class DatabaseAccess {
     }
 
 
-    public void setMemoAlarmFalse(int id) {
-        ContentValues values = new ContentValues();
-        values.put("alarmSet", 0);
-        database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
+    public Callable<Void> setMemoAlarmFalse(int id) {
+        return () -> {
+            ContentValues values = new ContentValues();
+            values.put("alarmSet", 0);
+            database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
+            return null;
+        };
     }
 
     public void startUpdateExpandedColumnTask(boolean itemsExpanded) {
         new UpdateExpandColumnTask(this).execute(itemsExpanded);
     }
 
-    public void updateExpandedColumns(Boolean expanded) {
-        if (!database.isOpen()) {
-            open();
-        }
-        ContentValues values = new ContentValues();
-        int flag = expanded ? 1 : 0;
-        values.put("expanded", flag);
-        database.update(DatabaseOpenHelper.TABLE, values, null, null);
+    public Callable<Void> updateExpandedColumns(Boolean expanded) {
+        return () -> {
+            ContentValues values = new ContentValues();
+            int flag = expanded ? 1 : 0;
+            values.put("expanded", flag);
+            database.update(DatabaseOpenHelper.TABLE, values, null, null);
+            return null;
+        };
+
     }
 
-    public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
-        ContentValues values = new ContentValues();
-        values.put("position", toPosition);
-        database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(fromId)});
-        values.put("position", fromPosition);
-        database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(toId)});
+    public Callable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
+        return () -> {
+            synchronized (this) {
+                ContentValues values = new ContentValues();
+                values.put("position", toPosition);
+                database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(fromId)});
+                values.put("position", fromPosition);
+                database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(toId)});
+                return null;
+            }
+        };
     }
 
     public Callable<List<ClickableMemo>> getAllMemos() {

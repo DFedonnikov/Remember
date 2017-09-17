@@ -1,5 +1,7 @@
 package com.gnest.remember.view;
 
+import android.support.v7.view.ActionMode;
+
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.fragments.ListItemFragment;
@@ -24,4 +26,6 @@ public interface IListFragmentView extends MvpView {
     ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
 
     MySelectableAdapter getAdapter();
+
+    ActionMode getActionMode();
 }

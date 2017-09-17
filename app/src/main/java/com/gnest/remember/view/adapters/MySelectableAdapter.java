@@ -44,14 +44,11 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         final SelectableViewHolder holder = (SelectableViewHolder) viewHolder;
         holder.bind(mMemos.get(position), position, mItemsExpanded);
-        holder.pin.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
-                    mListener.onStartDrag(holder);
-                }
-                return false;
+        holder.pin.setOnTouchListener((view, motionEvent) -> {
+            if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
+                mListener.onStartDrag(holder);
             }
+            return false;
         });
 
         if (multiChoiceEnabled && mSelectedList.indexOfKey(position) >= 0) {
@@ -95,8 +92,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     public void onItemDismiss(int position) {
         ClickableMemo memo = mMemos.get(position);
         mListener.onPerformSwipeDismiss(memo.getId(), memo.getPosition(), memo.isAlarmSet());
-        mMemos.remove(memo);
-        notifyItemRemoved(position);
     }
 
     @Override

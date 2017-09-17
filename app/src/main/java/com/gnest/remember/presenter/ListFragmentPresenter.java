@@ -9,10 +9,12 @@ import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 
 
 /**
@@ -22,6 +24,7 @@ import rx.android.schedulers.AndroidSchedulers;
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
     private IListFragmentModel mModel;
+    private List<Subscription> subscriptions;
 
     @Nullable
     private Subscription getDataSubscription;
@@ -29,22 +32,36 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     private Subscription deleteMemoSubscription;
     @Nullable
     private Subscription deleteSelectedSubscription;
+    @Nullable
+    private Subscription swapSubscription;
+    @Nullable
+    private Subscription alarmShutdownSubscription;
+    @Nullable
+    private Subscription updateExpandedSubscription;
 
     public ListFragmentPresenter() {
         mModel = new ListFragmentModelImpl();
+        subscriptions = new ArrayList<>();
+    }
+
+    @Override
+    public void attachView(IListFragmentView view) {
+        mModel.openDB();
+        super.attachView(view);
     }
 
     @Override
     public void detachView(boolean retainInstance) {
-        tryToUnsubscribe(getDataSubscription);
-        tryToUnsubscribe(deleteMemoSubscription);
-        tryToUnsubscribe(deleteSelectedSubscription);
+        mModel.closeDB();
+        tryToUnsubscribe(subscriptions);
         super.detachView(retainInstance);
     }
 
-    private void tryToUnsubscribe(Subscription subscription) {
-        if (isSubscribed(subscription)) {
-            subscription.unsubscribe();
+    private void tryToUnsubscribe(List<Subscription> subscriptions) {
+        for (Subscription subscription : subscriptions) {
+            if (isSubscribed(subscription)) {
+                subscription.unsubscribe();
+            }
         }
     }
 
@@ -56,12 +73,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     public void loadData() {
         getDataSubscription = mModel.getData()
                 .observeOn(AndroidSchedulers.mainThread())
-                .filter(memos -> !memos.isEmpty())
+                .filter(memos -> !((List<ClickableMemo>) memos).isEmpty())
                 .subscribe(memos -> {
                     if (isViewAttached()) {
-                        getView().setData(memos);
+                        getView().setData((List<ClickableMemo>) memos);
                     }
                 });
+        subscriptions.add(getDataSubscription);
     }
 
     @Override
@@ -87,9 +105,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                             if (deletedIds.contains(selected.getId()) && selected.isAlarmSet()) {
                                 getView().removeAlarm(selected.getId());
                             }
+                            memos.remove(selected);
                         }
+                        getView().getAdapter().notifyDataSetChanged();
+                        getView().getActionMode().finish();
                     }
                 });
+        subscriptions.add(deleteSelectedSubscription);
     }
 
     @Override
@@ -97,13 +119,16 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         deleteMemoSubscription = mModel.deleteMemoFromDB(memoId, memoPosition, memos)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(deleted -> {
-                    if (deleted && isAlarmSet) {
-                        if (isViewAttached()) {
+                    if (isViewAttached()) {
+                        if (deleted && isAlarmSet) {
                             getView().removeAlarm(memoId);
                         }
+                        memos.remove(memoPosition);
+                        getView().getAdapter().notifyItemRemoved(memoPosition);
+                        getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
                     }
                 });
-
+        subscriptions.add(deleteMemoSubscription);
     }
 
     @Override
@@ -115,13 +140,16 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
-        mModel.swapMemos(fromId, fromPosition, toId, toPosition);
+        swapSubscription = mModel.swapMemos(fromId, fromPosition, toId, toPosition).subscribe();
+        subscriptions.add(swapSubscription);
     }
 
     @Override
     public void processMemoAlarmShutdown(ClickableMemo clickableMemo) {
-        mModel.setMemoAlarmFalse(clickableMemo.getId());
-        clickableMemo.setAlarm(false);
+        alarmShutdownSubscription = mModel.setMemoAlarmFalse(clickableMemo.getId())
+                .subscribe(aVoid -> clickableMemo.setAlarm(false));
+        subscriptions.add(alarmShutdownSubscription);
+
     }
 
     @Override
@@ -143,10 +171,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
             if (view.getLayoutManager().getOrientation() == horizontalOrientationCode) {
                 view.getLayoutManager().setOrientation(verticalOrientationCode);
                 view.getAdapter().setItemsExpanded(false);
-                mModel.updateExpandedColumn(view.getAdapter().isItemsExpanded());
+                updateExpandedSubscription = mModel.updateExpandedColumn(view.getAdapter().isItemsExpanded())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe();
             } else {
                 view.getInteractionListener().onBackButtonPressed();
             }
         }
+        subscriptions.add(updateExpandedSubscription);
     }
 }
