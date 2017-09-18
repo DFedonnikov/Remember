@@ -1,15 +1,21 @@
 package com.gnest.remember.model;
 
+import android.support.v4.util.Pair;
+
 import com.gnest.remember.model.data.ClickableMemo;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import rx.Observable;
 
 /**
  * Created by DFedonnikov on 09.09.2017.
  */
 
 public interface IEditMemoModel {
+    Observable<Pair<Integer, Integer>> saveMemoToDB(String memoText, String memoColor);
+
     void setIsAlarmSet(boolean isSet);
 
     boolean isAlarmSet();
@@ -26,5 +32,7 @@ public interface IEditMemoModel {
 
     Calendar getSelectedDate();
 
-    void saveMemoToDB(String memoText, String memoColor);
+    void openDB();
+
+    void closeDB();
 }

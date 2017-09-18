@@ -9,7 +9,11 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by DFedonnikov on 08.09.2017.
@@ -21,6 +25,7 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     private SimpleDateFormat mCalendarAlarmSetFormat = new SimpleDateFormat("d MMMM yyyy hh:mm", Locale.ENGLISH);
 
     private IEditMemoModel mModel;
+    private List<Subscription> subscriptions;
     private boolean isCalendarExpanded;
 
     public EditMemoPresenter(ClickableMemo memo) {
@@ -30,23 +35,42 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
 
     @Override
     public void attachView(IEditMemoView view) {
+        mModel.openDB();
         super.attachView(view);
+    }
 
+    @Override
+    public void detachView(boolean retainInstance) {
+        mModel.closeDB();
+        tryToUnsubscribe(subscriptions);
+        super.detachView(retainInstance);
+    }
+
+    private void tryToUnsubscribe(List<Subscription> subscriptions) {
+        for (Subscription subscription : subscriptions) {
+            if (isSubscribed(subscription)) {
+                subscription.unsubscribe();
+            }
+        }
+    }
+
+    private boolean isSubscribed(Subscription subscription) {
+        return subscription != null && !subscription.isUnsubscribed();
     }
 
     @Override
     public void processBackButtonPress(String memoText, String memoColor, String alarmSetText) {
-        mModel.saveMemoToDB(memoText, memoColor);
-        int position = -1;
-        if (mModel.getEditedMemo() != null) {
-            if (mModel.isAlarmSet()) {
-                setAlarm(memoText, mModel.getEditedMemo().getId(), alarmSetText);
-            }
-            position = mModel.getEditedMemo().getPosition();
-        }
-        if (isViewAttached()) {
-            getView().memoSavedInteraction(position);
-        }
+        Subscription saveMemoSubscription = mModel.saveMemoToDB(memoText, memoColor)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(idPositionPair -> {
+                    if (mModel.isAlarmSet()) {
+                        setAlarm(memoText, idPositionPair.first, alarmSetText);
+                    }
+                    if (isViewAttached()) {
+                        getView().memoSavedInteraction(idPositionPair.second);
+                    }
+                });
+        subscriptions.add(saveMemoSubscription);
     }
 
     private void setAlarm(String notificationText, int id, String alarmSetText) {

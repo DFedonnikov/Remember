@@ -1,5 +1,7 @@
 package com.gnest.remember.model;
 
+import android.support.v4.util.Pair;
+
 import com.gnest.remember.App;
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.model.data.Memo;
@@ -7,6 +9,10 @@ import com.gnest.remember.model.db.DatabaseAccess;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Callable;
+
+import rx.Observable;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by DFedonnikov on 09.09.2017.
@@ -28,6 +34,49 @@ public class EditMemoModelImpl implements IEditMemoModel {
         this.isAlarmSet = false;
         if (memo != null) {
             this.wasAlarmSet = memo.isAlarmSet();
+        }
+    }
+
+    @Override
+    public void openDB() {
+        mDatabaseAccess.open();
+    }
+
+    @Override
+    public void closeDB() {
+        mDatabaseAccess.close();
+    }
+
+    private <T> Observable<T> getObservableFromCallable(Callable<T> callable) {
+        return Observable
+                .fromCallable(callable)
+                .subscribeOn(Schedulers.computation())
+                .retry((integer, throwable) -> {
+                    if (throwable instanceof IllegalStateException) {
+                        openDB();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+    }
+
+    @Override
+    public Observable<Pair<Integer, Integer>> saveMemoToDB(String memoText, String memoColor) {
+        if (mEditedMemo == null) {
+            // Add new mMemo
+            if (!memoText.isEmpty()) {
+                Memo temp = new Memo(memoText, memoColor, isAlarmSet);
+                return getObservableFromCallable(mDatabaseAccess.save(temp));
+            } else {
+                return Observable.just(new Pair<>(-1, -1));
+            }
+        } else {
+            // Update the mMemo
+            mEditedMemo.setMemoText(memoText);
+            mEditedMemo.setColor(memoColor);
+            mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
+            return getObservableFromCallable(mDatabaseAccess.update(mEditedMemo));
         }
     }
 
@@ -69,24 +118,5 @@ public class EditMemoModelImpl implements IEditMemoModel {
     @Override
     public int getSelectedMinute() {
         return sSelectedDate.get(Calendar.MINUTE);
-    }
-
-    @Override
-    public void saveMemoToDB(String memoText, String memoColor) {
-        mDatabaseAccess.open();
-        if (mEditedMemo == null) {
-            // Add new mMemo
-            if (!memoText.isEmpty()) {
-                Memo temp = new Memo(memoText, memoColor, isAlarmSet);
-                mDatabaseAccess.save(temp);
-            }
-        } else {
-            // Update the mMemo
-            mEditedMemo.setMemoText(memoText);
-            mEditedMemo.setColor(memoColor);
-            mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
-            mDatabaseAccess.update(mEditedMemo);
-        }
-        mDatabaseAccess.close();
     }
 }

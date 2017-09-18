@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import rx.Observable;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 
@@ -38,7 +39,15 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
     private <T> Observable<T> getObservableFromCallable(Callable<T> callable) {
         return Observable
                 .fromCallable(callable)
-                .subscribeOn(Schedulers.computation());
+                .subscribeOn(Schedulers.computation())
+                .retry((integer, throwable) -> {
+                    if (throwable instanceof IllegalStateException) {
+                        openDB();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
     }
 
 
@@ -65,10 +74,5 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
     @Override
     public Observable<Void> setMemoAlarmFalse(int id) {
        return getObservableFromCallable(mDatabaseAccess.setMemoAlarmFalse(id));
-    }
-
-    @Override
-    public Observable<Void> updateExpandedColumn(boolean itemsExpanded) {
-        return getObservableFromCallable(mDatabaseAccess.updateExpandedColumns(itemsExpanded));
     }
 }

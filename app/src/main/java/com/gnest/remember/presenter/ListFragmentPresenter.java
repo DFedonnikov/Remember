@@ -14,6 +14,7 @@ import java.util.List;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 
 
 /**
@@ -35,8 +36,6 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     private Subscription swapSubscription;
     @Nullable
     private Subscription alarmShutdownSubscription;
-    @Nullable
-    private Subscription updateExpandedSubscription;
 
     public ListFragmentPresenter() {
         mModel = new ListFragmentModelImpl();
@@ -170,13 +169,9 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
             if (view.getLayoutManager().getOrientation() == horizontalOrientationCode) {
                 view.getLayoutManager().setOrientation(verticalOrientationCode);
                 view.getAdapter().setItemsExpanded(false);
-                updateExpandedSubscription = mModel.updateExpandedColumn(view.getAdapter().isItemsExpanded())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe();
             } else {
                 view.getInteractionListener().onBackButtonPressed();
             }
         }
-        subscriptions.add(updateExpandedSubscription);
     }
 }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.util.Pair;
 import android.util.SparseArray;
 
 import com.gnest.remember.model.data.Memo;
@@ -48,28 +49,32 @@ public class DatabaseAccess {
         }
     }
 
-    public long save(Memo memo) {
-        ContentValues values = new ContentValues();
-        values.put("memo", memo.getMemoText());
-        values.put("position", currentLastPosition);
-        values.put("color", memo.getColor());
-        values.put("alarmSet", memo.isAlarmSet() ? 1 : 0);
-        long rowId = database.insert(DatabaseOpenHelper.TABLE, null, values);
-        if (rowId != -1) {
-            currentLastPosition++;
-            return rowId;
-        }
-        return -1;
+    public Callable<Pair<Integer, Integer>> save(Memo memo) {
+        return () -> {
+            ContentValues values = new ContentValues();
+            values.put("memo", memo.getMemoText());
+            values.put("position", currentLastPosition);
+            values.put("color", memo.getColor());
+            values.put("alarmSet", memo.isAlarmSet() ? 1 : 0);
+            long rowId = database.insert(DatabaseOpenHelper.TABLE, null, values);
+            if (rowId != -1) {
+                currentLastPosition++;
+            }
+            return new Pair<>((int) rowId, -1);
+        };
     }
 
-    public void update(ClickableMemo memo) {
-        ContentValues values = new ContentValues();
-        values.put("memo", memo.getMemoText());
-        values.put("color", memo.getColor());
-        values.put("alarmSet", memo.isAlarmSet() ? 1 : 0);
-        values.put("expanded", memo.isExpanded() ? 1 : 0);
-        int id = memo.getId();
-        database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
+    public Callable<Pair<Integer, Integer>> update(ClickableMemo memo) {
+        return () -> {
+            ContentValues values = new ContentValues();
+            values.put("memo", memo.getMemoText());
+            values.put("color", memo.getColor());
+            values.put("alarmSet", memo.isAlarmSet() ? 1 : 0);
+            values.put("expanded", memo.isExpanded() ? 1 : 0);
+            int id = memo.getId();
+            database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
+            return new Pair<>(id, memo.getPosition());
+        };
     }
 
     public Callable<List<Integer>> deleteSelected(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
@@ -117,17 +122,6 @@ public class DatabaseAccess {
             database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
             return null;
         };
-    }
-
-    public Callable<Void> updateExpandedColumns(Boolean expanded) {
-        return () -> {
-            ContentValues values = new ContentValues();
-            int flag = expanded ? 1 : 0;
-            values.put("expanded", flag);
-            database.update(DatabaseOpenHelper.TABLE, values, null, null);
-            return null;
-        };
-
     }
 
     public Callable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition) {

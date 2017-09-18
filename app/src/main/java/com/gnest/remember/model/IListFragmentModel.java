@@ -23,8 +23,6 @@ public interface IListFragmentModel {
 
     Observable<Void> setMemoAlarmFalse(int id);
 
-    Observable<Void> updateExpandedColumn(boolean itemsExpanded);
-
     void openDB();
 
     void closeDB();

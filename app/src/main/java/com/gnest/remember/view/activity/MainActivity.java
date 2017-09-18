@@ -17,6 +17,7 @@ import com.gnest.remember.model.services.AlarmService;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -78,9 +79,9 @@ public class MainActivity extends AppCompatActivity implements
                         .distinctUntilChanged(dataLoaded -> dataLoaded)
                         .zipWith(childrenLayoutCompleteSubject.distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
                         .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
                         .flatMap(pair -> Observable.from(itemFragment.getAdapter().getMemos()))
-                        .takeWhile(clickableMemo -> clickableMemo.getId() == id)
+                        .filter(clickableMemo -> clickableMemo.getId() == id)
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(clickableMemo -> {
                             itemFragment.getLayoutManager().openItem(clickableMemo.getPosition());
                             itemFragment.shutdownMemoAlarm(clickableMemo.getPosition());
