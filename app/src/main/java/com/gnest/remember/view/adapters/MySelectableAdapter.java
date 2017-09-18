@@ -22,6 +22,7 @@ import java.util.List;
  */
 
 public class MySelectableAdapter extends RecyclerView.Adapter implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
+
     private List<ClickableMemo> mMemos;
     private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
@@ -56,8 +57,9 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         } else {
             holder.setChecked(false);
         }
-
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -118,13 +120,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
 
     public void clearSelectedList() {
         mSelectedList.clear();
-        notifyDataSetChanged();
-    }
-
-    public void removeSelectedMemos(SparseArray<ClickableMemo> memosToRemove) {
-        for (int i = 0; i < memosToRemove.size(); i++) {
-            mMemos.remove(memosToRemove.valueAt(i));
-        }
         notifyDataSetChanged();
     }
 

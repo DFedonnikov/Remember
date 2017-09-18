@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import rx.Observable;
-import rx.functions.Action0;
 import rx.schedulers.Schedulers;
 
 

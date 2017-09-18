@@ -8,7 +8,6 @@ import android.util.SparseArray;
 
 import com.gnest.remember.model.data.Memo;
 import com.gnest.remember.model.data.ClickableMemo;
-import com.gnest.remember.model.asynctasks.UpdateExpandColumnTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,10 +117,6 @@ public class DatabaseAccess {
             database.update(DatabaseOpenHelper.TABLE, values, "_id = ?", new String[]{String.valueOf(id)});
             return null;
         };
-    }
-
-    public void startUpdateExpandedColumnTask(boolean itemsExpanded) {
-        new UpdateExpandColumnTask(this).execute(itemsExpanded);
     }
 
     public Callable<Void> updateExpandedColumns(Boolean expanded) {

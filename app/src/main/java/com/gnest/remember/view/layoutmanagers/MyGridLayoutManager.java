@@ -15,6 +15,8 @@ import com.gnest.remember.App;
 
 import java.util.ArrayList;
 
+import rx.subjects.BehaviorSubject;
+
 /**
  * Created by DFedonnikov on 23.07.2017.
  */
@@ -24,6 +26,8 @@ public class MyGridLayoutManager extends GridLayoutManager {
     private static final long TRANSITION_DURATION_MS = 300;
     private static final float SCALE_THRESHOLD_PERCENT = 1f;
     private static int sScreenWidth;
+
+    private final BehaviorSubject<Boolean> childrenLayoutCompleteSubject = BehaviorSubject.create();
 
     private SparseArray<View> mViewCache = new SparseArray<>();
     private int mAncorPos;
@@ -63,6 +67,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         super.onLayoutChildren(recycler, state);
         detachAndScrapAttachedViews(recycler);
         fill(recycler);
+        childrenLayoutCompleteSubject.onNext(true);
     }
 
     private void fill(RecyclerView.Recycler recycler) {
@@ -458,6 +463,10 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     public void setExpandListener(ExpandListener expandListener) {
         this.mExpandListener = expandListener;
+    }
+
+    public BehaviorSubject<Boolean> getChildrenLayoutCompleteSubject() {
+        return childrenLayoutCompleteSubject;
     }
 
     private static class ViewAnimationInfo {

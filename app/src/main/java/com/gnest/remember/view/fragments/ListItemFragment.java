@@ -37,11 +37,15 @@ import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
 import java.util.List;
 
+import rx.subjects.BehaviorSubject;
+
 
 public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragmentPresenter>
         implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView {
 
     private static final String ARG_COLUMN_COUNT = "ColumnCount";
+
+    private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
 
     private int mColumnCount;
     private OnListItemFragmentInteractionListener mListener;
@@ -156,6 +160,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         mAdapter.setMemos(data);
         mAdapter.notifyDataSetChanged();
         returnFromEditMode();
+        dataLoadedSubject.onNext(true);
     }
 
     private void returnFromEditMode() {
@@ -197,8 +202,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void onDeleteButtonPressed() {
         presenter.processDeleteSelectedMemos(mAdapter.getSelectedList(), mAdapter.getMemos());
-//        mAdapter.removeSelectedMemos(mAdapter.getSelectedList());
-//        actionMode.finish();
     }
 
     @Override
@@ -310,6 +313,10 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public OnListItemFragmentInteractionListener getInteractionListener() {
         return mListener;
+    }
+
+    public BehaviorSubject<Boolean> getDataLodingSubject() {
+        return dataLoadedSubject;
     }
 
     /**

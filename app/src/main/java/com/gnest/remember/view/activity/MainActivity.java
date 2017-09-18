@@ -5,21 +5,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.gnest.remember.R;
-import com.gnest.remember.model.asynctasks.OpenMemoFromNotificationTask;
 import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.model.services.AlarmService;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
+
 
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
-        ListItemFragment.OnListItemFragmentInteractionListener,
-        OpenMemoFromNotificationTask.NotificationOpenerHelper {
+        ListItemFragment.OnListItemFragmentInteractionListener {
 
     public static final int LM_HORIZONTAL_ORIENTATION = 0;
     public static final int LM_VERTICAL_ORIENTATION = 1;
@@ -61,16 +65,30 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-
         //To be executed if activity launched from notification
         Intent intent = getIntent();
         if (intent != null) {
             if (itemFragment != null) {
-                OpenMemoFromNotificationTask task = new OpenMemoFromNotificationTask(this, itemFragment.getAdapter());
-                task.execute(intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1));
+                long id = intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
+
+                BehaviorSubject<Boolean> dataLoadedSubject = itemFragment.getDataLodingSubject();
+                BehaviorSubject<Boolean> childrenLayoutCompleteSubject = itemFragment.getLayoutManager().getChildrenLayoutCompleteSubject();
+
+                dataLoadedSubject
+                        .distinctUntilChanged(dataLoaded -> dataLoaded)
+                        .zipWith(childrenLayoutCompleteSubject.distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .flatMap(pair -> Observable.from(itemFragment.getAdapter().getMemos()))
+                        .takeWhile(clickableMemo -> clickableMemo.getId() == id)
+                        .subscribe(clickableMemo -> {
+                            itemFragment.getLayoutManager().openItem(clickableMemo.getPosition());
+                            itemFragment.shutdownMemoAlarm(clickableMemo.getPosition());
+                            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                            notificationManager.cancel(clickableMemo.getId());
+                        });
             }
         }
-
     }
 
     private void insertItemFragment(Bundle bundle) {
@@ -136,13 +154,5 @@ public class MainActivity extends AppCompatActivity implements
             manager.putFragment(outState, ITEM_FRAMENT_NAME, itemFragment);
         }
         outState.putBoolean(EDIT_FRAG_VISIBILITY_KEY, isEditFragmentVisible);
-    }
-
-    @Override
-    public void openMemoFromNotification(int position, int notificationId) {
-        itemFragment.getLayoutManager().openItem(position);
-        itemFragment.shutdownMemoAlarm(position);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(notificationId);
     }
 }
