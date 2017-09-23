@@ -10,6 +10,8 @@ import java.util.Date;
  */
 
 public interface IEditMemoPresenter extends MvpPresenter<IEditMemoView> {
+    void loadData();
+
     void processRemoveAlarm(String removeAlarmMessage);
 
     void processDayClicked(Date dateClicked);

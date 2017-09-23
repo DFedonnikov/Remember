@@ -1,29 +1,44 @@
-package com.gnest.remember.model.data;
+package com.gnest.remember.model.db.data;
 
-import android.os.Binder;
+import android.support.annotation.Nullable;
+
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 
-public class Memo extends Binder {
+public class Memo extends RealmObject {
+    @PrimaryKey
     private int mId;
-    private String memoText;
+    private String mMemoText;
     private int mPosition;
     private String mColor;
     private boolean mIsAlarmSet;
+    private boolean mSelected = false;
+    private boolean mExpanded = false;
 
+
+    public Memo() {
+    }
 
     public Memo(String memoText, String color, boolean alarmSet) {
-        this.memoText = memoText;
+        this.mMemoText = memoText;
         this.mPosition = -1;
         this.mColor = color;
         this.mIsAlarmSet = alarmSet;
     }
 
-    Memo(int id, String memoText, int position, String color, boolean alarmSet) {
+    public Memo(int id, String memoText, int position, String color, boolean alarmSet) {
         this.mId = id;
-        this.memoText = memoText;
+        this.mMemoText = memoText;
         this.mPosition = position;
         this.mColor = color;
         this.mIsAlarmSet = alarmSet;
+    }
+
+    public Memo(int id, String memoText, int position, String color, boolean alarmSet, boolean isSelected, boolean isExpanded) {
+        this(id, memoText, position, color, alarmSet);
+        this.mSelected = isSelected;
+        this.mExpanded = isExpanded;
     }
 
     public int getId() {
@@ -31,11 +46,11 @@ public class Memo extends Binder {
     }
 
     public String getMemoText() {
-        return memoText;
+        return mMemoText;
     }
 
     public void setMemoText(String memoText) {
-        this.memoText = memoText;
+        this.mMemoText = memoText;
     }
 
     public int getPosition() {
@@ -62,6 +77,22 @@ public class Memo extends Binder {
         mIsAlarmSet = alarmSet;
     }
 
+    public boolean isSelected() {
+        return mSelected;
+    }
+
+    public void setSelected(boolean mSelected) {
+        this.mSelected = mSelected;
+    }
+
+    public boolean isExpanded() {
+        return mExpanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        this.mExpanded = expanded;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,14 +102,14 @@ public class Memo extends Binder {
 
         if (mId != memo.mId) return false;
         if (mPosition != memo.mPosition) return false;
-        return memoText != null ? memoText.equals(memo.memoText) : memo.memoText == null;
+        return mMemoText != null ? mMemoText.equals(memo.mMemoText) : memo.mMemoText == null;
 
     }
 
     @Override
     public int hashCode() {
         int result = mId;
-        result = 31 * result + (memoText != null ? memoText.hashCode() : 0);
+        result = 31 * result + (mMemoText != null ? mMemoText.hashCode() : 0);
         result = 31 * result + mPosition;
         return result;
     }

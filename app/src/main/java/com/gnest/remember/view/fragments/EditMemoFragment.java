@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.gnest.remember.R;
-import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.presenter.EditMemoPresenter;
 import com.gnest.remember.presenter.IEditMemoPresenter;
@@ -57,7 +56,7 @@ import java.util.TimeZone;
  */
 public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresenter>
         implements AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener {
-    public static final String MEMO_KEY = "memo_param";
+    public static final String MEMO_ID_KEY = "memo_param";
 
     private AppCompatActivity activity;
 
@@ -66,7 +65,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     private ImageView mRemoveAlert;
     private ImageView arrow;
 
-    private ClickableMemo mMemo;
+    //    private ClickableMemo mMemo;
+    private int memoId = -1;
     private String mColor;
     private AppBarLayout mAppBarLayout;
     private CompactCalendarView mCompactCalendarView;
@@ -93,7 +93,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             Bundle arguments = getArguments();
-            mMemo = (ClickableMemo) arguments.getBinder(MEMO_KEY);
+            memoId = arguments.getInt(MEMO_ID_KEY);
         }
     }
 
@@ -110,13 +110,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
                 setAlarmVisibility(false);
             }
         });
-
-        if (mMemo != null) {
-            mMemoEditTextView.setText(mMemo.getMemoText());
-            setAlarmVisibility(mMemo.isAlarmSet());
-        }
         return mView;
     }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -150,7 +146,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
             }
         });
 
-        presenter.processSetCurrentDate();
 
         arrow = mView.findViewById(R.id.date_picker_arrow);
 
@@ -162,6 +157,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
                 presenter.processDatePicker();
             }
         });
+
+        if (memoId != -1) {
+            presenter.loadData();
+        }
+        presenter.processSetCurrentDate();
+
     }
 
 
@@ -185,7 +186,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @Override
     @NonNull
     public IEditMemoPresenter createPresenter() {
-        return new EditMemoPresenter(mMemo);
+        return new EditMemoPresenter(memoId);
     }
 
     public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
@@ -224,6 +225,13 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     public void onBackButtonPressed() {
         presenter.processBackButtonPress(mMemoEditTextView.getText().toString(), mColor, getString(R.string.alarm_set_text));
+    }
+
+    @Override
+    public void setData(String memoText, String color, boolean alarmSet) {
+        mMemoEditTextView.setText(memoText);
+        mColor = color;
+        setAlarmVisibility(alarmSet);
     }
 
     @Override
@@ -298,8 +306,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         ColorSpinnerAdapter colorSpinnerAdapter = new ColorSpinnerAdapter(getContext());
         colorChoiceSpinner.setAdapter(colorSpinnerAdapter);
         colorChoiceSpinner.setOnItemSelectedListener(this);
-        if (mMemo != null) {
-            colorChoiceSpinner.setSelection(ColorSpinnerAdapter.Colors.valueOf(mMemo.getColor()).ordinal());
+        if (mColor != null) {
+            colorChoiceSpinner.setSelection(ColorSpinnerAdapter.Colors.valueOf(mColor).ordinal());
         }
     }
 

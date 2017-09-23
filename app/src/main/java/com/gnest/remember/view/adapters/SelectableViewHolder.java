@@ -8,7 +8,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.gnest.remember.R;
-import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
 
 /**
@@ -21,7 +21,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     private OnItemSelectedListener mListener;
     private int mPosition = 0;
     private TextView mTextView;
-    private ClickableMemo mMemo;
+    private Memo mMemo;
     private ScrollView mScrollView;
     private int mTextViewBackgroundId;
     private int mTextViewBackgroundSelectedId;
@@ -55,7 +55,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         } else {
             setDeselectedState();
         }
-        mMemo.setSelected(value);
+//        mMemo.setSelected(value);
     }
 
     @Override
@@ -80,11 +80,11 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     }
 
-    void bind(ClickableMemo memo, int position, boolean isExpanded) {
+    void bind(Memo memo, int position, boolean isExpanded) {
         String memoText = memo.getMemoText();
         mMemo = memo;
-        mMemo.setPosition(position);
-        mMemo.setExpanded(isExpanded);
+//        mMemo.setPosition(position);
+//        mMemo.setExpanded(isExpanded);
         mPosition = position;
         mTextView.setText(memoText);
         ColorSpinnerAdapter.Colors color = ColorSpinnerAdapter.Colors.valueOf(memo.getColor());
@@ -95,13 +95,13 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     }
 
     interface OnItemSelectedListener {
-        void onItemClicked(int mPosition, ClickableMemo mMemo);
+        void onItemClicked(int mPosition, Memo mMemo);
 
-        boolean onItemLongClicked(int mPosition, ClickableMemo mMemo);
+        boolean onItemLongClicked(int mPosition, Memo mMemo);
 
         boolean isMultiChoiceEnabled();
 
-        void updateSelectedList(int pos, ClickableMemo memo);
+        void updateSelectedList(int pos, Memo memo);
 
     }
 

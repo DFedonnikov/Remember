@@ -2,17 +2,22 @@ package com.gnest.remember.model;
 
 import android.support.v4.util.Pair;
 
-import com.gnest.remember.App;
-import com.gnest.remember.model.data.ClickableMemo;
-import com.gnest.remember.model.data.Memo;
+import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.model.db.DatabaseAccess;
+import com.gnest.remember.model.db.data.MemoRealmFields;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
+import io.realm.Realm;
 import rx.Observable;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Created by DFedonnikov on 09.09.2017.
@@ -21,30 +26,35 @@ import rx.schedulers.Schedulers;
 public class EditMemoModelImpl implements IEditMemoModel {
 
     private static Calendar sSelectedDate = Calendar.getInstance();
+    private final BehaviorSubject<Boolean> dataSavedSubject = BehaviorSubject.create();
+
+    private Realm realm;
+    private int mMemoId;
 
     private DatabaseAccess mDatabaseAccess;
-    private ClickableMemo mEditedMemo;
+    private Memo mEditedMemo;
     private boolean wasAlarmSet;
     private boolean isAlarmSet;
 
 
-    public EditMemoModelImpl(ClickableMemo memo) {
-        this.mDatabaseAccess = DatabaseAccess.getInstance(App.self());
-        this.mEditedMemo = memo;
+    public EditMemoModelImpl(int memoId) {
+//        this.mDatabaseAccess = DatabaseAccess.getInstance(App.self());
+//        openDB();
+        this.mMemoId = memoId;
         this.isAlarmSet = false;
-        if (memo != null) {
-            this.wasAlarmSet = memo.isAlarmSet();
-        }
+//        if (memo != null) {
+//            this.wasAlarmSet = memo.isAlarmSet();
+//        }
     }
 
     @Override
     public void openDB() {
-        mDatabaseAccess.open();
+        realm = Realm.getDefaultInstance();
     }
 
     @Override
     public void closeDB() {
-        mDatabaseAccess.close();
+        realm.close();
     }
 
     private <T> Observable<T> getObservableFromCallable(Callable<T> callable) {
@@ -62,23 +72,80 @@ public class EditMemoModelImpl implements IEditMemoModel {
     }
 
     @Override
-    public Observable<Pair<Integer, Integer>> saveMemoToDB(String memoText, String memoColor) {
-        if (mEditedMemo == null) {
-            // Add new mMemo
-            if (!memoText.isEmpty()) {
-                Memo temp = new Memo(memoText, memoColor, isAlarmSet);
-                return getObservableFromCallable(mDatabaseAccess.save(temp));
-            } else {
-                return Observable.just(new Pair<>(-1, -1));
+    public Observable<Memo> getData() {
+        Realm realm = null;
+        try {
+            realm = Realm.getDefaultInstance();
+            mEditedMemo = realm.where(Memo.class)
+                    .equalTo(MemoRealmFields.ID, mMemoId)
+                    .findFirstAsync();
+            return mEditedMemo.asObservable();
+        } finally {
+            if (realm != null) {
+                realm.close();
             }
-        } else {
-            // Update the mMemo
-            mEditedMemo.setMemoText(memoText);
-            mEditedMemo.setColor(memoColor);
-            mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
-            return getObservableFromCallable(mDatabaseAccess.update(mEditedMemo));
         }
     }
+
+    @Override
+    public Observable<Pair<Integer, Integer>> saveMemoToDB(String memoText, String memoColor) {
+        if (mEditedMemo == null) {
+            if (memoText.isEmpty()) {
+                return Observable.just(new Pair<>(-1, -1));
+            }
+            insertNewMemo(memoText, memoColor);
+        } else {
+            updateMemo(memoText, memoColor);
+        }
+        return dataSavedSubject
+                .subscribeOn(Schedulers.computation())
+                .distinctUntilChanged()
+                .zipWith(Observable.just(mEditedMemo), (aBoolean, memo) -> new Pair<>(memo.getId(), memo.getPosition()));
+    }
+
+    private void insertNewMemo(String memoText, String memoColor) {
+        Realm realm = null;
+        try {
+            int id = 0;
+            int position = 0;
+            realm = Realm.getDefaultInstance();
+
+            Number idNumber = realm.where(Memo.class)
+                    .max(MemoRealmFields.ID);
+            if (idNumber != null) {
+                id = idNumber.intValue() + 1;
+            }
+            Number positionNumber = realm.where(Memo.class)
+                    .max(MemoRealmFields.POSITION);
+            if (positionNumber != null) {
+                position = positionNumber.intValue() + 1;
+            }
+            mEditedMemo = new Memo(id, memoText, position, memoColor, isAlarmSet);
+            realm.executeTransactionAsync(realm1 -> realm1.insertOrUpdate(mEditedMemo), () -> dataSavedSubject.onNext(true));
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+    }
+
+    private void updateMemo(String memoText, String memoColor) {
+        Realm realm = null;
+        try {
+            realm = Realm.getDefaultInstance();
+            realm.executeTransaction(realm1 -> {
+                mEditedMemo.setMemoText(memoText);
+                mEditedMemo.setColor(memoColor);
+                mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
+            });
+            realm.executeTransactionAsync(realm1 -> realm1.insertOrUpdate(mEditedMemo), () -> dataSavedSubject.onNext(true));
+        } finally {
+            if (realm != null) {
+                realm.close();
+            }
+        }
+    }
+
 
     @Override
     public void setIsAlarmSet(boolean isSet) {
@@ -96,7 +163,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
     }
 
     @Override
-    public ClickableMemo getEditedMemo() {
+    public Memo getEditedMemo() {
         return mEditedMemo;
     }
 

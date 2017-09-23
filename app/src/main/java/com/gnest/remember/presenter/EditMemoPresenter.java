@@ -2,11 +2,11 @@ package com.gnest.remember.presenter;
 
 import com.gnest.remember.model.EditMemoModelImpl;
 import com.gnest.remember.model.IEditMemoModel;
-import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.IEditMemoView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -26,22 +26,24 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
 
     private IEditMemoModel mModel;
     private List<Subscription> subscriptions;
+    private Subscription dataLoadSubscription;
     private boolean isCalendarExpanded;
 
-    public EditMemoPresenter(ClickableMemo memo) {
-        this.mModel = new EditMemoModelImpl(memo);
+    public EditMemoPresenter(int memoId) {
+        this.mModel = new EditMemoModelImpl(memoId);
         this.isCalendarExpanded = false;
+        subscriptions = new ArrayList<>();
     }
 
     @Override
     public void attachView(IEditMemoView view) {
-        mModel.openDB();
+//        mModel.openDB();
         super.attachView(view);
     }
 
     @Override
     public void detachView(boolean retainInstance) {
-        mModel.closeDB();
+//        mModel.closeDB();
         tryToUnsubscribe(subscriptions);
         super.detachView(retainInstance);
     }
@@ -56,6 +58,18 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
 
     private boolean isSubscribed(Subscription subscription) {
         return subscription != null && !subscription.isUnsubscribed();
+    }
+
+    @Override
+    public void loadData() {
+        dataLoadSubscription = mModel.getData()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(memo -> {
+            if (isViewAttached()) {
+                getView().setData(memo.getMemoText(), memo.getColor(), memo.isAlarmSet());
+            }
+        });
+        subscriptions.add(dataLoadSubscription);
     }
 
     @Override

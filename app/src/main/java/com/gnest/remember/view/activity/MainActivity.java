@@ -10,14 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.gnest.remember.R;
-import com.gnest.remember.model.data.ClickableMemo;
 import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.model.services.AlarmService;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -79,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements
                         .distinctUntilChanged(dataLoaded -> dataLoaded)
                         .zipWith(childrenLayoutCompleteSubject.distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
                         .subscribeOn(Schedulers.computation())
-                        .flatMap(pair -> Observable.from(itemFragment.getAdapter().getMemos()))
+                        .flatMap(pair -> Observable.from(itemFragment.getAdapter().getData()))
                         .filter(clickableMemo -> clickableMemo.getId() == id)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(clickableMemo -> {
@@ -127,9 +125,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onEnterEditMode(ClickableMemo memo) {
+    public void onEnterEditMode(int memoId) {
         Bundle bundle = new Bundle();
-        bundle.putBinder(EditMemoFragment.MEMO_KEY, memo);
+        bundle.putInt(EditMemoFragment.MEMO_ID_KEY, memoId);
         insertEditFragment(bundle);
     }
 

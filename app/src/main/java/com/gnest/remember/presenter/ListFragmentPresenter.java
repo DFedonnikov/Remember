@@ -5,16 +5,17 @@ import android.util.SparseArray;
 
 import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
-import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmResults;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 
 
 /**
@@ -71,10 +72,10 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     public void loadData() {
         getDataSubscription = mModel.getData()
                 .observeOn(AndroidSchedulers.mainThread())
-                .filter(memos -> !((List<ClickableMemo>) memos).isEmpty())
+                .filter(RealmResults::isLoaded)
                 .subscribe(memos -> {
                     if (isViewAttached()) {
-                        getView().setData((List<ClickableMemo>) memos);
+                        getView().setData(memos);
                     }
                 });
         subscriptions.add(getDataSubscription);
@@ -93,19 +94,19 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteSelectedMemos(SparseArray<ClickableMemo> selectedMemos, List<ClickableMemo> memos) {
+    public void processDeleteSelectedMemos(SparseArray<Memo> selectedMemos, OrderedRealmCollection<Memo> memos) {
         deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedMemos, memos)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(deletedIds -> {
                     if (isViewAttached()) {
                         for (int i = 0; i < selectedMemos.size(); i++) {
-                            ClickableMemo selected = selectedMemos.valueAt(i);
+                            Memo selected = selectedMemos.valueAt(i);
                             if (deletedIds.contains(selected.getId()) && selected.isAlarmSet()) {
                                 getView().removeAlarm(selected.getId());
                             }
-                            memos.remove(selected);
+//                            memos.remove(selected);
                         }
-                        getView().getAdapter().notifyDataSetChanged();
+//                        getView().getAdapter().notifyDataSetChanged();
                         getView().getActionMode().finish();
                     }
                 });
@@ -113,24 +114,24 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteMemo(int memoId, int memoPosition, List<ClickableMemo> memos, boolean isAlarmSet) {
+    public void processDeleteMemo(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos, boolean isAlarmSet) {
         deleteMemoSubscription = mModel.deleteMemoFromDB(memoId, memoPosition, memos)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(deleted -> {
+                .subscribe(aVoid -> {
                     if (isViewAttached()) {
-                        if (deleted && isAlarmSet) {
+                        if (isAlarmSet) {
                             getView().removeAlarm(memoId);
                         }
-                        memos.remove(memoPosition);
-                        getView().getAdapter().notifyItemRemoved(memoPosition);
-                        getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
+//                        memos.remove(memoPosition);
+//                        getView().getAdapter().notifyItemRemoved(memoPosition);
+//                        getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
                     }
                 });
         subscriptions.add(deleteMemoSubscription);
     }
 
     @Override
-    public void processShare(SparseArray<ClickableMemo> selectedList) {
+    public void processShare(SparseArray<Memo> selectedList) {
         if (selectedList.size() == 1 && isViewAttached()) {
             getView().shareMemoText(selectedList.valueAt(0).getMemoText());
         }
@@ -143,21 +144,21 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processMemoAlarmShutdown(ClickableMemo clickableMemo) {
-        alarmShutdownSubscription = mModel.setMemoAlarmFalse(clickableMemo.getId())
-                .subscribe(aVoid -> clickableMemo.setAlarm(false));
+    public void processMemoAlarmShutdown(Memo memo) {
+        alarmShutdownSubscription = mModel.setMemoAlarmFalse(memo.getId())
+                .subscribe(aVoid -> memo.setAlarm(false));
         subscriptions.add(alarmShutdownSubscription);
 
     }
 
     @Override
-    public void processSingleChoiceClick(ClickableMemo memo, int verticalOrientationCode) {
+    public void processSingleChoiceClick(Memo memo, int verticalOrientationCode) {
         if (isViewAttached()) {
             IListFragmentView view = getView();
             if (view.getLayoutManager().getOrientation() == verticalOrientationCode) {
                 view.getLayoutManager().openItem(memo.getPosition());
             } else {
-                view.getInteractionListener().onEnterEditMode(memo);
+                view.getInteractionListener().onEnterEditMode(memo.getId());
             }
         }
     }

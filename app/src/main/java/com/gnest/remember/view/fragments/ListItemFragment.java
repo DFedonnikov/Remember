@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 
 import com.gnest.remember.R;
 
-import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 import com.gnest.remember.presenter.ListFragmentPresenter;
 import com.gnest.remember.view.IListFragmentView;
@@ -35,8 +35,8 @@ import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
-import java.util.List;
-
+import io.realm.RealmResults;
+import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
 
@@ -99,12 +99,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
             recyclerView.setLayoutManager(mMyGridLayoutManager);
         }
-        mAdapter = new MySelectableAdapter(this);
+        mAdapter = new MySelectableAdapter(null, true);
+        mAdapter.setActionListener(this);
         mMyGridLayoutManager.setExpandListener(mAdapter);
 
         recyclerView.setAdapter(mAdapter);
-
-
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -156,9 +155,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
 
     @Override
-    public void setData(List<ClickableMemo> data) {
-        mAdapter.setMemos(data);
-        mAdapter.notifyDataSetChanged();
+    public void setData(RealmResults<Memo> data) {
+        mAdapter.updateData(data);
         returnFromEditMode();
         dataLoadedSubject.onNext(true);
     }
@@ -201,12 +199,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onDeleteButtonPressed() {
-        presenter.processDeleteSelectedMemos(mAdapter.getSelectedList(), mAdapter.getMemos());
+        presenter.processDeleteSelectedMemos(mAdapter.getSelectedList(), mAdapter.getData());
     }
 
     @Override
     public void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
-        presenter.processDeleteMemo(memoId, memoPosition, mAdapter.getMemos(), isAlarmSet);
+        presenter.processDeleteMemo(memoId, memoPosition, mAdapter.getData(), isAlarmSet);
         if (actionMode != null) {
             actionMode.finish();
         }
@@ -283,12 +281,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
-    public void onSingleChoiceMemoClicked(ClickableMemo memo) {
+    public void onSingleChoiceMemoClicked(Memo memo) {
         presenter.processSingleChoiceClick(memo, LinearLayoutManager.VERTICAL);
     }
 
     public void shutdownMemoAlarm(int position) {
-        presenter.processMemoAlarmShutdown(mAdapter.getMemos().get(position));
+        presenter.processMemoAlarmShutdown(mAdapter.getItem(position));
         mAdapter.notifyItemChanged(position);
     }
 
@@ -334,6 +332,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
         void onBackButtonPressed();
 
-        void onEnterEditMode(ClickableMemo memo);
+        void onEnterEditMode(int memoId);
     }
 }

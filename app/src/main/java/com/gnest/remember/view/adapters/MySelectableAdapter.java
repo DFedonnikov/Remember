@@ -1,5 +1,6 @@
 package com.gnest.remember.view.adapters;
 
+import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
@@ -9,42 +10,46 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gnest.remember.R;
-import com.gnest.remember.model.data.ClickableMemo;
+import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmRecyclerViewAdapter;
 
 /**
  * Created by DFedonnikov on 08.07.2017.
  */
 
-public class MySelectableAdapter extends RecyclerView.Adapter implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
+public class MySelectableAdapter extends RealmRecyclerViewAdapter<Memo, SelectableViewHolder> implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
 
-    private List<ClickableMemo> mMemos;
+//    private List<ClickableMemo> mMemos;
     private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
-    private SparseArray<ClickableMemo> mSelectedList = new SparseArray<>();
+    private SparseArray<Memo> mSelectedList = new SparseArray<>();
     private boolean mItemsExpanded;
 
-    public MySelectableAdapter(OnItemActionPerformed listener) {
-        this.mListener = listener;
-        this.mMemos = new ArrayList<>();
+    public MySelectableAdapter(@Nullable OrderedRealmCollection<Memo> data, boolean autoUpdate) {
+        super(data, autoUpdate);
+    }
+
+
+
+    public void setActionListener(OnItemActionPerformed mListener) {
+        this.mListener = mListener;
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SelectableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_item, parent, false);
         return new SelectableViewHolder(view, this);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        final SelectableViewHolder holder = (SelectableViewHolder) viewHolder;
-        holder.bind(mMemos.get(position), position, mItemsExpanded);
+    public void onBindViewHolder(SelectableViewHolder viewHolder, int position) {
+        final SelectableViewHolder holder = viewHolder;
+        holder.bind(getItem(position), position, mItemsExpanded);
         holder.pin.setOnTouchListener((view, motionEvent) -> {
             if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
                 mListener.onStartDrag(holder);
@@ -57,13 +62,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         } else {
             holder.setChecked(false);
         }
-    }
-
-
-
-    @Override
-    public int getItemCount() {
-        return mMemos != null ? mMemos.size() : 0;
     }
 
     @Override
@@ -82,17 +80,17 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     private void makeSwap(int from, int to) {
-        ClickableMemo memoFrom = mMemos.get(from);
-        ClickableMemo memoTo = mMemos.get(to);
+        Memo memoFrom = getItem(from);
+        Memo memoTo = getItem(to);
         mListener.swapMemos(memoFrom.getId(), memoFrom.getPosition(), memoTo.getId(), memoTo.getPosition());
         memoTo.setPosition(from);
         memoFrom.setPosition(to);
-        Collections.swap(mMemos, from, to);
+//        Collections.swap(getData(), from, to);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        ClickableMemo memo = mMemos.get(position);
+        Memo memo = getItem(position);
         mListener.onPerformSwipeDismiss(memo.getId(), memo.getPosition(), memo.isAlarmSet());
     }
 
@@ -102,7 +100,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     @Override
-    public void updateSelectedList(int pos, ClickableMemo memo) {
+    public void updateSelectedList(int pos, Memo memo) {
         if (mSelectedList.indexOfKey(pos) >= 0) {
             mSelectedList.delete(pos);
         } else {
@@ -123,12 +121,12 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         notifyDataSetChanged();
     }
 
-    public SparseArray<ClickableMemo> getSelectedList() {
+    public SparseArray<Memo> getSelectedList() {
         return mSelectedList;
     }
 
     @Override
-    public void onItemClicked(int mPosition, ClickableMemo mMemo) {
+    public void onItemClicked(int mPosition, Memo mMemo) {
         if (isMultiChoiceEnabled()) {
             updateSelectedList(mPosition, mMemo);
             if (mSelectedList.size() < 2) {
@@ -142,7 +140,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
     }
 
     @Override
-    public boolean onItemLongClicked(int mPosition, ClickableMemo mMemo) {
+    public boolean onItemLongClicked(int mPosition, Memo mMemo) {
         if (!isMultiChoiceEnabled() && !mItemsExpanded) {
             updateSelectedList(mMemo.getPosition(), mMemo);
             mListener.showActionMode();
@@ -151,13 +149,13 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
         return false;
     }
 
-    public List<ClickableMemo> getMemos() {
-        return mMemos;
-    }
-
-    public void setMemos(List<ClickableMemo> mMemos) {
-        this.mMemos = mMemos;
-    }
+//    public List<ClickableMemo> getMemos() {
+//        return mMemos;
+//    }
+//
+//    public void setMemos(List<ClickableMemo> mMemos) {
+//        this.mMemos = mMemos;
+//    }
 
     public boolean isItemsExpanded() {
         return mItemsExpanded;
@@ -191,6 +189,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter implements Selecta
          */
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
 
-        void onSingleChoiceMemoClicked(ClickableMemo mMemo);
+        void onSingleChoiceMemoClicked(Memo mMemo);
     }
 }
