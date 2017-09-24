@@ -134,7 +134,7 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     public Observable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
 //        return getObservableFromCallable(mDatabaseAccess.swapMemos(fromId, fromPosition, toId, toPosition));
 
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Memo from = realm.where(Memo.class)
