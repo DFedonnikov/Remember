@@ -12,7 +12,6 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.OrderedRealmCollection;
 import io.realm.RealmResults;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -73,6 +72,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         getDataSubscription = mModel.getData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(RealmResults::isLoaded)
+                .first()
                 .subscribe(memos -> {
                     if (isViewAttached()) {
                         getView().setData(memos);
@@ -94,7 +94,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteSelectedMemos(SparseArray<Memo> selectedMemos, OrderedRealmCollection<Memo> memos) {
+    public void processDeleteSelectedMemos(SparseArray<Memo> selectedMemos, RealmResults<Memo> memos) {
         deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedMemos, memos)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(deletedIds -> {
@@ -104,9 +104,9 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                             if (deletedIds.contains(selected.getId()) && selected.isAlarmSet()) {
                                 getView().removeAlarm(selected.getId());
                             }
-//                            memos.remove(selected);
+                            memos.remove(selected);
                         }
-//                        getView().getAdapter().notifyDataSetChanged();
+                        getView().getAdapter().notifyDataSetChanged();
                         getView().getActionMode().finish();
                     }
                 });
@@ -114,17 +114,21 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteMemo(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos, boolean isAlarmSet) {
+    public void processDeleteMemo(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet) {
         deleteMemoSubscription = mModel.deleteMemoFromDB(memoId, memoPosition, memos)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aVoid -> {
-                    if (isViewAttached()) {
-                        if (isAlarmSet) {
-                            getView().removeAlarm(memoId);
-                        }
+                .take(2)
+                .subscribe(isDeleted -> {
+                    if (isDeleted) {
+                        if (isViewAttached()) {
+                            if (isAlarmSet) {
+                                getView().removeAlarm(memoId);
+                            }
 //                        memos.remove(memoPosition);
-//                        getView().getAdapter().notifyItemRemoved(memoPosition);
-//                        getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
+                            getView().getAdapter().notifyItemRemoved(memoPosition);
+                            getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
+                        }
+                        mModel.getDataDeletedSubject().onNext(false);
                     }
                 });
         subscriptions.add(deleteMemoSubscription);

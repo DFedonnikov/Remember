@@ -15,13 +15,16 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import rx.Observable;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 
 
 /**
  * Created by DFedonnikov on 24.08.2017.
  */
 
-public class ListFragmentModelImpl implements IListFragmentModel  {
+public class ListFragmentModelImpl implements IListFragmentModel {
+
+    private final BehaviorSubject<Boolean> dataDeletedSubject = BehaviorSubject.create();
 
     private DatabaseAccess mDatabaseAccess;
     private Realm realm;
@@ -61,12 +64,12 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
 //        return getObservableFromCallable(mDatabaseAccess.getAllMemos());
 
         return realm.where(Memo.class)
-                .findAllSortedAsync(MemoRealmFields.ID)
+                .findAllSortedAsync(MemoRealmFields.POSITION)
                 .asObservable();
     }
 
     @Override
-    public Observable<List<Integer>> deleteSelectedMemosFromDB(SparseArray<Memo> selectedMemos, OrderedRealmCollection<Memo> memos) {
+    public Observable<List<Integer>> deleteSelectedMemosFromDB(SparseArray<Memo> selectedMemos, OrderedRealmCollection<Memo> memoss) {
 //        return getObservableFromCallable(mDatabaseAccess.deleteSelected(selectedMemos, memos));
         List<Integer> deletedIds = new ArrayList<>();
 
@@ -80,6 +83,8 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
                             .findFirst()
                             .deleteFromRealm();
                     deletedIds.add(memo.getId());
+                    RealmResults<Memo> memos = realm.where(Memo.class)
+                            .findAllSortedAsync(MemoRealmFields.ID);
                     for (int j = memo.getPosition() + 1; j < memos.size(); j++) {
                         Memo memoToUpdate = memos.get(j);
                         realm.where(Memo.class)
@@ -95,27 +100,34 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
     }
 
     @Override
-    public Observable<Void> deleteMemoFromDB(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos) {
+    public Observable<Boolean> deleteMemoFromDB(int memoId, int memoPosition, OrderedRealmCollection<Memo> memoss) {
 //        return getObservableFromCallable(mDatabaseAccess.delete(memoId, memoPosition, memos));
 
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                realm.where(Memo.class)
-                        .equalTo(MemoRealmFields.ID, memoId)
-                        .findFirst()
-                        .deleteFromRealm();
-                for (int i = memoPosition + 1; i < memos.size(); i++) {
+//                realm.where(Memo.class)
+//                        .equalTo(MemoRealmFields.ID, memoId)
+//                        .findFirst()
+//                        .deleteFromRealm();
+                RealmResults<Memo> memos = realm.where(Memo.class)
+                        .findAllSorted(MemoRealmFields.POSITION);
+                memos.deleteFromRealm(memoPosition);
+                for (int i = memoPosition; i < memos.size(); i++) {
                     Memo memoToUpdate = memos.get(i);
-                    realm.where(Memo.class)
-                            .equalTo(MemoRealmFields.ID, memoToUpdate.getId())
-                            .findFirst()
-                            .setPosition(i - 1);
+                    memoToUpdate.setPosition(i);
+                    realm.insertOrUpdate(memoToUpdate);
+//                    realm.where(Memo.class)
+//                            .equalTo(MemoRealmFields.ID, memoToUpdate.getId())
+//                            .findFirst()
+//                            .setPosition(i);
                 }
             }
-        });
+        }, () -> dataDeletedSubject.onNext(true));
 
-        return Observable.empty();
+        return dataDeletedSubject
+                .subscribeOn(Schedulers.computation())
+                .distinctUntilChanged();
     }
 
     @Override
@@ -125,14 +137,16 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                realm.where(Memo.class)
+                Memo from = realm.where(Memo.class)
                         .equalTo(MemoRealmFields.ID, fromId)
-                        .findFirst()
-                        .setPosition(toPosition);
-                realm.where(Memo.class)
+                        .findFirst();
+                from.setPosition(toPosition);
+                Memo to = realm.where(Memo.class)
                         .equalTo(MemoRealmFields.ID, toId)
-                        .findFirst()
-                        .setPosition(fromPosition);
+                        .findFirst();
+                to.setPosition(fromPosition);
+                realm.insertOrUpdate(from);
+                realm.insertOrUpdate(to);
             }
         });
 
@@ -154,5 +168,10 @@ public class ListFragmentModelImpl implements IListFragmentModel  {
             }
         });
         return Observable.empty();
+    }
+
+    @Override
+    public BehaviorSubject<Boolean> getDataDeletedSubject() {
+        return dataDeletedSubject;
     }
 }

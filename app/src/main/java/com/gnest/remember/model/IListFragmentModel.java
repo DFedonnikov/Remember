@@ -9,6 +9,7 @@ import java.util.List;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmResults;
 import rx.Observable;
+import rx.subjects.BehaviorSubject;
 
 /**
  * Created by DFedonnikov on 23.08.2017.
@@ -19,7 +20,7 @@ public interface IListFragmentModel {
 
     Observable<List<Integer>> deleteSelectedMemosFromDB(SparseArray<Memo> selectedMemos, OrderedRealmCollection<Memo> memos);
 
-    Observable<Void> deleteMemoFromDB(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos);
+    Observable<Boolean> deleteMemoFromDB(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos);
 
     Observable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition);
 
@@ -28,4 +29,6 @@ public interface IListFragmentModel {
     void openDB();
 
     void closeDB();
+
+    BehaviorSubject<Boolean> getDataDeletedSubject();
 }

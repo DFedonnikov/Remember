@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 
 import io.realm.Realm;
+import io.realm.RealmObject;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -32,7 +33,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
     private int mMemoId;
 
     private DatabaseAccess mDatabaseAccess;
-    private Memo mEditedMemo;
+    private volatile Memo mEditedMemo;
     private boolean wasAlarmSet;
     private boolean isAlarmSet;
 
@@ -97,31 +98,59 @@ public class EditMemoModelImpl implements IEditMemoModel {
         } else {
             updateMemo(memoText, memoColor);
         }
-        return dataSavedSubject
-                .subscribeOn(Schedulers.computation())
-                .distinctUntilChanged()
-                .zipWith(Observable.just(mEditedMemo), (aBoolean, memo) -> new Pair<>(memo.getId(), memo.getPosition()));
+        return mEditedMemo
+                .asObservable()
+                .flatMap(new Func1<RealmObject, Observable<Pair<Integer, Integer>>>() {
+                    @Override
+                    public Observable<Pair<Integer, Integer>> call(RealmObject realmObject) {
+                        Memo obj = (Memo) realmObject;
+                        return Observable.just(new Pair<>(obj.getId(), obj.getPosition()));
+                    }
+                });
+
+
+//        return dataSavedSubject
+//                .subscribeOn(Schedulers.computation())
+//                .distinctUntilChanged()
+//                .zipWith(Observable
+//                        .just(mEditedMemo), new Func2<Boolean, Memo, Pair<Integer, Integer>>() {
+//                    @Override
+//                    public Pair<Integer, Integer> call(Boolean aBoolean, Memo memo) {
+//                        return new Pair<>(mEditedMemo.getId(), mEditedMemo.getPosition());
+//                    }
+//                })
+//                .doOnUnsubscribe(new Action0() {
+//                    @Override
+//                    public void call() {
+//                        dataSavedSubject.onNext(false);
+//                    }
+//                });
     }
 
     private void insertNewMemo(String memoText, String memoColor) {
         Realm realm = null;
         try {
-            int id = 0;
-            int position = 0;
             realm = Realm.getDefaultInstance();
+            realm.executeTransaction(realm1 -> {
+                int id = 0;
+                int position = 0;
 
-            Number idNumber = realm.where(Memo.class)
-                    .max(MemoRealmFields.ID);
-            if (idNumber != null) {
-                id = idNumber.intValue() + 1;
-            }
-            Number positionNumber = realm.where(Memo.class)
-                    .max(MemoRealmFields.POSITION);
-            if (positionNumber != null) {
-                position = positionNumber.intValue() + 1;
-            }
-            mEditedMemo = new Memo(id, memoText, position, memoColor, isAlarmSet);
-            realm.executeTransactionAsync(realm1 -> realm1.insertOrUpdate(mEditedMemo), () -> dataSavedSubject.onNext(true));
+                Number idNumber = realm1.where(Memo.class)
+                        .max(MemoRealmFields.ID);
+                if (idNumber != null) {
+                    id = idNumber.intValue() + 1;
+                }
+                Number positionNumber = realm1.where(Memo.class)
+                        .max(MemoRealmFields.POSITION);
+                if (positionNumber != null) {
+                    position = positionNumber.intValue() + 1;
+                }
+                Memo temp = new Memo(id, memoText, position, memoColor, isAlarmSet, false, true);
+                realm1.insertOrUpdate(temp);
+                mEditedMemo = realm1.where(Memo.class)
+                        .equalTo(MemoRealmFields.ID, id)
+                        .findFirst();
+            });
         } finally {
             if (realm != null) {
                 realm.close();
@@ -137,8 +166,8 @@ public class EditMemoModelImpl implements IEditMemoModel {
                 mEditedMemo.setMemoText(memoText);
                 mEditedMemo.setColor(memoColor);
                 mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
+                realm1.insertOrUpdate(mEditedMemo);
             });
-            realm.executeTransactionAsync(realm1 -> realm1.insertOrUpdate(mEditedMemo), () -> dataSavedSubject.onNext(true));
         } finally {
             if (realm != null) {
                 realm.close();

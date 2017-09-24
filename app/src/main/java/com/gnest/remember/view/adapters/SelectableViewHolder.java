@@ -19,9 +19,10 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     private View mView;
     private OnItemSelectedListener mListener;
-    private int mPosition = 0;
-    private TextView mTextView;
     private Memo mMemo;
+    private int mPosition = 0;
+    private boolean mExpanded;
+    private TextView mTextView;
     private ScrollView mScrollView;
     private int mTextViewBackgroundId;
     private int mTextViewBackgroundSelectedId;
@@ -66,7 +67,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     @Override
     public void setDeselectedState() {
-        if (mMemo.isExpanded()) {
+        if (mExpanded) {
             mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundExpandedId));
             pin.setVisibility(View.INVISIBLE);
             mTextView.setMaxLines(Integer.MAX_VALUE);
@@ -86,12 +87,13 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 //        mMemo.setPosition(position);
 //        mMemo.setExpanded(isExpanded);
         mPosition = position;
+        mExpanded = isExpanded;
         mTextView.setText(memoText);
         ColorSpinnerAdapter.Colors color = ColorSpinnerAdapter.Colors.valueOf(memo.getColor());
         mTextViewBackgroundId = color.getMemoBackgroundId();
         mTextViewBackgroundSelectedId = color.getMemoBackgroundSelectedId();
         mTextViewBackgroundExpandedId = color.getMemoBackgroundExpandedId();
-        setChecked(memo.isSelected());
+//        setChecked(memo.isSelected());
     }
 
     interface OnItemSelectedListener {

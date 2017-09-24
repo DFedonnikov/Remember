@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements
                         .distinctUntilChanged(dataLoaded -> dataLoaded)
                         .zipWith(childrenLayoutCompleteSubject.distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
                         .subscribeOn(Schedulers.computation())
-                        .flatMap(pair -> Observable.from(itemFragment.getAdapter().getData()))
+                        .flatMap(pair -> Observable.from(itemFragment.getAdapter().getMemos()))
                         .filter(clickableMemo -> clickableMemo.getId() == id)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(clickableMemo -> {

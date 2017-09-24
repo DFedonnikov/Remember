@@ -9,6 +9,7 @@ import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 import java.util.List;
 
 import io.realm.OrderedRealmCollection;
+import io.realm.RealmResults;
 
 /**
  * Created by DFedonnikov on 08.09.2017.
@@ -18,9 +19,9 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
 
     void loadData();
 
-    void processDeleteMemo(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos, boolean isAlarmSet);
+    void processDeleteMemo(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet);
 
-    void processDeleteSelectedMemos(SparseArray<Memo> selectedMemos, OrderedRealmCollection<Memo> memos);
+    void processDeleteSelectedMemos(SparseArray<Memo> selectedMemos, RealmResults<Memo> memos);
 
     void processShare(SparseArray<Memo> selectedList);
 

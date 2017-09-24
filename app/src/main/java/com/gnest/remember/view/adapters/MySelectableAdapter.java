@@ -14,26 +14,26 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import io.realm.OrderedRealmCollection;
+import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
+import io.realm.RealmResults;
 
 /**
  * Created by DFedonnikov on 08.07.2017.
  */
 
-public class MySelectableAdapter extends RealmRecyclerViewAdapter<Memo, SelectableViewHolder> implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
+public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHolder> implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
 
-//    private List<ClickableMemo> mMemos;
+    private RealmResults<Memo> mMemos;
     private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
     private SparseArray<Memo> mSelectedList = new SparseArray<>();
     private boolean mItemsExpanded;
-
-    public MySelectableAdapter(@Nullable OrderedRealmCollection<Memo> data, boolean autoUpdate) {
-        super(data, autoUpdate);
-    }
-
-
 
     public void setActionListener(OnItemActionPerformed mListener) {
         this.mListener = mListener;
@@ -49,7 +49,7 @@ public class MySelectableAdapter extends RealmRecyclerViewAdapter<Memo, Selectab
     @Override
     public void onBindViewHolder(SelectableViewHolder viewHolder, int position) {
         final SelectableViewHolder holder = viewHolder;
-        holder.bind(getItem(position), position, mItemsExpanded);
+        holder.bind(mMemos.get(position), position, mItemsExpanded);
         holder.pin.setOnTouchListener((view, motionEvent) -> {
             if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
                 mListener.onStartDrag(holder);
@@ -62,6 +62,11 @@ public class MySelectableAdapter extends RealmRecyclerViewAdapter<Memo, Selectab
         } else {
             holder.setChecked(false);
         }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mMemos != null ? mMemos.size() : 0;
     }
 
     @Override
@@ -80,17 +85,17 @@ public class MySelectableAdapter extends RealmRecyclerViewAdapter<Memo, Selectab
     }
 
     private void makeSwap(int from, int to) {
-        Memo memoFrom = getItem(from);
-        Memo memoTo = getItem(to);
+        Memo memoFrom = mMemos.get(from);
+        Memo memoTo = mMemos.get(to);
         mListener.swapMemos(memoFrom.getId(), memoFrom.getPosition(), memoTo.getId(), memoTo.getPosition());
-        memoTo.setPosition(from);
-        memoFrom.setPosition(to);
-//        Collections.swap(getData(), from, to);
+//        memoTo.setPosition(from);
+//        memoFrom.setPosition(to);
+//        Collections.swap(mMemos, from, to);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        Memo memo = getItem(position);
+        Memo memo = mMemos.get(position);
         mListener.onPerformSwipeDismiss(memo.getId(), memo.getPosition(), memo.isAlarmSet());
     }
 
@@ -149,13 +154,13 @@ public class MySelectableAdapter extends RealmRecyclerViewAdapter<Memo, Selectab
         return false;
     }
 
-//    public List<ClickableMemo> getMemos() {
-//        return mMemos;
-//    }
-//
-//    public void setMemos(List<ClickableMemo> mMemos) {
-//        this.mMemos = mMemos;
-//    }
+    public RealmResults<Memo> getMemos() {
+        return mMemos;
+    }
+
+    public void setMemos(RealmResults<Memo> memos) {
+        this.mMemos = memos;
+    }
 
     public boolean isItemsExpanded() {
         return mItemsExpanded;
