@@ -69,11 +69,11 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
 
-//        if (viewHolder instanceof ItemTouchHelperViewHolder) {
-//            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-////            itemViewHolder.setSelectedState();
-//            itemViewHolder.setDeselectedState();
-//        }
+        if (viewHolder instanceof ItemTouchHelperViewHolder) {
+            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
+//            itemViewHolder.setSelectedState();
+            itemViewHolder.setDeselectedState();
+        }
         super.clearView(recyclerView, viewHolder);
     }
 

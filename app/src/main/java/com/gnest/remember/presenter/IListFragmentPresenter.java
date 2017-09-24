@@ -1,14 +1,12 @@
 package com.gnest.remember.presenter;
 
+import android.support.v4.util.Pair;
 import android.util.SparseArray;
 
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
-import java.util.List;
-
-import io.realm.OrderedRealmCollection;
 import io.realm.RealmResults;
 
 /**
@@ -21,9 +19,9 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
 
     void processDeleteMemo(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet);
 
-    void processDeleteSelectedMemos(SparseArray<Memo> selectedMemos, RealmResults<Memo> memos);
+    void processDeleteSelectedMemos(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet, RealmResults<Memo> memos);
 
-    void processShare(SparseArray<Memo> selectedList);
+    void processShare(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet);
 
     void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
 

@@ -3,20 +3,13 @@ package com.gnest.remember.model;
 import android.support.v4.util.Pair;
 
 import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.model.db.DatabaseAccess;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 import io.realm.Realm;
-import io.realm.RealmObject;
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -32,15 +25,12 @@ public class EditMemoModelImpl implements IEditMemoModel {
     private Realm realm;
     private int mMemoId;
 
-    private DatabaseAccess mDatabaseAccess;
     private volatile Memo mEditedMemo;
     private boolean wasAlarmSet;
     private boolean isAlarmSet;
 
 
     public EditMemoModelImpl(int memoId) {
-//        this.mDatabaseAccess = DatabaseAccess.getInstance(App.self());
-//        openDB();
         this.mMemoId = memoId;
         this.isAlarmSet = false;
 //        if (memo != null) {
@@ -58,34 +48,12 @@ public class EditMemoModelImpl implements IEditMemoModel {
         realm.close();
     }
 
-    private <T> Observable<T> getObservableFromCallable(Callable<T> callable) {
-        return Observable
-                .fromCallable(callable)
-                .subscribeOn(Schedulers.computation())
-                .retry((integer, throwable) -> {
-                    if (throwable instanceof IllegalStateException) {
-                        openDB();
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
-    }
-
     @Override
     public Observable<Memo> getData() {
-        Realm realm = null;
-        try {
-            realm = Realm.getDefaultInstance();
-            mEditedMemo = realm.where(Memo.class)
-                    .equalTo(MemoRealmFields.ID, mMemoId)
-                    .findFirstAsync();
-            return mEditedMemo.asObservable();
-        } finally {
-            if (realm != null) {
-                realm.close();
-            }
-        }
+        mEditedMemo = realm.where(Memo.class)
+                .equalTo(MemoRealmFields.ID, mMemoId)
+                .findFirst();
+        return mEditedMemo.asObservable();
     }
 
     @Override
@@ -98,81 +66,67 @@ public class EditMemoModelImpl implements IEditMemoModel {
         } else {
             updateMemo(memoText, memoColor);
         }
-        return mEditedMemo
-                .asObservable()
-                .flatMap(new Func1<RealmObject, Observable<Pair<Integer, Integer>>>() {
-                    @Override
-                    public Observable<Pair<Integer, Integer>> call(RealmObject realmObject) {
-                        Memo obj = (Memo) realmObject;
-                        return Observable.just(new Pair<>(obj.getId(), obj.getPosition()));
+
+        return dataSavedSubject
+                .subscribeOn(Schedulers.computation())
+                .distinctUntilChanged()
+                .flatMap(dataSaved -> {
+                    {
+                        if (mEditedMemo == null) {
+                            Realm realm = null;
+                            try {
+                                realm = Realm.getDefaultInstance();
+                                int id = -1;
+                                Number idNumber = realm.where(Memo.class)
+                                        .max(MemoRealmFields.ID);
+                                if (idNumber != null) {
+                                    id = idNumber.intValue();
+                                }
+                                return Observable.just(new Pair<>(id, -1));
+                            } finally {
+                                if (realm != null) {
+                                    realm.close();
+                                }
+                            }
+                        } else {
+                            return Observable.just(new Pair<>(mEditedMemo.getId(), mEditedMemo.getPosition()));
+                        }
                     }
                 });
-
-
-//        return dataSavedSubject
-//                .subscribeOn(Schedulers.computation())
-//                .distinctUntilChanged()
-//                .zipWith(Observable
-//                        .just(mEditedMemo), new Func2<Boolean, Memo, Pair<Integer, Integer>>() {
-//                    @Override
-//                    public Pair<Integer, Integer> call(Boolean aBoolean, Memo memo) {
-//                        return new Pair<>(mEditedMemo.getId(), mEditedMemo.getPosition());
-//                    }
-//                })
-//                .doOnUnsubscribe(new Action0() {
-//                    @Override
-//                    public void call() {
-//                        dataSavedSubject.onNext(false);
-//                    }
-//                });
     }
 
     private void insertNewMemo(String memoText, String memoColor) {
-        Realm realm = null;
-        try {
-            realm = Realm.getDefaultInstance();
-            realm.executeTransaction(realm1 -> {
-                int id = 0;
-                int position = 0;
+        realm.executeTransactionAsync(realm1 -> {
+            int id = 0;
+            int position = 0;
 
-                Number idNumber = realm1.where(Memo.class)
-                        .max(MemoRealmFields.ID);
-                if (idNumber != null) {
-                    id = idNumber.intValue() + 1;
-                }
-                Number positionNumber = realm1.where(Memo.class)
-                        .max(MemoRealmFields.POSITION);
-                if (positionNumber != null) {
-                    position = positionNumber.intValue() + 1;
-                }
-                Memo temp = new Memo(id, memoText, position, memoColor, isAlarmSet, false, true);
-                realm1.insertOrUpdate(temp);
-                mEditedMemo = realm1.where(Memo.class)
-                        .equalTo(MemoRealmFields.ID, id)
-                        .findFirst();
-            });
-        } finally {
-            if (realm != null) {
-                realm.close();
+            Number idNumber = realm1.where(Memo.class)
+                    .max(MemoRealmFields.ID);
+            if (idNumber != null) {
+                id = idNumber.intValue() + 1;
             }
-        }
+            Number positionNumber = realm1.where(Memo.class)
+                    .max(MemoRealmFields.POSITION);
+            if (positionNumber != null) {
+                position = positionNumber.intValue() + 1;
+            }
+            Memo temp = new Memo(id, memoText, position, memoColor, isAlarmSet, false, true);
+            realm1.insertOrUpdate(temp);
+        }, () -> dataSavedSubject.onNext(true));
     }
 
     private void updateMemo(String memoText, String memoColor) {
-        Realm realm = null;
-        try {
-            realm = Realm.getDefaultInstance();
-            realm.executeTransaction(realm1 -> {
-                mEditedMemo.setMemoText(memoText);
-                mEditedMemo.setColor(memoColor);
-                mEditedMemo.setAlarm(isAlarmSet || wasAlarmSet);
-                realm1.insertOrUpdate(mEditedMemo);
-            });
-        } finally {
-            if (realm != null) {
-                realm.close();
-            }
-        }
+        realm.executeTransactionAsync(realm1 -> {
+            Memo toUpdate = realm1.
+                    where(Memo.class)
+                    .equalTo(MemoRealmFields.ID, mMemoId)
+                    .findFirst();
+
+            toUpdate.setMemoText(memoText);
+            toUpdate.setColor(memoColor);
+            toUpdate.setAlarm(isAlarmSet || wasAlarmSet);
+            realm1.insertOrUpdate(toUpdate);
+        }, () -> dataSavedSubject.onNext(true));
     }
 
 

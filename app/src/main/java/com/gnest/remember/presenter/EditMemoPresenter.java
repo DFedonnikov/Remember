@@ -37,13 +37,13 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
 
     @Override
     public void attachView(IEditMemoView view) {
-//        mModel.openDB();
+        mModel.openDB();
         super.attachView(view);
     }
 
     @Override
     public void detachView(boolean retainInstance) {
-//        mModel.closeDB();
+        mModel.closeDB();
         tryToUnsubscribe(subscriptions);
         super.detachView(retainInstance);
     }

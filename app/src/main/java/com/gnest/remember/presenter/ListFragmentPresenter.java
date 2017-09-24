@@ -1,17 +1,20 @@
 package com.gnest.remember.presenter;
 
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.util.SparseArray;
 
 import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
 import com.gnest.remember.model.db.data.Memo;
+import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -94,21 +97,23 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteSelectedMemos(SparseArray<Memo> selectedMemos, RealmResults<Memo> memos) {
-        deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedMemos, memos)
+    public void processDeleteSelectedMemos(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet, RealmResults<Memo> memos) {
+        deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedIdAlarmSet, memos)
                 .observeOn(AndroidSchedulers.mainThread())
+                .take(2)
                 .subscribe(deletedIds -> {
                     if (isViewAttached()) {
-                        for (int i = 0; i < selectedMemos.size(); i++) {
-                            Memo selected = selectedMemos.valueAt(i);
-                            if (deletedIds.contains(selected.getId()) && selected.isAlarmSet()) {
-                                getView().removeAlarm(selected.getId());
+                        for (int i = 0; i < selectedIdAlarmSet.size(); i++) {
+                            Pair<Integer, Boolean> pair = selectedIdAlarmSet.valueAt(i);
+                            int id = pair.first;
+                            if (deletedIds.contains(id) && pair.second) {
+                                getView().removeAlarm(id);
                             }
-                            memos.remove(selected);
                         }
                         getView().getAdapter().notifyDataSetChanged();
                         getView().getActionMode().finish();
                     }
+                    mModel.getDataDeletedSubject().onNext(false);
                 });
         subscriptions.add(deleteSelectedSubscription);
     }
@@ -124,7 +129,6 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                             if (isAlarmSet) {
                                 getView().removeAlarm(memoId);
                             }
-//                        memos.remove(memoPosition);
                             getView().getAdapter().notifyItemRemoved(memoPosition);
                             getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
                         }
@@ -135,9 +139,21 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processShare(SparseArray<Memo> selectedList) {
-        if (selectedList.size() == 1 && isViewAttached()) {
-            getView().shareMemoText(selectedList.valueAt(0).getMemoText());
+    public void processShare(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet) {
+        if (selectedIdAlarmSet.size() == 1 && isViewAttached()) {
+            Realm realm = null;
+            try {
+                realm = Realm.getDefaultInstance();
+                Memo memo = realm.where(Memo.class)
+                        .equalTo(MemoRealmFields.ID, selectedIdAlarmSet.valueAt(0).first)
+                        .findFirst();
+                getView().shareMemoText(memo.getMemoText());
+            } finally {
+                if (realm != null) {
+                    realm.close();
+                }
+            }
+
         }
     }
 

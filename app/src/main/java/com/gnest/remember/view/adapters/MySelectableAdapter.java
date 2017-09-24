@@ -1,6 +1,6 @@
 package com.gnest.remember.view.adapters;
 
-import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
@@ -14,13 +14,6 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import io.realm.OrderedRealmCollection;
-import io.realm.Realm;
-import io.realm.RealmRecyclerViewAdapter;
 import io.realm.RealmResults;
 
 /**
@@ -32,7 +25,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     private RealmResults<Memo> mMemos;
     private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
-    private SparseArray<Memo> mSelectedList = new SparseArray<>();
+    private SparseArray<Pair<Integer, Boolean>> mSelectedList = new SparseArray<>();
     private boolean mItemsExpanded;
 
     public void setActionListener(OnItemActionPerformed mListener) {
@@ -88,9 +81,6 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
         Memo memoFrom = mMemos.get(from);
         Memo memoTo = mMemos.get(to);
         mListener.swapMemos(memoFrom.getId(), memoFrom.getPosition(), memoTo.getId(), memoTo.getPosition());
-//        memoTo.setPosition(from);
-//        memoFrom.setPosition(to);
-//        Collections.swap(mMemos, from, to);
     }
 
     @Override
@@ -109,7 +99,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
         if (mSelectedList.indexOfKey(pos) >= 0) {
             mSelectedList.delete(pos);
         } else {
-            mSelectedList.put(pos, memo);
+            mSelectedList.put(pos, new Pair<>(memo.getId(), memo.isAlarmSet()));
         }
         if (mSelectedList.size() == 0) {
             mListener.shutDownActionMode();
@@ -126,7 +116,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
         notifyDataSetChanged();
     }
 
-    public SparseArray<Memo> getSelectedList() {
+    public SparseArray<Pair<Integer, Boolean>> getSelectedList() {
         return mSelectedList;
     }
 
