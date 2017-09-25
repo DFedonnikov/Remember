@@ -114,7 +114,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
         mAppBarLayout = mView.findViewById(R.id.app_bar_layout);
 
-
         mCompactCalendarView = mView.findViewById(R.id.compactcalendar_view);
 
         mCompactCalendarView.setLocale(TimeZone.getDefault(), Locale.getDefault());

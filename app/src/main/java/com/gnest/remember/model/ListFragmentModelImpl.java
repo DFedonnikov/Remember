@@ -14,7 +14,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import rx.Observable;
 import rx.schedulers.Schedulers;
-import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 /**
  * Created by DFedonnikov on 24.08.2017.
@@ -22,7 +22,7 @@ import rx.subjects.BehaviorSubject;
 
 public class ListFragmentModelImpl implements IListFragmentModel {
 
-    private final BehaviorSubject<Boolean> dataDeletedSubject = BehaviorSubject.create();
+    private final PublishSubject<Boolean> dataDeletedSubject = PublishSubject.create();
 
     private Realm realm;
 
@@ -48,7 +48,7 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     }
 
     @Override
-    public Observable<List<Integer>> deleteSelectedMemosFromDB(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet, OrderedRealmCollection<Memo> memoss) {
+    public Observable<Pair<Boolean, List<Integer>>> deleteSelectedMemosFromDB(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet, OrderedRealmCollection<Memo> memoss) {
         List<Integer> deletedIds = new ArrayList<>();
 
         realm.executeTransactionAsync(realm1 -> {
@@ -72,9 +72,9 @@ public class ListFragmentModelImpl implements IListFragmentModel {
         }, () -> dataDeletedSubject.onNext(true));
 
         return dataDeletedSubject
-                .subscribeOn(Schedulers.computation())
+                .subscribeOn(Schedulers.newThread())
                 .distinctUntilChanged()
-                .zipWith(Observable.just(deletedIds), (deleted, integers) -> integers);
+                .zipWith(Observable.just(deletedIds), Pair::new);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     }
 
     @Override
-    public BehaviorSubject<Boolean> getDataDeletedSubject() {
+    public PublishSubject<Boolean> getDataDeletedSubject() {
         return dataDeletedSubject;
     }
 }
