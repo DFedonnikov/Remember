@@ -24,8 +24,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
 
     private Realm realm;
     private int mMemoId;
-
-    private volatile Memo mEditedMemo;
+    private boolean isNew;
     private boolean wasAlarmSet;
     private boolean isAlarmSet;
 
@@ -33,9 +32,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
     public EditMemoModelImpl(int memoId) {
         this.mMemoId = memoId;
         this.isAlarmSet = false;
-//        if (memo != null) {
-//            this.wasAlarmSet = memo.isAlarmSet();
-//        }
+        this.isNew = memoId == -1;
     }
 
     @Override
@@ -49,16 +46,15 @@ public class EditMemoModelImpl implements IEditMemoModel {
     }
 
     @Override
-    public Observable<Memo> getData() {
-        mEditedMemo = realm.where(Memo.class)
-                .equalTo(MemoRealmFields.ID, mMemoId)
-                .findFirst();
-        return mEditedMemo.asObservable();
+    public Memo getData() {
+        Memo memo = getEditedMemo();
+        wasAlarmSet = memo.isAlarmSet();
+        return memo;
     }
 
     @Override
     public Observable<Pair<Integer, Integer>> saveMemoToDB(String memoText, String memoColor) {
-        if (mEditedMemo == null) {
+        if (isNew) {
             if (memoText.isEmpty()) {
                 return Observable.just(new Pair<>(-1, -1));
             }
@@ -72,24 +68,17 @@ public class EditMemoModelImpl implements IEditMemoModel {
                 .distinctUntilChanged()
                 .flatMap(dataSaved -> {
                     {
-                        if (mEditedMemo == null) {
-                            Realm realm = null;
-                            try {
-                                realm = Realm.getDefaultInstance();
-                                int id = -1;
-                                Number idNumber = realm.where(Memo.class)
-                                        .max(MemoRealmFields.ID);
-                                if (idNumber != null) {
-                                    id = idNumber.intValue();
-                                }
-                                return Observable.just(new Pair<>(id, -1));
-                            } finally {
-                                if (realm != null) {
-                                    realm.close();
-                                }
+                        if (isNew) {
+                            int id = -1;
+                            Number idNumber = realm.where(Memo.class)
+                                    .max(MemoRealmFields.ID);
+                            if (idNumber != null) {
+                                id = idNumber.intValue();
                             }
+                            return Observable.just(new Pair<>(id, -1));
                         } else {
-                            return Observable.just(new Pair<>(mEditedMemo.getId(), mEditedMemo.getPosition()));
+                            Memo memo = getEditedMemo();
+                            return Observable.just(new Pair<>(memo.getId(), memo.getPosition()));
                         }
                     }
                 });
@@ -147,7 +136,9 @@ public class EditMemoModelImpl implements IEditMemoModel {
 
     @Override
     public Memo getEditedMemo() {
-        return mEditedMemo;
+        return realm.where(Memo.class)
+                .equalTo(MemoRealmFields.ID, mMemoId)
+                .findFirst();
     }
 
     @Override

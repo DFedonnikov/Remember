@@ -2,6 +2,7 @@ package com.gnest.remember.presenter;
 
 import com.gnest.remember.model.EditMemoModelImpl;
 import com.gnest.remember.model.IEditMemoModel;
+import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IEditMemoView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
@@ -26,7 +27,6 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
 
     private IEditMemoModel mModel;
     private List<Subscription> subscriptions;
-    private Subscription dataLoadSubscription;
     private boolean isCalendarExpanded;
 
     public EditMemoPresenter(int memoId) {
@@ -62,14 +62,10 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
 
     @Override
     public void loadData() {
-        dataLoadSubscription = mModel.getData()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(memo -> {
-            if (isViewAttached()) {
-                getView().setData(memo.getMemoText(), memo.getColor(), memo.isAlarmSet());
-            }
-        });
-        subscriptions.add(dataLoadSubscription);
+        Memo memo = mModel.getData();
+        if (isViewAttached()) {
+            getView().setData(memo.getMemoText(), memo.getColor(), memo.isAlarmSet());
+        }
     }
 
     @Override
@@ -106,8 +102,9 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
         if (isViewAttached()) {
             mModel.setIsAlarmSet(false);
             mModel.setWasAlarmSet(false);
-            if (mModel.getEditedMemo() != null) {
-                setNotification(false, null, mModel.getEditedMemo().getId());
+            Memo memo = mModel.getEditedMemo();
+            if (memo != null) {
+                setNotification(false, null, memo.getId());
             }
             getView().showAlarmToast(removeAlarmMessage);
         }

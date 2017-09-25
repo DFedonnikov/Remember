@@ -14,7 +14,7 @@ import rx.Observable;
  */
 
 public interface IEditMemoModel {
-    Observable<Memo> getData();
+    Memo getData();
 
     Observable<Pair<Integer, Integer>> saveMemoToDB(String memoText, String memoColor);
 

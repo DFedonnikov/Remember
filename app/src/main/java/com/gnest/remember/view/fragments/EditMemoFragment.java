@@ -65,7 +65,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     private ImageView mRemoveAlert;
     private ImageView arrow;
 
-    //    private ClickableMemo mMemo;
     private int memoId = -1;
     private String mColor;
     private AppBarLayout mAppBarLayout;
@@ -77,12 +76,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment EditMemoFragment.
-     */
     public static EditMemoFragment newInstance() {
         return new EditMemoFragment();
     }
@@ -103,12 +96,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         mView = inflater.inflate(R.layout.fragment_edit_memo, container, false);
         mMemoEditTextView = mView.findViewById(R.id.editTextMemo);
         mRemoveAlert = mView.findViewById(R.id.bt_remove_alert);
-        mRemoveAlert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                presenter.processRemoveAlarm(getString(R.string.alarm_remove_text));
-                setAlarmVisibility(false);
-            }
+        mRemoveAlert.setOnClickListener(view -> {
+            presenter.processRemoveAlarm(getString(R.string.alarm_remove_text));
+            setAlarmVisibility(false);
         });
         return mView;
     }
@@ -124,13 +114,10 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
         mAppBarLayout = mView.findViewById(R.id.app_bar_layout);
 
-        // Set up the CompactCalendarView
-
 
         mCompactCalendarView = mView.findViewById(R.id.compactcalendar_view);
 
-        // Force English
-        mCompactCalendarView.setLocale(TimeZone.getDefault(), /*Locale.getDefault()*/Locale.ENGLISH);
+        mCompactCalendarView.setLocale(TimeZone.getDefault(), Locale.getDefault());
 
         mCompactCalendarView.setShouldDrawDaysHeader(true);
 
@@ -151,18 +138,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
         RelativeLayout datePickerButton = mView.findViewById(R.id.date_picker_button);
 
-        datePickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.processDatePicker();
-            }
-        });
+        datePickerButton.setOnClickListener(v -> presenter.processDatePicker());
 
         if (memoId != -1) {
             presenter.loadData();
         }
         presenter.processSetCurrentDate();
-
     }
 
 
@@ -199,20 +180,17 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
             int hour = 0;
             int minute = 0;
             if (getArguments() != null) {
                 hour = getArguments().getInt(HOUR_KEY);
                 minute = getArguments().getInt(MINUTE_KEY);
             }
-            // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
             if (mListener != null) {
                 mListener.onTimeSet(hourOfDay, minute);
             }

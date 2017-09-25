@@ -10,12 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.gnest.remember.R;
+import com.gnest.remember.model.db.data.Memo;
+import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.model.services.AlarmService;
 
+import io.realm.Realm;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -67,9 +71,8 @@ public class MainActivity extends AppCompatActivity implements
         //To be executed if activity launched from notification
         Intent intent = getIntent();
         if (intent != null) {
-            if (itemFragment != null) {
-                long id = intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
-
+            long id = intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
+            if (itemFragment != null && id != -1) {
                 BehaviorSubject<Boolean> dataLoadedSubject = itemFragment.getDataLodingSubject();
                 BehaviorSubject<Boolean> childrenLayoutCompleteSubject = itemFragment.getLayoutManager().getChildrenLayoutCompleteSubject();
 
@@ -77,7 +80,18 @@ public class MainActivity extends AppCompatActivity implements
                         .distinctUntilChanged(dataLoaded -> dataLoaded)
                         .zipWith(childrenLayoutCompleteSubject.distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
                         .subscribeOn(Schedulers.computation())
-                        .flatMap(pair -> Observable.from(itemFragment.getAdapter().getMemos()))
+                        .flatMap(pair -> {
+                            Realm realm = null;
+                            try {
+                                realm = Realm.getDefaultInstance();
+                                return Observable.from(realm.where(Memo.class)
+                                        .findAllSortedAsync(MemoRealmFields.POSITION));
+                            } finally {
+                                if (realm != null) {
+                                    realm.close();
+                                }
+                            }
+                        })
                         .filter(clickableMemo -> clickableMemo.getId() == id)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(clickableMemo -> {
