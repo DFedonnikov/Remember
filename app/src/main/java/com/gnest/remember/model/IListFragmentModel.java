@@ -10,13 +10,6 @@ import java.util.List;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmResults;
 import rx.Observable;
-import rx.subjects.AsyncSubject;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
-
-/**
- * Created by DFedonnikov on 23.08.2017.
- */
 
 public interface IListFragmentModel {
     Observable<RealmResults<Memo>> getData();
@@ -25,13 +18,11 @@ public interface IListFragmentModel {
 
     Observable<Boolean> deleteMemoFromDB(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos);
 
-    Observable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition);
+    void swapMemos(int fromId, int fromPosition, int toId, int toPosition);
 
-    Observable<Void> setMemoAlarmFalse(int id);
+    void setMemoAlarmFalse(int id);
 
     void openDB();
 
     void closeDB();
-
-    PublishSubject<Boolean> getDataDeletedSubject();
 }

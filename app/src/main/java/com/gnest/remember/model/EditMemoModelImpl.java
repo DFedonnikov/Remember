@@ -13,10 +13,6 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
-/**
- * Created by DFedonnikov on 09.09.2017.
- */
-
 public class EditMemoModelImpl implements IEditMemoModel {
 
     private static Calendar sSelectedDate = Calendar.getInstance();
@@ -50,6 +46,13 @@ public class EditMemoModelImpl implements IEditMemoModel {
         Memo memo = getEditedMemo();
         wasAlarmSet = memo.isAlarmSet();
         return memo;
+    }
+
+    @Override
+    public Memo getEditedMemo() {
+        return realm.where(Memo.class)
+                .equalTo(MemoRealmFields.ID, mMemoId)
+                .findFirst();
     }
 
     @Override
@@ -104,20 +107,21 @@ public class EditMemoModelImpl implements IEditMemoModel {
         }, () -> dataSavedSubject.onNext(true));
     }
 
+
     private void updateMemo(String memoText, String memoColor) {
         realm.executeTransactionAsync(realm1 -> {
             Memo toUpdate = realm1.
                     where(Memo.class)
                     .equalTo(MemoRealmFields.ID, mMemoId)
                     .findFirst();
-
-            toUpdate.setMemoText(memoText);
-            toUpdate.setColor(memoColor);
-            toUpdate.setAlarm(isAlarmSet || wasAlarmSet);
-            realm1.insertOrUpdate(toUpdate);
+            if (toUpdate != null) {
+                toUpdate.setMemoText(memoText);
+                toUpdate.setColor(memoColor);
+                toUpdate.setAlarm(isAlarmSet || wasAlarmSet);
+                realm1.insertOrUpdate(toUpdate);
+            }
         }, () -> dataSavedSubject.onNext(true));
     }
-
 
     @Override
     public void setIsAlarmSet(boolean isSet) {
@@ -132,13 +136,6 @@ public class EditMemoModelImpl implements IEditMemoModel {
     @Override
     public void setWasAlarmSet(boolean isSet) {
         wasAlarmSet = isSet;
-    }
-
-    @Override
-    public Memo getEditedMemo() {
-        return realm.where(Memo.class)
-                .equalTo(MemoRealmFields.ID, mMemoId)
-                .findFirst();
     }
 
     @Override

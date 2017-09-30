@@ -17,11 +17,6 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
 
-
-/**
- * Created by DFedonnikov on 23.08.2017.
- */
-
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
     private IListFragmentModel mModel;
@@ -33,10 +28,6 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     private Subscription deleteMemoSubscription;
     @Nullable
     private Subscription deleteSelectedSubscription;
-    @Nullable
-    private Subscription swapSubscription;
-    @Nullable
-    private Subscription alarmShutdownSubscription;
 
     public ListFragmentPresenter() {
         mModel = new ListFragmentModelImpl();
@@ -108,7 +99,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                 .subscribe(isDeleted -> {
                     if (ListFragmentPresenter.this.isViewAttached()) {
                         if (isAlarmSet) {
-                            ListFragmentPresenter.this.getView().removeAlarm(memoId);
+                            getView().removeAlarm(memoId);
                         }
                         getView().getAdapter().notifyItemRemoved(memoPosition);
                         getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
@@ -126,7 +117,9 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                 Memo memo = realm.where(Memo.class)
                         .equalTo(MemoRealmFields.ID, selectedIdAlarmSet.valueAt(0).first)
                         .findFirst();
-                getView().shareMemoText(memo.getMemoText());
+                if (memo != null) {
+                    getView().shareMemoText(memo.getMemoText());
+                }
             } finally {
                 if (realm != null) {
                     realm.close();
@@ -138,16 +131,12 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
-        swapSubscription = mModel.swapMemos(fromId, fromPosition, toId, toPosition).subscribe();
-        compositeSubscription.add(swapSubscription);
+        mModel.swapMemos(fromId, fromPosition, toId, toPosition);
     }
 
     @Override
     public void processMemoAlarmShutdown(Memo memo) {
-        alarmShutdownSubscription = mModel.setMemoAlarmFalse(memo.getId())
-                .subscribe(aVoid -> memo.setAlarm(false));
-        compositeSubscription.add(alarmShutdownSubscription);
-
+        mModel.setMemoAlarmFalse(memo.getId());
     }
 
     @Override

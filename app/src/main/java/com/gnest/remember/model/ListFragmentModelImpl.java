@@ -16,10 +16,6 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
-/**
- * Created by DFedonnikov on 24.08.2017.
- */
-
 public class ListFragmentModelImpl implements IListFragmentModel {
 
     private final PublishSubject<Boolean> dataDeletedSubject = PublishSubject.create();
@@ -56,17 +52,19 @@ public class ListFragmentModelImpl implements IListFragmentModel {
                     .findAllSorted(MemoRealmFields.POSITION);
             for (int i = 0; i < selectedIdAlarmSet.size(); i++) {
                 int id = selectedIdAlarmSet.valueAt(i).first;
-                int position = realm1
+                Memo memo = realm1
                         .where(Memo.class)
                         .equalTo(MemoRealmFields.ID, selectedIdAlarmSet.valueAt(i).first)
-                        .findFirst()
-                        .getPosition();
-                deletedIds.add(id);
-                memos.deleteFromRealm(position);
-                for (int j = position; j < memos.size(); j++) {
-                    Memo memoToUpdate = memos.get(j);
-                    memoToUpdate.setPosition(j);
-                    realm1.insertOrUpdate(memoToUpdate);
+                        .findFirst();
+                if (memo != null) {
+                    int position = memo.getPosition();
+                    deletedIds.add(id);
+                    memos.deleteFromRealm(position);
+                    for (int j = position; j < memos.size(); j++) {
+                        Memo memoToUpdate = memos.get(j);
+                        memoToUpdate.setPosition(j);
+                        realm1.insertOrUpdate(memoToUpdate);
+                    }
                 }
             }
         }, () -> dataDeletedSubject.onNext(true));
@@ -96,33 +94,33 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     }
 
     @Override
-    public Observable<Void> swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
+    public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
         realm.executeTransaction(realm1 -> {
             Memo from = realm1.where(Memo.class)
                     .equalTo(MemoRealmFields.ID, fromId)
                     .findFirst();
-            from.setPosition(toPosition);
             Memo to = realm1.where(Memo.class)
                     .equalTo(MemoRealmFields.ID, toId)
                     .findFirst();
-            to.setPosition(fromPosition);
-            realm1.insertOrUpdate(from);
-            realm1.insertOrUpdate(to);
+            if (from != null && to != null) {
+                from.setPosition(toPosition);
+                to.setPosition(fromPosition);
+                realm1.insertOrUpdate(from);
+                realm1.insertOrUpdate(to);
+            }
         });
-        return Observable.empty();
     }
 
     @Override
-    public Observable<Void> setMemoAlarmFalse(int id) {
-        realm.executeTransactionAsync(realm1 -> realm1.where(Memo.class)
-                .equalTo(MemoRealmFields.ID, id)
-                .findFirst()
-                .setAlarm(false));
-        return Observable.empty();
-    }
-
-    @Override
-    public PublishSubject<Boolean> getDataDeletedSubject() {
-        return dataDeletedSubject;
+    public void setMemoAlarmFalse(int id) {
+        realm.executeTransactionAsync(realm1 -> {
+            Memo memo = realm1.where(Memo.class)
+                    .equalTo(MemoRealmFields.ID, id)
+                    .findFirst();
+            if (memo != null) {
+                memo.setAlarm(false);
+                realm1.insertOrUpdate(memo);
+            }
+        });
     }
 }
