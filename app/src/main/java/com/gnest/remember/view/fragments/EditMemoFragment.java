@@ -279,7 +279,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         inflater.inflate(R.menu.ab_editfragment, menu);
         MenuItem item = menu.findItem(R.id.item_color_choice_spinner);
         AppCompatSpinner colorChoiceSpinner = (AppCompatSpinner) item.getActionView();
-        colorChoiceSpinner.setSupportBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color.spinnerTint));
+        colorChoiceSpinner.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         ColorSpinnerAdapter colorSpinnerAdapter = new ColorSpinnerAdapter(getContext());
         colorChoiceSpinner.setAdapter(colorSpinnerAdapter);
         colorChoiceSpinner.setOnItemSelectedListener(this);
