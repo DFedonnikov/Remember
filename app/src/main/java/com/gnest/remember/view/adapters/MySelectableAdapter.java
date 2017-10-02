@@ -27,6 +27,13 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     private OnItemActionPerformed mListener;
     private SparseArray<Pair<Integer, Boolean>> mSelectedList = new SparseArray<>();
     private boolean mItemsExpanded;
+    private int mMemoSize;
+    private int mMargins;
+
+    public MySelectableAdapter(int memoSize, int margins) {
+        this.mMemoSize = memoSize;
+        this.mMargins = margins;
+    }
 
     public void setActionListener(OnItemActionPerformed mListener) {
         this.mListener = mListener;
@@ -42,7 +49,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     @Override
     public void onBindViewHolder(SelectableViewHolder viewHolder, int position) {
         final SelectableViewHolder holder = viewHolder;
-        holder.bind(mMemos.get(position), position, mItemsExpanded);
+        holder.bind(mMemos.get(position), position, mItemsExpanded, mMemoSize, mMargins);
         holder.pin.setOnTouchListener((view, motionEvent) -> {
             if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
                 mListener.onStartDrag(holder);

@@ -19,7 +19,6 @@ import com.gnest.remember.model.services.AlarmService;
 import io.realm.Realm;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -38,19 +37,22 @@ public class MainActivity extends AppCompatActivity implements
     private static final String EDIT_FRAG_VISIBILITY_KEY = "edit_frag_visibility_key";
     private static final String EDIT_FRAMENT_NAME = "edit_fragment";
     private static final String ITEM_FRAMENT_NAME = "item_fragment";
-    private static final int MEMO_WIDTH = 175;
+    public static final int MEMO_MARGINS_DP = 14;
+    public static final int ITEM_MARGINS_DP = 16;
+    public static final int MAX_MEMO_SIZE = 180;
 
     private ListItemFragment itemFragment;
     private EditMemoFragment editMemoFragment;
     private boolean isEditFragVisible;
-    private static int COLUMNS = 1;
+    private static int COLUMNS;
+    private static int MEMO_SIZE_PX;
+    private static int MARGINS_PX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        int screenWidthDP = getResources().getConfiguration().screenWidthDp;
-        COLUMNS = screenWidthDP / MEMO_WIDTH;
+        calculateColumnsAndMemoSize();
         if (savedInstanceState != null) {
             isEditFragVisible = savedInstanceState.getBoolean(EDIT_FRAG_VISIBILITY_KEY);
             FragmentManager manager = getSupportFragmentManager();
@@ -58,11 +60,22 @@ public class MainActivity extends AppCompatActivity implements
                 editMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAMENT_NAME);
             } else {
                 itemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAMENT_NAME);
-                itemFragment.setColumnCount(COLUMNS);
+                Bundle args = itemFragment.getArguments();
+                args.putInt(ListItemFragment.ARG_COLUMN_COUNT, COLUMNS);
+                args.putInt(ListItemFragment.ARG_MEMO_SIZE, MEMO_SIZE_PX);
+                args.putInt(ListItemFragment.ARG_MEMO_MARGINS, MARGINS_PX);
             }
         } else {
             insertItemFragment(null);
         }
+    }
+
+    private void calculateColumnsAndMemoSize() {
+        int screenWidthDP = getResources().getConfiguration().screenWidthDp;
+        COLUMNS = screenWidthDP / MAX_MEMO_SIZE;
+        float density = getResources().getDisplayMetrics().density;
+        MEMO_SIZE_PX = (int) (((screenWidthDP - 2 * MEMO_MARGINS_DP - ITEM_MARGINS_DP * COLUMNS) / COLUMNS) * density + 0.5);
+        MARGINS_PX = (int) (MEMO_MARGINS_DP * density + 0.5);
     }
 
     @Override
@@ -105,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void insertItemFragment(Bundle bundle) {
-        itemFragment = ListItemFragment.newInstance(COLUMNS);
+        itemFragment = ListItemFragment.newInstance(COLUMNS, MEMO_SIZE_PX, MARGINS_PX);
         if (bundle != null) {
             itemFragment.getArguments().putBundle(BUNDLE_KEY, bundle);
         }

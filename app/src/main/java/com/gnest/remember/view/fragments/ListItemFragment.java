@@ -44,11 +44,15 @@ import rx.subjects.BehaviorSubject;
 public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragmentPresenter>
         implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView {
 
-    private static final String ARG_COLUMN_COUNT = "ColumnCount";
+    public static final String ARG_COLUMN_COUNT = "ColumnCount";
+    public static final String ARG_MEMO_SIZE = "MemoSize";
+    public static final String ARG_MEMO_MARGINS = "MemoMargins";
 
     private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
 
     private int mColumnCount;
+    private int mMemoSize;
+    private int mMargins;
     private OnListItemFragmentInteractionListener mListener;
     private MySelectableAdapter mAdapter;
     private View mView;
@@ -64,10 +68,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public ListItemFragment() {
     }
 
-    public static ListItemFragment newInstance(int columnCount) {
+    public static ListItemFragment newInstance(int columnCount, int memoSize, int margins) {
         ListItemFragment fragment = new ListItemFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_MEMO_SIZE, memoSize);
+        args.putInt(ARG_MEMO_MARGINS, margins);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,9 +82,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
         actionMenu = new ActionMenu(this);
     }
 
@@ -92,6 +95,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (getArguments() != null) {
+            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mMemoSize = getArguments().getInt(ARG_MEMO_SIZE);
+            mMargins = getArguments().getInt(ARG_MEMO_MARGINS);
+        }
         RecyclerView recyclerView = mView.findViewById(R.id.memo_list);
         Context context = mView.getContext();
         if (mColumnCount <= 1) {
@@ -100,7 +108,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
             recyclerView.setLayoutManager(mMyGridLayoutManager);
         }
-        mAdapter = new MySelectableAdapter();
+        mAdapter = new MySelectableAdapter(mMemoSize, mMargins);
         mAdapter.setActionListener(this);
         mMyGridLayoutManager.setExpandListener(mAdapter);
 
@@ -290,10 +298,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void shutdownMemoAlarm(int position) {
         presenter.processMemoAlarmShutdown(mAdapter.getMemos().get(position));
         mAdapter.notifyItemChanged(position);
-    }
-
-    public void setColumnCount(int columnCount) {
-        this.mColumnCount = columnCount;
     }
 
     public void onBackButtonPressed() {
