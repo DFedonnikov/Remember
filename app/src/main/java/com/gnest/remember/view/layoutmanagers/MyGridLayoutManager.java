@@ -64,6 +64,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        super.onLayoutChildren(recycler, state);
         detachAndScrapAttachedViews(recycler);
         fill(recycler);
         childrenLayoutCompleteSubject.onNext(true);
