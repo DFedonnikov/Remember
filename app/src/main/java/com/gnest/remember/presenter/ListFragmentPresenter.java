@@ -65,7 +65,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         if (isViewAttached()) {
             IListFragmentView view = getView();
             if (view != null) {
-                view.getLayoutManager().setmAncorPos(lastPosition);
+                view.getLayoutManager().setAncorPos(lastPosition);
                 view.getLayoutManager().setOrientation(lastOrientation);
                 view.getAdapter().setItemsExpanded(isExpanded);
             }

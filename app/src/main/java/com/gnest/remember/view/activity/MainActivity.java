@@ -37,9 +37,8 @@ public class MainActivity extends AppCompatActivity implements
     private static final String EDIT_FRAG_VISIBILITY_KEY = "edit_frag_visibility_key";
     private static final String EDIT_FRAMENT_NAME = "edit_fragment";
     private static final String ITEM_FRAMENT_NAME = "item_fragment";
-    public static final int MEMO_MARGINS_DP = 14;
-    public static final int ITEM_MARGINS_DP = 16;
-    public static final int MAX_MEMO_SIZE = 180;
+    public static final int ITEM_MARGINS_DP = 12;
+    public static final int MAX_MEMO_SIZE_DP = 180;
 
     private ListItemFragment itemFragment;
     private EditMemoFragment editMemoFragment;
@@ -72,10 +71,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private void calculateColumnsAndMemoSize() {
         int screenWidthDP = getResources().getConfiguration().screenWidthDp;
-        COLUMNS = screenWidthDP / MAX_MEMO_SIZE;
+        COLUMNS = screenWidthDP / MAX_MEMO_SIZE_DP;
         float density = getResources().getDisplayMetrics().density;
-        MEMO_SIZE_PX = (int) (((screenWidthDP - 2 * MEMO_MARGINS_DP - ITEM_MARGINS_DP * COLUMNS) / COLUMNS) * density + 0.5);
-        MARGINS_PX = (int) (MEMO_MARGINS_DP * density + 0.5);
+        MEMO_SIZE_PX = (int) (((screenWidthDP - 2 * ITEM_MARGINS_DP * COLUMNS) / COLUMNS) * density + 0.5);
+        MARGINS_PX = (int) (ITEM_MARGINS_DP * density + 0.5);
     }
 
     @Override

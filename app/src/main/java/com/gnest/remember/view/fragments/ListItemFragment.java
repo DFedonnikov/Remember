@@ -105,7 +105,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
-            mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
+            mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount, mMemoSize, mMargins);
             recyclerView.setLayoutManager(mMyGridLayoutManager);
         }
         mAdapter = new MySelectableAdapter(mMemoSize, mMargins);

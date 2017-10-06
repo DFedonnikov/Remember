@@ -17,10 +17,6 @@ import java.util.ArrayList;
 
 import rx.subjects.BehaviorSubject;
 
-/**
- * Created by DFedonnikov on 23.07.2017.
- */
-
 public class MyGridLayoutManager extends GridLayoutManager {
 
     private static final long TRANSITION_DURATION_MS = 300;
@@ -28,17 +24,21 @@ public class MyGridLayoutManager extends GridLayoutManager {
     private static int sScreenWidth;
 
     private final BehaviorSubject<Boolean> childrenLayoutCompleteSubject = BehaviorSubject.create();
-
     private SparseArray<View> mViewCache = new SparseArray<>();
+
+    private int mMemoSize;
+    private int mMagrings;
     private int mAncorPos;
     private int mCurrentOrientation;
     private int mLastPosition;
     private ExpandListener mExpandListener;
 
-    public MyGridLayoutManager(Context context, int spanCount) {
+    public MyGridLayoutManager(Context context, int spanCount, int memoSize, int margins) {
         super(context, spanCount);
         DisplayMetrics metrics = App.self().getResources().getDisplayMetrics();
         sScreenWidth = metrics.widthPixels;
+        this.mMemoSize = memoSize;
+        this.mMagrings = margins;
     }
 
     @Override
@@ -64,7 +64,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        super.onLayoutChildren(recycler, state);
         detachAndScrapAttachedViews(recycler);
         fill(recycler);
         childrenLayoutCompleteSubject.onNext(true);
@@ -112,8 +111,10 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     private void fillUp(@Nullable View anchorView, RecyclerView.Recycler recycler) {
         int anchorPos;
+        int anchorTop = 0;
         if (anchorView != null) {
             anchorPos = getPosition(anchorView);
+            anchorTop = getDecoratedTop(anchorView);
         } else {
             anchorPos = mAncorPos;
         }
@@ -121,28 +122,43 @@ public class MyGridLayoutManager extends GridLayoutManager {
         boolean fillUp = true;
         int pos = anchorPos - 1;
 
+        int viewBottom = anchorTop;
+        final int widthSpec = View.MeasureSpec.makeMeasureSpec(mMemoSize + 2 * mMagrings, View.MeasureSpec.EXACTLY);
+        final int heightSpec = View.MeasureSpec.makeMeasureSpec(mMemoSize + 2 * mMagrings, View.MeasureSpec.EXACTLY);
+
         while (fillUp && pos >= 0) {
             View view = mViewCache.get(pos); //проверяем кэш
             if (view == null) {
                 //если вьюшки нет в кэше - просим у recycler новую, измеряем и лэйаутим её
                 view = recycler.getViewForPosition(pos);
                 addView(view, 0);
+                measureChildWithDecorations(view, widthSpec, heightSpec);
+                int decoratedMeasuredWidth = getDecoratedMeasuredWidth(view);
+                int decoratedMeasuredHeight = getDecoratedMeasuredHeight(view);
+                int column = getColumnOfPosition(pos);
+                int left = decoratedMeasuredWidth * column;
+                layoutDecoratedWithMargins(view, left, viewBottom - decoratedMeasuredHeight, left + decoratedMeasuredWidth, viewBottom);
             } else {
                 //если вьюшка есть в кэше - просто аттачим её обратно
                 //нет необходимости проводить measure/layout цикл.
-                attachView(view);
+                attachView(view, 0);
                 mViewCache.remove(pos);
             }
-            int viewBottom = getDecoratedTop(view);
-            fillUp = (viewBottom > 0);
+
+            if (isViewLeftmost(pos)) {
+                viewBottom = getDecoratedTop(view);
+                fillUp = (viewBottom > 0);
+            }
             pos--;
         }
     }
 
     private void fillDown(@Nullable View anchorView, RecyclerView.Recycler recycler) {
         int anchorPos;
+        int anchorTop = 0;
         if (anchorView != null) {
             anchorPos = getPosition(anchorView);
+            anchorTop = getDecoratedTop(anchorView);
         } else {
             anchorPos = mAncorPos;
         }
@@ -150,31 +166,37 @@ public class MyGridLayoutManager extends GridLayoutManager {
         int pos = anchorPos;
         boolean fillDown = true;
         int height = getHeight();
+        int viewTop = anchorTop;
         int itemCount = getItemCount();
+        final int widthSpec = View.MeasureSpec.makeMeasureSpec(mMemoSize + 2 * mMagrings, View.MeasureSpec.EXACTLY);
+        final int heightSpec = View.MeasureSpec.makeMeasureSpec(mMemoSize + 2 * mMagrings, View.MeasureSpec.EXACTLY);
 
         while (fillDown && pos < itemCount) {
             View view = mViewCache.get(pos);
             if (view == null) {
                 view = recycler.getViewForPosition(pos);
                 addView(view);
+                measureChildWithDecorations(view, widthSpec, heightSpec);
+                int decoratedMeasuredWidth = getDecoratedMeasuredWidth(view);
+                int decoratedMeasuredHeight = getDecoratedMeasuredHeight(view);
+                int column = getColumnOfPosition(pos);
+                int left = decoratedMeasuredWidth * column;
+                layoutDecoratedWithMargins(view, left, viewTop, left + decoratedMeasuredWidth, viewTop + decoratedMeasuredHeight);
             } else {
                 attachView(view);
                 mViewCache.remove(pos);
 
             }
-            int viewTop = getDecoratedBottom(view);
 
             //If view is rightmost we should check if we need to layout next row of elements
             if (isViewRightmost(view, pos)) {
+                viewTop = getDecoratedBottom(view);
                 fillDown = viewTop <= height;
             }
             pos++;
         }
     }
 
-    private boolean isViewRightmost(View view, int viewPosition) {
-        return (viewPosition + 1) % getSpanCount() == 0;
-    }
 
     private void fillLeft(@Nullable View anchorView, RecyclerView.Recycler recycler) {
         int anchorPos;
@@ -256,6 +278,43 @@ public class MyGridLayoutManager extends GridLayoutManager {
         mLastPosition = getLargestSquareViewPosition();
     }
 
+    private View getAnchorView() {
+        int childCount = getChildCount();
+        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
+        int maxSquare = 0;
+        View anchorView = null;
+        for (int i = 0; i < childCount; i++) {
+            View view = getChildAt(i);
+            int top = getDecoratedTop(view);
+            int bottom = getDecoratedBottom(view);
+            int left = getDecoratedLeft(view);
+            int right = getDecoratedRight(view);
+            Rect viewRect = new Rect(left, top, right, bottom);
+            boolean intersect = viewRect.intersect(mainRect);
+            if (intersect) {
+                int square = viewRect.width() * viewRect.height();
+                if (square > maxSquare) {
+                    anchorView = view;
+                }
+            }
+        }
+        return anchorView;
+    }
+
+    private void measureChildWithDecorations(View child, int widthSpec, int heightSpec) {
+        Rect decorRect = new Rect();
+        calculateItemDecorationsForChild(child, decorRect);
+        child.measure(widthSpec, heightSpec);
+    }
+
+    private boolean isViewLeftmost(int viewPosition) {
+        return (viewPosition) % getSpanCount() == 0;
+    }
+
+    private boolean isViewRightmost(View view, int viewPosition) {
+        return (viewPosition + 1) % getSpanCount() == 0;
+    }
+
     private int getLargestSquareViewPosition() {
         int childCount = getChildCount();
         int maxSquare = 0;
@@ -278,29 +337,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
         }
 
         return maxSquareView != null ? getPosition(maxSquareView) : 0;
-    }
-
-    private View getAnchorView() {
-        int childCount = getChildCount();
-        Rect mainRect = new Rect(0, 0, getWidth(), getHeight());
-        int maxSquare = 0;
-        View anchorView = null;
-        for (int i = 0; i < childCount; i++) {
-            View view = getChildAt(i);
-            int top = getDecoratedTop(view);
-            int bottom = getDecoratedBottom(view);
-            int left = getDecoratedLeft(view);
-            int right = getDecoratedRight(view);
-            Rect viewRect = new Rect(left, top, right, bottom);
-            boolean intersect = viewRect.intersect(mainRect);
-            if (intersect) {
-                int square = viewRect.width() * viewRect.height();
-                if (square > maxSquare) {
-                    anchorView = view;
-                }
-            }
-        }
-        return anchorView;
     }
 
     public void openItem(int pos) {
@@ -339,17 +375,14 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
         ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
         animator.setDuration(TRANSITION_DURATION_MS);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float animationProgress = (float) animation.getAnimatedValue();
-                for (ViewAnimationInfo animationInfo : animationInfos) {
-                    int top = (int) (animationInfo.startTop + animationProgress * (animationInfo.finishTop - animationInfo.startTop));
-                    int bottom = (int) (animationInfo.startBottom + animationProgress * (animationInfo.finishBottom - animationInfo.startBottom));
-                    layoutDecorated(animationInfo.view, 0, top, getWidth(), bottom);
-                }
-                updateViewScale();
+        animator.addUpdateListener(animation -> {
+            float animationProgress = (float) animation.getAnimatedValue();
+            for (ViewAnimationInfo animationInfo : animationInfos) {
+                int top = (int) (animationInfo.startTop + animationProgress * (animationInfo.finishTop - animationInfo.startTop));
+                int bottom = (int) (animationInfo.startBottom + animationProgress * (animationInfo.finishBottom - animationInfo.startBottom));
+                layoutDecorated(animationInfo.view, 0, top, getWidth(), bottom);
             }
+            updateViewScale();
         });
 
         animator.addListener(new Animator.AnimatorListener() {
@@ -377,10 +410,12 @@ public class MyGridLayoutManager extends GridLayoutManager {
         animator.start();
     }
 
-    private void measureChildWithDecorations(View child, int widthSpec, int heightSpec) {
-        Rect decorRect = new Rect();
-        calculateItemDecorationsForChild(child, decorRect);
-        child.measure(widthSpec, heightSpec);
+    private static class ViewAnimationInfo {
+        int startTop;
+        int startBottom;
+        int finishTop;
+        int finishBottom;
+        View view;
     }
 
     private void updateViewScale() {
@@ -404,6 +439,54 @@ public class MyGridLayoutManager extends GridLayoutManager {
             view.setScaleY(scale);
         }
     }
+
+    @Override
+    public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        int delta = scrollVerticallyInternal(dy);
+        offsetChildrenVertical(-delta);
+        fill(recycler);
+        return delta;
+    }
+
+    private int scrollVerticallyInternal(int dy) {
+        int childCount = getChildCount();
+        int itemCount = getItemCount();
+        if (childCount == 0) {
+            return 0;
+        }
+
+        final View topView = getChildAt(0);
+        final View bottomView = getChildAt(childCount - 1);
+
+        int viewSpan = getDecoratedBottom(bottomView) - getDecoratedTop(topView);
+        if (viewSpan <= getHeight()) {
+            return 0;
+        }
+
+        int delta = 0;
+        if (dy < 0) {
+            View firstView = getChildAt(0);
+            int firstViewAdapterPos = getPosition(firstView);
+            if (firstViewAdapterPos > 0) {
+                delta = dy;
+            } else {
+                int viewTop = getDecoratedTop(firstView) - mMagrings;
+                delta = Math.max(viewTop, dy);
+            }
+        } else if (dy > 0) {
+            View lastView = getChildAt(childCount - 1);
+            int lastViewAdapterPos = getPosition(lastView);
+            if (lastViewAdapterPos < itemCount - 1) {
+                delta = dy;
+            } else {
+                int viewBottom = getDecoratedBottom(lastView) + mMagrings;
+                int parentBottom = getHeight();
+                delta = Math.min(viewBottom - parentBottom, dy);
+            }
+        }
+        return delta;
+    }
+
 
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
@@ -453,12 +536,17 @@ public class MyGridLayoutManager extends GridLayoutManager {
         return delta;
     }
 
-    public void setmAncorPos(int mAncorPos) {
-        this.mAncorPos = mAncorPos;
+    public void setAncorPos(int ancorPos) {
+        this.mAncorPos = ancorPos;
     }
 
     public int getLastPosition() {
         return mLastPosition;
+    }
+
+    // Return the column index of this position
+    private int getColumnOfPosition(int position) {
+        return position % getSpanCount();
     }
 
     public void setExpandListener(ExpandListener expandListener) {
@@ -467,14 +555,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     public BehaviorSubject<Boolean> getChildrenLayoutCompleteSubject() {
         return childrenLayoutCompleteSubject;
-    }
-
-    private static class ViewAnimationInfo {
-        int startTop;
-        int startBottom;
-        int finishTop;
-        int finishBottom;
-        View view;
     }
 
     public interface ExpandListener {
