@@ -1,23 +1,10 @@
 package com.gnest.remember.view;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.os.Bundle;
-
 import com.hannesdorfmann.mosby.mvp.MvpView;
 
-import java.util.Calendar;
 import java.util.Date;
 
-/**
- * Created by DFedonnikov on 08.09.2017.
- */
-
 public interface IEditMemoView extends MvpView {
-
-    AlarmManager getAlarmManager();
-
-    PendingIntent getPendingIntent(String notificationText, int id);
 
     void setData(String memoText, String color, boolean alarmSet);
 

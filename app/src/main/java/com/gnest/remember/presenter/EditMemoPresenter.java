@@ -16,10 +16,6 @@ import java.util.Locale;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
-/**
- * Created by DFedonnikov on 08.09.2017.
- */
-
 public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implements IEditMemoPresenter {
 
     private SimpleDateFormat mCalendarDateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
@@ -65,6 +61,20 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
         Memo memo = mModel.getData();
         if (isViewAttached()) {
             getView().setData(memo.getMemoText(), memo.getColor(), memo.isAlarmSet());
+            Calendar alarmDate = Calendar.getInstance();
+            if (memo.getAlarmDate() != -1) {
+                alarmDate.setTimeInMillis(memo.getAlarmDate());
+            }
+            processSetCurrentDate(alarmDate);
+        }
+    }
+
+    @Override
+    public void processSetCurrentDate(Calendar date) {
+        if (isViewAttached()) {
+            String currentDate = mCalendarDateFormat.format(date.getTime());
+            getView().setSubtitle(currentDate);
+            getView().setCurrentDate(date.getTime());
         }
     }
 
@@ -140,17 +150,6 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     }
 
     @Override
-    public void processSetCurrentDate() {
-        Date current = Calendar.getInstance().getTime();
-        mModel.setDateSelected(current);
-        String currentDate = mCalendarDateFormat.format(current);
-        if (isViewAttached()) {
-            getView().setSubtitle(currentDate);
-            getView().setCurrentDate(current);
-        }
-    }
-
-    @Override
     public void processDatePicker() {
         if (isViewAttached()) {
             getView().animateArrow(isCalendarExpanded);
@@ -167,7 +166,9 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
         Calendar now = Calendar.getInstance();
         if (selectedDate.after(now)) {
             mModel.setIsAlarmSet(true);
-            getView().setAlarmVisibility(true);
+            if (isViewAttached()) {
+                getView().setAlarmVisibility(true);
+            }
         }
     }
 

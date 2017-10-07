@@ -17,6 +17,7 @@
     <string name="selected_memo_color">Selected memo color</string>
     <string name="spinner_list_item_color_image">Spinner list item color image</string>
     <string name="send_memo_intent_title">Send Memo&#8230;,</string>
+    <string name="preference_file_key">com.gnest.remember.PREFERENCE_FILE_KEY</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>

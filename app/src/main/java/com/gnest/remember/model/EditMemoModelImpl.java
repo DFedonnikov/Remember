@@ -45,6 +45,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
     public Memo getData() {
         Memo memo = getEditedMemo();
         wasAlarmSet = memo.isAlarmSet();
+        sSelectedDate.setTimeInMillis(memo.getAlarmDate());
         return memo;
     }
 
@@ -102,7 +103,8 @@ public class EditMemoModelImpl implements IEditMemoModel {
             if (positionNumber != null) {
                 position = positionNumber.intValue() + 1;
             }
-            Memo temp = new Memo(id, memoText, position, memoColor, isAlarmSet, false, true);
+            long alarmDate = isAlarmSet ? sSelectedDate.getTimeInMillis() : -1;
+            Memo temp = new Memo(id, memoText, position, memoColor, alarmDate, isAlarmSet, false, true);
             realm1.insertOrUpdate(temp);
         }, () -> dataSavedSubject.onNext(true));
     }
@@ -117,6 +119,11 @@ public class EditMemoModelImpl implements IEditMemoModel {
             if (toUpdate != null) {
                 toUpdate.setMemoText(memoText);
                 toUpdate.setColor(memoColor);
+                if (isAlarmSet || wasAlarmSet) {
+                    toUpdate.setAlarmDate(sSelectedDate.getTimeInMillis());
+                } else {
+                    toUpdate.setAlarmDate(-1);
+                }
                 toUpdate.setAlarm(isAlarmSet || wasAlarmSet);
                 realm1.insertOrUpdate(toUpdate);
             }

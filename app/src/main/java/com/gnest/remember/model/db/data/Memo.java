@@ -1,10 +1,7 @@
 package com.gnest.remember.model.db.data;
 
-import android.support.annotation.Nullable;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-
 
 public class Memo extends RealmObject {
     @PrimaryKey
@@ -12,6 +9,7 @@ public class Memo extends RealmObject {
     private String mMemoText;
     private int mPosition;
     private String mColor;
+    private long mAlarmDate;
     private boolean mIsAlarmSet;
     private boolean mSelected = false;
     private boolean mExpanded = false;
@@ -27,16 +25,17 @@ public class Memo extends RealmObject {
         this.mIsAlarmSet = alarmSet;
     }
 
-    public Memo(int id, String memoText, int position, String color, boolean alarmSet) {
+    public Memo(int id, String memoText, int position, String color, long alarmDate, boolean alarmSet) {
         this.mId = id;
         this.mMemoText = memoText;
         this.mPosition = position;
         this.mColor = color;
+        this.mAlarmDate = alarmDate;
         this.mIsAlarmSet = alarmSet;
     }
 
-    public Memo(int id, String memoText, int position, String color, boolean alarmSet, boolean isSelected, boolean isExpanded) {
-        this(id, memoText, position, color, alarmSet);
+    public Memo(int id, String memoText, int position, String color, long alarmDate, boolean alarmSet, boolean isSelected, boolean isExpanded) {
+        this(id, memoText, position, color, alarmDate, alarmSet);
         this.mSelected = isSelected;
         this.mExpanded = isExpanded;
     }
@@ -67,6 +66,14 @@ public class Memo extends RealmObject {
 
     public void setColor(String mColor) {
         this.mColor = mColor;
+    }
+
+    public long getAlarmDate() {
+        return mAlarmDate;
+    }
+
+    public void setAlarmDate(long alarmDate) {
+        this.mAlarmDate = alarmDate;
     }
 
     public boolean isAlarmSet() {

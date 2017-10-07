@@ -1,8 +1,6 @@
 package com.gnest.remember.view.fragments;
 
-import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +32,7 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.gnest.remember.R;
-import com.gnest.remember.model.services.AlarmService;
+import com.gnest.remember.model.services.AlarmReceiver;
 import com.gnest.remember.presenter.EditMemoPresenter;
 import com.gnest.remember.presenter.IEditMemoPresenter;
 import com.gnest.remember.view.adapters.ColorSpinnerAdapter;
@@ -42,6 +40,7 @@ import com.gnest.remember.view.IEditMemoView;
 import com.gnest.remember.view.activity.MainActivity;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -141,8 +140,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
         if (memoId != -1) {
             presenter.loadData();
+        } else {
+            presenter.processSetCurrentDate(Calendar.getInstance());
         }
-        presenter.processSetCurrentDate();
     }
 
 
@@ -226,25 +226,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     }
 
     @Override
-    public AlarmManager getAlarmManager() {
-        return (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-    }
-
-    @Override
-    public PendingIntent getPendingIntent(String notificationText, int id) {
-        Intent intent = AlarmService.getServiceIntent(activity, notificationText, id);
-        return PendingIntent.getService(activity, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    @Override
     public void setAlarm(boolean isSet, long alarmDate, String notificationText, int id) {
-        AlarmManager manager = getAlarmManager();
-        PendingIntent pendingIntent = getPendingIntent(notificationText, id);
-        if (isSet) {
-            manager.set(AlarmManager.RTC_WAKEUP, alarmDate, pendingIntent);
-        } else {
-            manager.cancel(pendingIntent);
-        }
+        Intent intent = AlarmReceiver.getReceiverIntent(getContext(), id, notificationText, alarmDate, isSet);
+        activity.sendBroadcast(intent);
     }
 
     @Override

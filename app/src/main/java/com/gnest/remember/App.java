@@ -8,10 +8,6 @@ import com.gnest.remember.model.db.migration.RealmMigration;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-/**
- * Created by DFedonnikov on 11.08.2017.
- */
-
 public class App extends Application {
 
     private static App sSelf;
@@ -27,7 +23,7 @@ public class App extends Application {
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .name("memo.realm")
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .migration(new RealmMigration())
                 .build();
         Realm.setDefaultConfiguration(config);
