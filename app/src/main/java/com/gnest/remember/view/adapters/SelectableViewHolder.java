@@ -12,17 +12,12 @@ import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
 
-/**
- * Created by DFedonnikov on 08.07.2017.
- */
-
 class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
     private View mView;
     private OnItemSelectedListener mListener;
     private Memo mMemo;
     private int mPosition = 0;
-    private boolean mExpanded;
     private TextView mTextView;
     private ScrollView mScrollView;
     private int mTextViewBackgroundId;
@@ -37,27 +32,8 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mTextView = itemView.findViewById(R.id.memo_textView);
         pin = itemView.findViewById(R.id.pin);
         mScrollView = itemView.findViewById(R.id.textScrollView);
-        mTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onItemClicked(mPosition, mMemo);
-            }
-        });
-        mTextView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                return mListener.onItemLongClicked(mPosition, mMemo);
-            }
-        });
-    }
-
-    void setChecked(boolean value) {
-        if (value) {
-            setSelectedState();
-        } else {
-            setDeselectedState();
-        }
-//        mMemo.setSelected(value);
+        mTextView.setOnClickListener(view -> mListener.onItemClicked(mPosition, mMemo, SelectableViewHolder.this));
+        mTextView.setOnLongClickListener(view -> mListener.onItemLongClicked(mPosition, mMemo, SelectableViewHolder.this));
     }
 
     @Override
@@ -68,46 +44,61 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     @Override
     public void setDeselectedState() {
-        if (mExpanded) {
-            mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundExpandedId));
-            pin.setVisibility(View.INVISIBLE);
-            mTextView.setMaxLines(Integer.MAX_VALUE);
-            mScrollView.setEnabled(true);
-        } else {
-            mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundId));
-            pin.setVisibility(View.VISIBLE);
-            mTextView.setMaxLines(5);
-            mScrollView.setEnabled(false);
-        }
-
+        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundId));
+        pin.setVisibility(View.VISIBLE);
     }
 
-    void bind(Memo memo, int position, boolean isExpanded, int memoSize, int margins) {
-        String memoText = memo.getMemoText();
+    private void setDeselectedAndExpandedState() {
+        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundExpandedId));
+        pin.setVisibility(View.INVISIBLE);
+    }
+
+    void bind(Memo memo, int position, boolean isExpanded, boolean isSelected, int memoSize, int margins) {
         mMemo = memo;
-//        mMemo.setPosition(position);
-//        mMemo.setExpanded(isExpanded);
         mPosition = position;
-        mExpanded = isExpanded;
-        mTextView.setText(memoText);
+        setUpViewSizesAndMargins(memoSize, margins);
+        setUpBackgroundColors(memo.getColor());
+        setUpTextField(memo.getMemoText(), isExpanded, isSelected);
+    }
+
+    private void setUpViewSizesAndMargins(int memoSize, int margins) {
         ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(memoSize, memoSize);
         layoutParams.setMargins(margins, margins, margins, margins);
         mView.setLayoutParams(layoutParams);
-        ColorSpinnerAdapter.Colors color = ColorSpinnerAdapter.Colors.valueOf(memo.getColor());
+    }
+
+    private void setUpBackgroundColors(String memoColor) {
+        ColorSpinnerAdapter.Colors color = ColorSpinnerAdapter.Colors.valueOf(memoColor);
         mTextViewBackgroundId = color.getMemoBackgroundId();
         mTextViewBackgroundSelectedId = color.getMemoBackgroundSelectedId();
         mTextViewBackgroundExpandedId = color.getMemoBackgroundExpandedId();
-//        setChecked(memo.isSelected());
+    }
+
+    private void setUpTextField(String memoText, boolean isExpanded, boolean isSelected) {
+        mTextView.setText(memoText);
+        if (isExpanded) {
+            setDeselectedAndExpandedState();
+            mTextView.setMaxLines(Integer.MAX_VALUE);
+            mScrollView.setEnabled(true);
+        } else {
+            if (isSelected) {
+                setSelectedState();
+            } else {
+                setDeselectedState();
+            }
+            mTextView.setMaxLines(5);
+            mScrollView.setEnabled(false);
+        }
     }
 
     interface OnItemSelectedListener {
-        void onItemClicked(int mPosition, Memo mMemo);
+        void onItemClicked(int mPosition, Memo mMemo, SelectableViewHolder viewHolder);
 
-        boolean onItemLongClicked(int mPosition, Memo mMemo);
+        boolean onItemLongClicked(int mPosition, Memo mMemo, SelectableViewHolder viewHolder);
 
         boolean isMultiChoiceEnabled();
 
-        void updateSelectedList(int pos, Memo memo);
+        void updateSelectedList(int pos, Memo memo, SelectableViewHolder viewHolder);
 
     }
 

@@ -16,10 +16,6 @@ import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
 import io.realm.RealmResults;
 
-/**
- * Created by DFedonnikov on 08.07.2017.
- */
-
 public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHolder> implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
 
     private RealmResults<Memo> mMemos;
@@ -49,19 +45,14 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     @Override
     public void onBindViewHolder(SelectableViewHolder viewHolder, int position) {
         final SelectableViewHolder holder = viewHolder;
-        holder.bind(mMemos.get(position), position, mItemsExpanded, mMemoSize, mMargins);
+        boolean isSelected = multiChoiceEnabled && mSelectedList.indexOfKey(position) >= 0;
+        holder.bind(mMemos.get(position), position, mItemsExpanded, isSelected, mMemoSize, mMargins);
         holder.pin.setOnTouchListener((view, motionEvent) -> {
             if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
                 mListener.onStartDrag(holder);
             }
             return false;
         });
-
-        if (multiChoiceEnabled && mSelectedList.indexOfKey(position) >= 0) {
-            holder.setChecked(true);
-        } else {
-            holder.setChecked(false);
-        }
     }
 
     @Override
@@ -102,16 +93,20 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     }
 
     @Override
-    public void updateSelectedList(int pos, Memo memo) {
+    public void updateSelectedList(int pos, Memo memo, SelectableViewHolder viewHolder) {
         if (mSelectedList.indexOfKey(pos) >= 0) {
             mSelectedList.delete(pos);
+            viewHolder.setDeselectedState();
         } else {
             mSelectedList.put(pos, new Pair<>(memo.getId(), memo.isAlarmSet()));
+            viewHolder.setSelectedState();
         }
         if (mSelectedList.size() == 0) {
             mListener.shutDownActionMode();
+            viewHolder.setDeselectedState();
         }
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
+//        notifyItemChanged(pos);
     }
 
     public void switchMultiSelect(boolean switchedOn) {
@@ -128,9 +123,9 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     }
 
     @Override
-    public void onItemClicked(int mPosition, Memo mMemo) {
+    public void onItemClicked(int mPosition, Memo mMemo, SelectableViewHolder viewHolder) {
         if (isMultiChoiceEnabled()) {
-            updateSelectedList(mPosition, mMemo);
+            updateSelectedList(mPosition, mMemo, viewHolder);
             if (mSelectedList.size() < 2) {
                 mListener.setShareButtonVisibility(true);
             } else {
@@ -142,9 +137,9 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     }
 
     @Override
-    public boolean onItemLongClicked(int mPosition, Memo mMemo) {
+    public boolean onItemLongClicked(int mPosition, Memo mMemo, SelectableViewHolder viewHolder) {
         if (!isMultiChoiceEnabled() && !mItemsExpanded) {
-            updateSelectedList(mMemo.getPosition(), mMemo);
+            updateSelectedList(mMemo.getPosition(), mMemo, viewHolder);
             mListener.showActionMode();
             return true;
         }
