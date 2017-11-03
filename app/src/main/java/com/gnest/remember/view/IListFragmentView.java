@@ -8,13 +8,9 @@ import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby.mvp.MvpView;
 
-import java.util.List;
-
 import io.realm.RealmResults;
-
-/**
- * Created by DFedonnikov on 08.09.2017.
- */
+import rx.Observable;
+import rx.subjects.PublishSubject;
 
 public interface IListFragmentView extends MvpView {
     void setData(RealmResults<Memo> data);
@@ -30,4 +26,6 @@ public interface IListFragmentView extends MvpView {
     MySelectableAdapter getAdapter();
 
     ActionMode getActionMode();
+
+    Observable<Boolean> showConfirmPopup(int memoPosition, PublishSubject<Boolean> subject);
 }

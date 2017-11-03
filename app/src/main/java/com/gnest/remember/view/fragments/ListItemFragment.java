@@ -8,18 +8,22 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.gnest.remember.R;
 
@@ -35,10 +39,14 @@ import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmResults;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 
 public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragmentPresenter>
@@ -214,10 +222,40 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
-        presenter.processDeleteMemo(memoId, memoPosition, mAdapter.getMemos(), isAlarmSet);
-        if (actionMode != null) {
-            actionMode.finish();
-        }
+        presenter.processSwipeDismiss(memoId, memoPosition, getAdapter().getMemos(), isAlarmSet);
+
+    }
+
+    @Override
+    public Observable<Boolean> showConfirmPopup(int memoPosition, PublishSubject<Boolean> subject) {
+        PopupWindow popupWindow = showPopup(memoPosition, subject);
+        return Observable
+                .timer(1500, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(aLong -> {
+                    if (popupWindow.isShowing()) {
+                        popupWindow.dismiss();
+                    }
+                    return Observable.just(subject.hasCompleted());
+                });
+    }
+
+    private PopupWindow showPopup(int memoPosition, PublishSubject<Boolean> subject) {
+        View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
+        TextView cancel = layout.findViewById(R.id.btn_cancel_dismiss);
+
+        PopupWindow popupWindow = new PopupWindow(layout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
+
+        cancel.setOnClickListener(v -> {
+            subject.onNext(true);
+            subject.onCompleted();
+            popupWindow.dismiss();
+            getAdapter().notifyItemRangeChanged(memoPosition, getAdapter().getItemCount());
+        });
+        popupWindow.showAtLocation(layout, Gravity.BOTTOM, 0, 0);
+
+        return popupWindow;
     }
 
     @Override

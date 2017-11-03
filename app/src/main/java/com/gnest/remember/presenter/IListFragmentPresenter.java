@@ -9,10 +9,6 @@ import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
 import io.realm.RealmResults;
 
-/**
- * Created by DFedonnikov on 08.09.2017.
- */
-
 public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> {
 
     void loadData();
@@ -32,4 +28,6 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
     void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode);
 
     void processReturnFromEditMode(int lastOrientation, int lastPosition, boolean isExpanded);
+
+    void processSwipeDismiss(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet);
 }

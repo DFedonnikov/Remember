@@ -15,6 +15,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
@@ -28,6 +29,8 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     private Subscription deleteMemoSubscription;
     @Nullable
     private Subscription deleteSelectedSubscription;
+    @Nullable
+    private Subscription confirmDismissSubscription;
 
     public ListFragmentPresenter() {
         mModel = new ListFragmentModelImpl();
@@ -90,6 +93,24 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     }
                 });
         compositeSubscription.add(deleteSelectedSubscription);
+    }
+
+    @Override
+    public void processSwipeDismiss(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet) {
+        if (isViewAttached()) {
+            PublishSubject<Boolean> subject = PublishSubject.create();
+            confirmDismissSubscription = getView()
+                    .showConfirmPopup(memoPosition, subject)
+                    .subscribe(cancel -> {
+                        if (!cancel) {
+                            processDeleteMemo(memoId, memoPosition, memos, isAlarmSet);
+                            if (getView().getActionMode() != null) {
+                                getView().getActionMode().finish();
+                            }
+                        }
+                    });
+            compositeSubscription.add(confirmDismissSubscription);
+        }
     }
 
     @Override
