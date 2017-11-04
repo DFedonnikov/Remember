@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/drawer_item_notes"
+        android:icon="@drawable/ic_note"
+        android:title="@string/drawer_item_notes" />
+
+    <item
+        android:id="@+id/drawer_item_archive"
+        android:icon="@drawable/ic_drawer_archive_black"
+        android:title="@string/drawer_item_archive" />
+
+    <item android:title="@string/drawer_item_actions">
+        <menu>
+            <item
+                android:id="@+id/drawer_item_add"
+                android:icon="@drawable/ic_drawer_note_add_black"
+                android:title="@string/drawer_item_add" />
+
+            <item
+                android:id="@+id/drawer_item_share"
+                android:icon="@drawable/btn_share"
+                android:title="@string/drawer_item_share" />
+        </menu>
+
+    </item>
+
+</menu>

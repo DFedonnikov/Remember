@@ -3,11 +3,21 @@ package com.gnest.remember.view.activity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
@@ -25,7 +35,7 @@ import rx.subjects.BehaviorSubject;
 
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
-        ListItemFragment.OnListItemFragmentInteractionListener {
+        ListItemFragment.OnListItemFragmentInteractionListener, NavigationView.OnNavigationItemSelectedListener {
 
     public static final int LM_HORIZONTAL_ORIENTATION = 0;
     public static final int LM_VERTICAL_ORIENTATION = 1;
@@ -42,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private ListItemFragment itemFragment;
     private EditMemoFragment editMemoFragment;
+    private DrawerLayout drawerLayout;
     private boolean isEditFragVisible;
     private static int COLUMNS;
     private static int MEMO_SIZE_PX;
@@ -80,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+
         //To be executed if activity launched from notification
         Intent intent = getIntent();
         if (intent != null) {
@@ -133,7 +145,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if (itemFragment != null && itemFragment.isVisible()) {
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else if (itemFragment != null && itemFragment.isVisible()) {
             itemFragment.onBackButtonPressed();
         } else if (editMemoFragment != null && editMemoFragment.isVisible()) {
             editMemoFragment.onBackButtonPressed();
@@ -157,6 +171,50 @@ public class MainActivity extends AppCompatActivity implements
         insertEditFragment(bundle);
     }
 
+    @Override
+    public void configureDrawer() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.nav_open_drawer, R.string.nav_close_drawer);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.drawer_item_notes:
+                //TODO
+                Toast.makeText(this, "notes selected", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.drawer_item_archive:
+                //TODO
+                Toast.makeText(this, "archive selected", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.drawer_item_add:
+                //TODO
+                break;
+            case R.id.drawer_item_share:
+                //TODO
+                break;
+        }
+
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        }
+        return false;
+    }
+
+
+
+
     private void insertEditFragment(Bundle state) {
         editMemoFragment = EditMemoFragment.newInstance();
         if (state != null) {
@@ -166,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements
         ft.replace(R.id.current_fragment, editMemoFragment, null);
         ft.commit();
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

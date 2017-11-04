@@ -110,6 +110,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         toolbar.setTitle("");
         activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
+        mListener.configureDrawer();
 
         mAppBarLayout = mView.findViewById(R.id.app_bar_layout);
 
@@ -320,5 +321,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
      */
     public interface OnEditMemoFragmentInteractionListener {
         void onSaveEditMemoFragmentInteraction(Bundle bundle);
+
+        void configureDrawer();
     }
 }

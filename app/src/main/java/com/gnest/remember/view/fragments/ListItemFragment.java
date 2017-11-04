@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -134,6 +136,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         Toolbar toolbar = mView.findViewById(R.id.ItemFragmentToolbar);
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
+        mListener.configureDrawer();
     }
 
     @Override
@@ -210,6 +213,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             case R.id.add:
                 mListener.onAddButtonPressed();
                 return true;
+            case android.R.id.home:
+                ((DrawerLayout) getActivity().findViewById(R.id.drawer_layout)).openDrawer(GravityCompat.START);
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -377,5 +382,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         void onBackButtonPressed();
 
         void onEnterEditMode(int memoId);
+
+        void configureDrawer();
     }
 }

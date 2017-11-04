@@ -19,6 +19,14 @@
     <string name="send_memo_intent_title">Send Memo&#8230;,</string>
     <string name="preference_file_key">com.gnest.remember.PREFERENCE_FILE_KEY</string>
     <string name="note_archived_message">Note has been archived</string>
+    <string name="drawer_item_notes">Notes</string>
+    <string name="drawer_item_archive">Archive</string>
+    <string name="nav_open_drawer">open drawer</string>
+    <string name="nav_close_drawer">close drawer</string>
+    <string name="drawer_item_add">Add note</string>
+    <string name="drawer_item_share">Share</string>
+    <string name="iv_ct_drawer_header_image">Drawer Header Image</string>
+    <string name="drawer_item_actions">Actions</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>
