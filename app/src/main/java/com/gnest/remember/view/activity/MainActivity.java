@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.model.db.data.MemoRealmFields;
+import com.gnest.remember.view.fragments.ArchiveItemFragment;
 import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.model.services.AlarmService;
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private ListItemFragment itemFragment;
     private EditMemoFragment editMemoFragment;
+    private ArchiveItemFragment archiveFragment;
     private DrawerLayout drawerLayout;
     private boolean isEditFragVisible;
     private static int COLUMNS;
@@ -129,12 +132,34 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void insertItemFragment(Bundle bundle) {
-        itemFragment = ListItemFragment.newInstance(COLUMNS, MEMO_SIZE_PX, MARGINS_PX);
-        if (bundle != null) {
-            itemFragment.getArguments().putBundle(BUNDLE_KEY, bundle);
+        insertFragment(ListItemFragment.class, bundle);
+    }
+
+    private void insertArchiveFragment() {
+        insertFragment(ArchiveItemFragment.class, null);
+    }
+
+    private void insertEditFragment(Bundle state) {
+        insertFragment(EditMemoFragment.class, state);
+    }
+
+    private <T extends Class<? extends Fragment>> void insertFragment(T fragmentClass, Bundle bundle) {
+        Fragment fragment;
+        if (fragmentClass.equals(ArchiveItemFragment.class)) {
+            fragment = archiveFragment = ArchiveItemFragment.newInstance(COLUMNS, MEMO_SIZE_PX, MARGINS_PX);
+        } else if (fragmentClass.equals(EditMemoFragment.class)) {
+            fragment = editMemoFragment = EditMemoFragment.newInstance();
+            if (bundle != null) {
+                editMemoFragment.setArguments(bundle);
+            }
+        } else {
+            fragment = itemFragment = ListItemFragment.newInstance(COLUMNS, MEMO_SIZE_PX, MARGINS_PX);
+            if (bundle != null) {
+                itemFragment.getArguments().putBundle(BUNDLE_KEY, bundle);
+            }
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.current_fragment, itemFragment, null);
+        ft.replace(R.id.current_fragment, fragment, null);
         ft.commit();
     }
 
@@ -191,17 +216,32 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.drawer_item_notes:
                 //TODO
+                if (editMemoFragment != null && editMemoFragment.isVisible()) {
+                    editMemoFragment.onBackButtonPressed();
+                } else {
+                    insertItemFragment(null);
+                }
                 Toast.makeText(this, "notes selected", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.drawer_item_archive:
                 //TODO
+                insertArchiveFragment();
                 Toast.makeText(this, "archive selected", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.drawer_item_add:
                 //TODO
+                if (editMemoFragment != null && editMemoFragment.isVisible()) {
+                    editMemoFragment.onBackButtonPressed();
+                }
+                onAddButtonPressed();
                 break;
             case R.id.drawer_item_share:
                 //TODO
+                if (itemFragment != null && itemFragment.isVisible() && itemFragment.getAdapter().getSelectedList().size() > 0) {
+                    itemFragment.onShareButtonPressed();
+                } else if (editMemoFragment != null && editMemoFragment.isVisible()) {
+                    //TODO
+                }
                 break;
         }
 
@@ -210,19 +250,6 @@ public class MainActivity extends AppCompatActivity implements
             return true;
         }
         return false;
-    }
-
-
-
-
-    private void insertEditFragment(Bundle state) {
-        editMemoFragment = EditMemoFragment.newInstance();
-        if (state != null) {
-            editMemoFragment.setArguments(state);
-        }
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.current_fragment, editMemoFragment, null);
-        ft.commit();
     }
 
     @Override

@@ -243,7 +243,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
                         popupWindow.dismiss();
                     }
                     return Observable.just(subject.hasCompleted());
-                });
+                })
+                .doOnUnsubscribe(popupWindow::dismiss);
     }
 
     private PopupWindow showPopup(int memoPosition, PublishSubject<Boolean> subject) {
