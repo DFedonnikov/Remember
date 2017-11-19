@@ -202,7 +202,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     }
 
     public void onBackButtonPressed() {
-        presenter.processBackButtonPress(mMemoEditTextView.getText().toString(), mColor, getString(R.string.alarm_set_text));
+        saveMemo(false, -1);
     }
 
     @Override
@@ -212,8 +212,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         setAlarmVisibility(alarmSet);
     }
 
+    public void saveMemo(boolean isTriggeredByDrawerItem, int itemId) {
+        presenter.processSaveMemo(mMemoEditTextView.getText().toString(), mColor, getString(R.string.alarm_set_text), isTriggeredByDrawerItem, itemId);
+    }
+
     @Override
-    public void memoSavedInteraction(int memoPosition) {
+    public void memoSavedInteraction(int memoPosition, boolean isTriggeredByDrawerItem, int itemId) {
         if (mListener != null) {
             Bundle bundle = null;
             if (memoPosition != -1) {
@@ -222,7 +226,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
                 bundle.putInt(MainActivity.POSITION_KEY, memoPosition);
                 bundle.putBoolean(MainActivity.EXPANDED_KEY, true);
             }
-            mListener.onSaveEditMemoFragmentInteraction(bundle);
+            mListener.onSaveEditMemoFragmentInteraction(bundle, isTriggeredByDrawerItem, itemId);
         }
     }
 
@@ -320,7 +324,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnEditMemoFragmentInteractionListener {
-        void onSaveEditMemoFragmentInteraction(Bundle bundle);
+        void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem, int itemId);
 
         void configureDrawer();
     }

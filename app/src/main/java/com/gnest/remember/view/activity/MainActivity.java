@@ -15,9 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.gnest.remember.R;
@@ -164,8 +162,21 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSaveEditMemoFragmentInteraction(Bundle bundle) {
-        insertItemFragment(bundle);
+    public void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem, int itemId) {
+        if (isTriggeredByDrawerItem) {
+            switch (itemId) {
+                case R.id.drawer_item_add:
+                    onAddButtonPressed();
+                    break;
+                case R.id.drawer_item_archive:
+                    insertArchiveFragment();
+                    break;
+                default:
+                    insertItemFragment(null);
+            }
+        } else {
+            insertItemFragment(bundle);
+        }
     }
 
     @Override
@@ -217,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.drawer_item_notes:
                 //TODO
                 if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.onBackButtonPressed();
+                    editMemoFragment.saveMemo(true, item.getItemId());
                 } else {
                     insertItemFragment(null);
                 }
@@ -225,15 +236,20 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.drawer_item_archive:
                 //TODO
-                insertArchiveFragment();
+                if (editMemoFragment != null && editMemoFragment.isVisible()) {
+                    editMemoFragment.saveMemo(true, item.getItemId());
+                } else {
+                    insertArchiveFragment();
+                }
                 Toast.makeText(this, "archive selected", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.drawer_item_add:
                 //TODO
                 if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.onBackButtonPressed();
+                    editMemoFragment.saveMemo(true, item.getItemId());
+                } else {
+                    onAddButtonPressed();
                 }
-                onAddButtonPressed();
                 break;
             case R.id.drawer_item_share:
                 //TODO
