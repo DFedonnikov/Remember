@@ -274,6 +274,8 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
 
+        setTitle(item.getTitle());
+
         if (drawerLayout != null) {
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
