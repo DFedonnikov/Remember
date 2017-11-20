@@ -222,12 +222,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onDeleteButtonPressed() {
-        presenter.processDeleteSelectedMemos(mAdapter.getSelectedList(), mAdapter.getMemos());
+        presenter.processDeleteSelectedMemos(mAdapter.getSelectedList());
     }
 
     @Override
     public void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
-        presenter.processSwipeDismiss(memoId, memoPosition, getAdapter().getMemos(), isAlarmSet);
+        presenter.processSwipeDismiss(memoId, memoPosition, isAlarmSet);
 
     }
 
@@ -249,6 +249,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     private PopupWindow showPopup(int memoPosition, PublishSubject<Boolean> subject) {
         View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
+        setUpCancelMessage(layout);
         TextView cancel = layout.findViewById(R.id.btn_cancel_dismiss);
 
         PopupWindow popupWindow = new PopupWindow(layout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
@@ -262,6 +263,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         popupWindow.showAtLocation(layout, Gravity.BOTTOM, 0, 0);
 
         return popupWindow;
+    }
+
+    void setUpCancelMessage(View layout) {
+        TextView cancelMessage = layout.findViewById(R.id.cancelText);
+        cancelMessage.setText(R.string.note_archived_message);
     }
 
     @Override
