@@ -200,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements
             itemFragment.onBackButtonPressed();
         } else if (editMemoFragment != null && editMemoFragment.isVisible()) {
             editMemoFragment.onBackButtonPressed();
+        } else if (archiveFragment != null && archiveFragment.isVisible()) {
+            archiveFragment.onBackButtonPressed();
         }
     }
 
