@@ -54,10 +54,6 @@ import rx.subjects.PublishSubject;
 public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragmentPresenter>
         implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView {
 
-    public static final String ARG_COLUMN_COUNT = "ColumnCount";
-    public static final String ARG_MEMO_SIZE = "MemoSize";
-    public static final String ARG_MEMO_MARGINS = "MemoMargins";
-
     private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
 
     private int mColumnCount;
@@ -81,9 +77,9 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public static ListItemFragment newInstance(int columnCount, int memoSize, int margins) {
         ListItemFragment fragment = new ListItemFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putInt(ARG_MEMO_SIZE, memoSize);
-        args.putInt(ARG_MEMO_MARGINS, margins);
+        args.putInt(MainActivity.ARG_COLUMN_COUNT, columnCount);
+        args.putInt(MainActivity.ARG_MEMO_SIZE, memoSize);
+        args.putInt(MainActivity.ARG_MEMO_MARGINS, margins);
         fragment.setArguments(args);
         return fragment;
     }
@@ -106,9 +102,9 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mMemoSize = getArguments().getInt(ARG_MEMO_SIZE);
-            mMargins = getArguments().getInt(ARG_MEMO_MARGINS);
+            mColumnCount = getArguments().getInt(MainActivity.ARG_COLUMN_COUNT);
+            mMemoSize = getArguments().getInt(MainActivity.ARG_MEMO_SIZE);
+            mMargins = getArguments().getInt(MainActivity.ARG_MEMO_MARGINS);
         }
         RecyclerView recyclerView = mView.findViewById(R.id.memo_list);
         Context context = mView.getContext();

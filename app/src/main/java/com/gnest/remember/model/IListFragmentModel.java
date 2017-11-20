@@ -13,6 +13,8 @@ import rx.Observable;
 public interface IListFragmentModel {
     Observable<RealmResults<Memo>> getData();
 
+    Memo getMemoById(int id);
+
     Observable<Pair<Boolean, List<Integer>>> deleteSelectedMemosFromDB(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet);
 
     Observable<Memo> deleteMemo(int memoId);

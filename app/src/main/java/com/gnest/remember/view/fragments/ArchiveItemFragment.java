@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.gnest.remember.R;
 import com.gnest.remember.presenter.ArchiveFragmentPresenter;
 import com.gnest.remember.presenter.IListFragmentPresenter;
+import com.gnest.remember.view.activity.MainActivity;
 
 public class ArchiveItemFragment extends ListItemFragment {
 
@@ -17,9 +18,9 @@ public class ArchiveItemFragment extends ListItemFragment {
     public static ArchiveItemFragment newInstance(int columnCount, int memoSize, int margins) {
         ArchiveItemFragment fragment = new ArchiveItemFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putInt(ARG_MEMO_SIZE, memoSize);
-        args.putInt(ARG_MEMO_MARGINS, margins);
+        args.putInt(MainActivity.ARG_COLUMN_COUNT, columnCount);
+        args.putInt(MainActivity.ARG_MEMO_SIZE, memoSize);
+        args.putInt(MainActivity.ARG_MEMO_MARGINS, margins);
         fragment.setArguments(args);
         return fragment;
     }

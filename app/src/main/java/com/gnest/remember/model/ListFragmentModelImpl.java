@@ -1,5 +1,6 @@
 package com.gnest.remember.model;
 
+import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.util.SparseArray;
 
@@ -44,6 +45,14 @@ public class ListFragmentModelImpl implements IListFragmentModel {
         return primaryRealm.where(Memo.class)
                 .findAllSortedAsync(MemoRealmFields.POSITION)
                 .asObservable();
+    }
+
+    @Override
+    @Nullable
+    public Memo getMemoById(int id) {
+        return primaryRealm.where(Memo.class)
+                .equalTo(MemoRealmFields.ID, id)
+                .findFirst();
     }
 
     @Override

@@ -125,22 +125,11 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void processShare(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet) {
-        if (selectedIdAlarmSet.size() == 1 && isViewAttached()) {
-            Realm realm = null;
-            try {
-                realm = Realm.getDefaultInstance();
-                Memo memo = realm.where(Memo.class)
-                        .equalTo(MemoRealmFields.ID, selectedIdAlarmSet.valueAt(0).first)
-                        .findFirst();
-                if (memo != null) {
-                    getView().shareMemoText(memo.getMemoText());
-                }
-            } finally {
-                if (realm != null) {
-                    realm.close();
-                }
+        if (selectedIdAlarmSet.size() == 1) {
+            Memo memo = mModel.getMemoById(selectedIdAlarmSet.valueAt(0).first);
+            if (memo != null && isViewAttached()) {
+                getView().shareMemoText(memo.getMemoText());
             }
-
         }
     }
 

@@ -28,6 +28,7 @@
     <string name="drawer_item_share">Share</string>
     <string name="iv_ct_drawer_header_image">Drawer Header Image</string>
     <string name="drawer_item_actions">Actions</string>
+    <string name="choose_to_share_message">Please choose note to share</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>
