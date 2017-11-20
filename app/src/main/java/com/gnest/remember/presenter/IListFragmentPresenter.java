@@ -7,15 +7,11 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
-import io.realm.RealmResults;
-
 public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> {
 
     void loadData();
 
-    void processDeleteMemo(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet);
-
-    void processDeleteSelectedMemos(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet, RealmResults<Memo> memos);
+    void processDeleteSelectedMemos(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet);
 
     void processShare(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet);
 
@@ -29,5 +25,5 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
 
     void processReturnFromEditMode(int lastOrientation, int lastPosition, boolean isExpanded);
 
-    void processSwipeDismiss(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet);
+    void processSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet);
 }

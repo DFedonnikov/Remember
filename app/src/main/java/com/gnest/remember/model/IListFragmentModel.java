@@ -7,16 +7,17 @@ import com.gnest.remember.model.db.data.Memo;
 
 import java.util.List;
 
-import io.realm.OrderedRealmCollection;
 import io.realm.RealmResults;
 import rx.Observable;
 
 public interface IListFragmentModel {
     Observable<RealmResults<Memo>> getData();
 
-    Observable<Pair<Boolean, List<Integer>>> deleteSelectedMemosFromDB(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet, OrderedRealmCollection<Memo> memos);
+    Observable<Pair<Boolean, List<Integer>>> deleteSelectedMemosFromDB(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet);
 
-    Observable<Boolean> deleteMemoFromDB(int memoId, int memoPosition, OrderedRealmCollection<Memo> memos);
+    Observable<Memo> deleteMemo(int memoId);
+
+    void revertDeleteMemo(Memo toRevert);
 
     void swapMemos(int fromId, int fromPosition, int toId, int toPosition);
 

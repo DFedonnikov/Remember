@@ -2,6 +2,7 @@ package com.gnest.remember.model;
 
 import android.support.v4.util.Pair;
 
+import com.gnest.remember.App;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 
@@ -90,14 +91,23 @@ public class EditMemoModelImpl implements IEditMemoModel {
 
     private void insertNewMemo(String memoText, String memoColor) {
         realm.executeTransactionAsync(realm1 -> {
-            int id = 0;
+            int idMain = 0;
+            int idArchived = 0;
             int position = 0;
 
-            Number idNumber = realm1.where(Memo.class)
+            Number idNumberMain = realm1.where(Memo.class)
                     .max(MemoRealmFields.ID);
-            if (idNumber != null) {
-                id = idNumber.intValue() + 1;
+            if (idNumberMain != null) {
+                idMain = idNumberMain.intValue() + 1;
             }
+            Realm realmAchrived = Realm.getInstance(App.getConfigurationByName(MemoRealmFields.ARCHIVE_CONFIG_NAME));
+            Number idNumberArchived = realmAchrived.where(Memo.class)
+                    .max(MemoRealmFields.ID);
+            realmAchrived.close();
+            if (idNumberArchived != null) {
+                idArchived = idNumberArchived.intValue() + 1;
+            }
+            int id = Math.max(idMain, idArchived);
             Number positionNumber = realm1.where(Memo.class)
                     .max(MemoRealmFields.POSITION);
             if (positionNumber != null) {

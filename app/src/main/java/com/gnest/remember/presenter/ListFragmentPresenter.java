@@ -13,6 +13,7 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.PublishSubject;
@@ -20,17 +21,8 @@ import rx.subscriptions.CompositeSubscription;
 
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
-    private IListFragmentModel mModel;
+    IListFragmentModel mModel;
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
-
-    @Nullable
-    private Subscription getDataSubscription;
-    @Nullable
-    private Subscription deleteMemoSubscription;
-    @Nullable
-    private Subscription deleteSelectedSubscription;
-    @Nullable
-    private Subscription confirmDismissSubscription;
 
     public ListFragmentPresenter() {
         mModel = new ListFragmentModelImpl();
@@ -51,7 +43,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void loadData() {
-        getDataSubscription = mModel.getData()
+        Subscription getDataSubscription = mModel.getData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(RealmResults::isLoaded)
                 .first()
@@ -76,8 +68,8 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteSelectedMemos(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet, RealmResults<Memo> memos) {
-        deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedIdAlarmSet, memos)
+    public void processDeleteSelectedMemos(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet) {
+        Subscription deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedIdAlarmSet)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(deletedIdsPair -> {
                     if (isViewAttached()) {
@@ -96,37 +88,39 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processSwipeDismiss(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet) {
+    public void processSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
-            confirmDismissSubscription = getView()
-                    .showConfirmPopup(memoPosition, subject)
-                    .subscribe(cancel -> {
-                        if (!cancel) {
-                            processDeleteMemo(memoId, memoPosition, memos, isAlarmSet);
+            Subscription confirmDismissSubscription = deleteMemoFromDb(memoId)
+                    .zipWith(getView().showConfirmPopup(memoPosition, subject), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .doOnSubscribe(() -> {
+                        getView().getAdapter().notifyItemRemoved(memoPosition);
+                        getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
+                    })
+                    .subscribe(cancelMemoPair -> {
+                        if (!cancelMemoPair.first) {
+                            if (isAlarmSet) {
+                                getView().removeAlarm(memoId);
+                            }
                             if (getView().getActionMode() != null) {
                                 getView().getActionMode().finish();
                             }
+                        } else {
+                            revertDeleteMemoFromDb(cancelMemoPair.second);
+                            getView().getAdapter().notifyDataSetChanged();
                         }
                     });
             compositeSubscription.add(confirmDismissSubscription);
         }
     }
 
-    @Override
-    public void processDeleteMemo(int memoId, int memoPosition, RealmResults<Memo> memos, boolean isAlarmSet) {
-        deleteMemoSubscription = mModel.deleteMemoFromDB(memoId, memoPosition, memos)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isDeleted -> {
-                    if (ListFragmentPresenter.this.isViewAttached()) {
-                        if (isAlarmSet) {
-                            getView().removeAlarm(memoId);
-                        }
-                        getView().getAdapter().notifyItemRemoved(memoPosition);
-                        getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
-                    }
-                });
-        compositeSubscription.add(deleteMemoSubscription);
+    private Observable<Memo> deleteMemoFromDb(int memoId) {
+        return mModel.deleteMemo(memoId);
+    }
+
+
+    private void revertDeleteMemoFromDb(Memo toRevert) {
+        mModel.revertDeleteMemo(toRevert);
     }
 
     @Override
