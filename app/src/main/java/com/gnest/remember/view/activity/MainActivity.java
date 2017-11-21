@@ -262,18 +262,6 @@ public class MainActivity extends AppCompatActivity implements
                     onAddButtonPressed();
                 }
                 break;
-            case R.id.drawer_item_share:
-                //TODO
-                if (itemFragment != null && itemFragment.isVisible() && itemFragment.getAdapter().getSelectedList().size() == 1) {
-                    itemFragment.onShareButtonPressed();
-                } else if (archiveFragment != null && archiveFragment.isVisible() && archiveFragment.getAdapter().getSelectedList().size() == 1) {
-                    archiveFragment.onShareButtonPressed();
-                } else if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    //TODO
-                } else {
-                    Toast.makeText(this, R.string.choose_to_share_message, Toast.LENGTH_SHORT).show();
-                }
-                break;
         }
 
         setTitle(item.getTitle());

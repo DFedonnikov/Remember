@@ -16,11 +16,6 @@
                 android:id="@+id/drawer_item_add"
                 android:icon="@drawable/ic_drawer_note_add_black"
                 android:title="@string/drawer_item_add" />
-
-            <item
-                android:id="@+id/drawer_item_share"
-                android:icon="@drawable/btn_share"
-                android:title="@string/drawer_item_share" />
         </menu>
 
     </item>
