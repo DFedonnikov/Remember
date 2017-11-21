@@ -79,7 +79,7 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     }
 
     @Override
-    public void processSaveMemo(String memoText, String memoColor, String alarmSetText, boolean isTriggeredByDrawerItem, int itemId) {
+    public void processSaveMemo(String memoText, String memoColor, String alarmSetText, boolean isTriggeredByDrawerItem) {
         Subscription saveMemoSubscription = mModel.saveMemoToDB(memoText, memoColor)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(idPositionPair -> {
@@ -87,7 +87,7 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
                         setAlarm(memoText, idPositionPair.first, alarmSetText);
                     }
                     if (isViewAttached()) {
-                        getView().memoSavedInteraction(idPositionPair.second, isTriggeredByDrawerItem, itemId);
+                        getView().memoSavedInteraction(idPositionPair.second, isTriggeredByDrawerItem);
                     }
                 });
         subscriptions.add(saveMemoSubscription);

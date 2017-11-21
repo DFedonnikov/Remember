@@ -202,7 +202,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     }
 
     public void onBackButtonPressed() {
-        saveMemo(false, -1);
+        saveMemo(false);
     }
 
     @Override
@@ -212,12 +212,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         setAlarmVisibility(alarmSet);
     }
 
-    public void saveMemo(boolean isTriggeredByDrawerItem, int itemId) {
-        presenter.processSaveMemo(mMemoEditTextView.getText().toString(), mColor, getString(R.string.alarm_set_text), isTriggeredByDrawerItem, itemId);
+    public void saveMemo(boolean isTriggeredByDrawerItem) {
+        presenter.processSaveMemo(mMemoEditTextView.getText().toString(), mColor, getString(R.string.alarm_set_text), isTriggeredByDrawerItem);
     }
 
     @Override
-    public void memoSavedInteraction(int memoPosition, boolean isTriggeredByDrawerItem, int itemId) {
+    public void memoSavedInteraction(int memoPosition, boolean isTriggeredByDrawerItem) {
         if (mListener != null) {
             Bundle bundle = null;
             if (memoPosition != -1) {
@@ -226,7 +226,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
                 bundle.putInt(MainActivity.POSITION_KEY, memoPosition);
                 bundle.putBoolean(MainActivity.EXPANDED_KEY, true);
             }
-            mListener.onSaveEditMemoFragmentInteraction(bundle, isTriggeredByDrawerItem, itemId);
+            mListener.onSaveEditMemoFragmentInteraction(bundle, isTriggeredByDrawerItem);
         }
     }
 
@@ -324,7 +324,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnEditMemoFragmentInteractionListener {
-        void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem, int itemId);
+        void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem);
 
         void configureDrawer();
     }

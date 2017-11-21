@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
@@ -175,19 +174,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem, int itemId) {
-        if (isTriggeredByDrawerItem) {
-            switch (itemId) {
-                case R.id.drawer_item_add:
-                    onAddButtonPressed();
-                    break;
-                case R.id.drawer_item_archive:
-                    insertArchiveFragment();
-                    break;
-                default:
-                    insertItemFragment(null);
-            }
-        } else {
+    public void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem) {
+        if (!isTriggeredByDrawerItem) {
             insertItemFragment(bundle);
         }
     }
@@ -243,24 +231,21 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.drawer_item_notes:
                 //TODO
                 if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.saveMemo(true, item.getItemId());
-                } else {
-                    insertItemFragment(null);
+                    editMemoFragment.saveMemo(true);
                 }
+                insertItemFragment(null);
                 break;
             case R.id.drawer_item_archive:
                 if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.saveMemo(true, item.getItemId());
-                } else {
-                    insertArchiveFragment();
+                    editMemoFragment.saveMemo(true);
                 }
+                insertArchiveFragment();
                 break;
             case R.id.drawer_item_add:
                 if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.saveMemo(true, item.getItemId());
-                } else {
-                    onAddButtonPressed();
+                    editMemoFragment.saveMemo(true);
                 }
+                onAddButtonPressed();
                 break;
         }
 

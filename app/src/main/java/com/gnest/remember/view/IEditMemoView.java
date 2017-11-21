@@ -24,5 +24,5 @@ public interface IEditMemoView extends MvpView {
 
     void setAlarmVisibility(boolean b);
 
-    void memoSavedInteraction(int memoPosition, boolean isTriggeredByDrawerItem, int itemId);
+    void memoSavedInteraction(int memoPosition, boolean isTriggeredByDrawerItem);
 }

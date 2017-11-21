@@ -21,5 +21,5 @@ public interface IEditMemoPresenter extends MvpPresenter<IEditMemoView> {
 
     void processTimeSet(int hour, int minute);
 
-    void processSaveMemo(String memoText, String memoColor, String alarmSetText, boolean isTriggeredByDrawerItem, int itemId);
+    void processSaveMemo(String memoText, String memoColor, String alarmSetText, boolean isTriggeredByDrawerItem);
 }
