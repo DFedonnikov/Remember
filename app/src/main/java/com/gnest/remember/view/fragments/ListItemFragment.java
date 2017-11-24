@@ -218,34 +218,33 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onDeleteButtonPressed() {
-        presenter.processDeleteSelectedMemos(mAdapter.getSelectedList());
+        presenter.processDeleteSelectedMemos(mAdapter.getSelectedIds());
     }
 
     @Override
-    public void onPerformSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
-        presenter.processSwipeDismiss(memoId, memoPosition, isAlarmSet);
+    public void onPerformSwipeDismiss(int memoId, int memoPosition) {
+        presenter.processSwipeDismiss(memoId, memoPosition);
 
     }
 
     @Override
-    public Observable<Boolean> showConfirmPopup(int memoPosition, PublishSubject<Boolean> subject) {
-        PopupWindow popupWindow = showPopup(memoPosition, subject);
-        return Observable
-                .timer(1500, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(aLong -> {
-                    if (popupWindow.isShowing()) {
-                        popupWindow.dismiss();
-                    }
-                    return Observable.just(subject.hasCompleted());
-                })
-                .doOnUnsubscribe(popupWindow::dismiss);
-    }
-
-    private PopupWindow showPopup(int memoPosition, PublishSubject<Boolean> subject) {
+    public Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject) {
         View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
-        setUpCancelMessage(layout);
+        PopupWindow popupWindow = setUpPopupWindow(layout, subject);
+        setUpCancelArchiveActionMessage(layout);
+        return getPopUpObservable(subject, popupWindow);
+    }
+
+    @Override
+    public Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject) {
+        View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
+        PopupWindow popupWindow = setUpPopupWindow(layout, subject);
+        setUpCancelRemoveMessage(layout);
+        return getPopUpObservable(subject, popupWindow);
+    }
+
+    @NonNull
+    private PopupWindow setUpPopupWindow(View layout, PublishSubject<Boolean> subject) {
         TextView cancel = layout.findViewById(R.id.btn_cancel_dismiss);
 
         PopupWindow popupWindow = new PopupWindow(layout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
@@ -254,16 +253,35 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             subject.onNext(true);
             subject.onCompleted();
             popupWindow.dismiss();
-            getAdapter().notifyItemRangeChanged(memoPosition, getAdapter().getItemCount());
         });
         popupWindow.showAtLocation(layout, Gravity.BOTTOM, 0, 0);
 
         return popupWindow;
     }
 
-    void setUpCancelMessage(View layout) {
+    void setUpCancelArchiveActionMessage(View layout) {
         TextView cancelMessage = layout.findViewById(R.id.cancelText);
         cancelMessage.setText(R.string.note_archived_message);
+    }
+
+    void setUpCancelRemoveMessage(View layout) {
+        TextView cancelMessage = layout.findViewById(R.id.cancelText);
+        cancelMessage.setText(R.string.note_removed_message);
+    }
+
+    @NonNull
+    private Observable<Boolean> getPopUpObservable(PublishSubject<Boolean> subject, PopupWindow popupWindow) {
+        return Observable
+                .timer(1500, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(aLong -> {
+                    if (popupWindow.isShowing()) {
+                        popupWindow.dismiss();
+                    }
+                    return Observable.just(subject.hasCompleted()).repeat();
+                })
+                .doOnUnsubscribe(popupWindow::dismiss);
     }
 
     @Override
@@ -272,12 +290,19 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = AlarmService.getServiceIntent(activity, null, memoId);
         PendingIntent pendingIntent = PendingIntent.getService(activity, memoId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        manager.cancel(pendingIntent);
+        if (manager != null) {
+            manager.cancel(pendingIntent);
+        }
+    }
+
+    @Override
+    public void onArchiveButtonPressed() {
+        presenter.processArchiveActionOnSelected(mAdapter.getSelectedIds());
     }
 
     @Override
     public void onShareButtonPressed() {
-        presenter.processShare(mAdapter.getSelectedList());
+        presenter.processShare(mAdapter.getSelectedIds());
     }
 
     @Override
@@ -316,6 +341,13 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void shutDownActionMode() {
         if (actionMode != null) {
             actionMode.finish();
+        }
+    }
+
+    @Override
+    public void updateContextActionMenu(int numOfSelectedItems) {
+        if (actionMode != null) {
+            actionMode.setTitle(String.valueOf(numOfSelectedItems != 0 ? numOfSelectedItems : ""));
         }
     }
 

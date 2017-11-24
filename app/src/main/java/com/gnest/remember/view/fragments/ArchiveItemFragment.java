@@ -37,8 +37,8 @@ public class ArchiveItemFragment extends ListItemFragment {
     }
 
     @Override
-    void setUpCancelMessage(View layout) {
+    void setUpCancelArchiveActionMessage(View layout) {
         TextView cancelMessage = layout.findViewById(R.id.cancelText);
-        cancelMessage.setText(R.string.note_deleted_message);
+        cancelMessage.setText(R.string.note_unarchived_message);
     }
 }

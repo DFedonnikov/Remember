@@ -6,11 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gnest.remember.R;
-
-
-/**
- * Created by DFedonnikov on 08.07.2017.
- */
+import com.gnest.remember.view.fragments.ArchiveItemFragment;
 
 public class ActionMenu implements ActionMode.Callback {
 
@@ -23,12 +19,15 @@ public class ActionMenu implements ActionMode.Callback {
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        mode.getMenuInflater().inflate(R.menu.context_menu_bar, menu);
+        if (listener instanceof ArchiveItemFragment) {
+            mode.getMenuInflater().inflate(R.menu.context_menu_bar_archive_frag, menu);
+        } else {
+            mode.getMenuInflater().inflate(R.menu.context_menu_bar_list_frag, menu);
+        }
         listener.switchMultiSelect(true);
         shareButton = menu.findItem(R.id.share);
         return true;
     }
-
 
 
     @Override
@@ -39,6 +38,9 @@ public class ActionMenu implements ActionMode.Callback {
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.archive:
+                listener.onArchiveButtonPressed();
+                return true;
             case R.id.delete:
                 listener.onDeleteButtonPressed();
                 return true;
@@ -73,6 +75,8 @@ public class ActionMenu implements ActionMode.Callback {
         void switchMultiSelect(boolean switchedOn);
 
         void clearSelection();
+
+        void onArchiveButtonPressed();
     }
 
 }

@@ -1,19 +1,17 @@
 package com.gnest.remember.presenter;
 
-import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
-import android.util.SparseArray;
 
 import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
 import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
-import io.realm.Realm;
+import java.util.Collections;
+import java.util.List;
+
 import io.realm.RealmResults;
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.PublishSubject;
@@ -68,70 +66,97 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteSelectedMemos(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet) {
-        Subscription deleteSelectedSubscription = mModel.deleteSelectedMemosFromDB(selectedIdAlarmSet)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(deletedIdsPair -> {
-                    if (isViewAttached()) {
-                        for (int i = 0; i < selectedIdAlarmSet.size(); i++) {
-                            Pair<Integer, Boolean> idAlarmPair = selectedIdAlarmSet.valueAt(i);
-                            int id = idAlarmPair.first;
-                            if (deletedIdsPair.second.contains(id) && idAlarmPair.second) {
-                                getView().removeAlarm(id);
+    public void processDeleteSelectedMemos(List<Integer> selectedIds) {
+        if (isViewAttached()) {
+            PublishSubject<Boolean> subject = PublishSubject.create();
+            Subscription removeSelectedSubscription = mModel.deleteSelected(selectedIds)
+                    .zipWith(getView().showConfirmRemovePopup(subject), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .doOnSubscribe(() -> {
+                        if (isViewAttached()) {
+                            getView().getAdapter().notifyDataSetChanged();
+                            shutDownActionMode();
+                        }
+                    })
+                    .subscribe(cancelMemoPair -> {
+                        if (isViewAttached()) {
+                            Memo processed = cancelMemoPair.second;
+                            if (!cancelMemoPair.first) {
+                                removeAlarmNotification(processed.getId(), processed.isAlarmSet());
+                            } else {
+                                mModel.revertDeleteMemo(processed);
+                                getView().getAdapter().notifyDataSetChanged();
                             }
                         }
-                        getView().getAdapter().notifyDataSetChanged();
-                        getView().getActionMode().finish();
-                    }
-                });
-        compositeSubscription.add(deleteSelectedSubscription);
+                    });
+            compositeSubscription.add(removeSelectedSubscription);
+        }
     }
 
     @Override
-    public void processSwipeDismiss(int memoId, int memoPosition, boolean isAlarmSet) {
+    public void processSwipeDismiss(int memoId, int memoPosition) {
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
-            Subscription confirmDismissSubscription = deleteMemoFromDb(memoId)
-                    .zipWith(getView().showConfirmPopup(memoPosition, subject), (memo, cancel) -> new Pair<>(cancel, memo))
+            Subscription confirmDismissSubscription = mModel.moveBetweenRealms(Collections.singletonList(memoId))
+                    .zipWith(getView().showConfirmArchiveActionPopup(subject), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
-                        getView().getAdapter().notifyItemRemoved(memoPosition);
-                        getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount());
+                        if (isViewAttached()) {
+                            getView().getAdapter().notifyItemRemoved(memoPosition);
+                            getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount() > 1 ? 1 : 0);
+                            shutDownActionMode();
+                        }
                     })
                     .subscribe(cancelMemoPair -> {
-                        if (!cancelMemoPair.first) {
-                            if (isAlarmSet) {
-                                getView().removeAlarm(memoId);
+                        if (isViewAttached()) {
+                            Memo processed = cancelMemoPair.second;
+                            if (!cancelMemoPair.first) {
+                                removeAlarmNotification(processed.getId(), processed.isAlarmSet());
+                            } else {
+                                mModel.revertArchived(processed);
+                                getView().getAdapter().notifyDataSetChanged();
                             }
-                            if (getView().getActionMode() != null) {
-                                getView().getActionMode().finish();
-                            }
-                        } else {
-                            revertDeleteMemoFromDb(cancelMemoPair.second);
-                            getView().getAdapter().notifyDataSetChanged();
                         }
                     });
             compositeSubscription.add(confirmDismissSubscription);
         }
     }
 
-    private Observable<Memo> deleteMemoFromDb(int memoId) {
-        return mModel.deleteMemo(memoId);
-    }
-
-
-    private void revertDeleteMemoFromDb(Memo toRevert) {
-        mModel.revertDeleteMemo(toRevert);
+    @Override
+    public void processArchiveActionOnSelected(List<Integer> selectedIds) {
+        if (isViewAttached()) {
+            PublishSubject<Boolean> subject = PublishSubject.create();
+            Subscription confirmArchiveSubscription = mModel.moveBetweenRealms(selectedIds)
+                    .zipWith(getView().showConfirmArchiveActionPopup(subject), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .doOnSubscribe(() -> {
+                        if (isViewAttached()) {
+                            getView().getAdapter().notifyDataSetChanged();
+                            shutDownActionMode();
+                        }
+                    })
+                    .subscribe(cancelMemoPair -> {
+                        if (isViewAttached()) {
+                            Memo processed = cancelMemoPair.second;
+                            if (!cancelMemoPair.first) {
+                                removeAlarmNotification(processed.getId(), processed.isAlarmSet());
+                            } else {
+                                mModel.revertArchived(processed);
+                                getView().getAdapter().notifyDataSetChanged();
+                            }
+                        }
+                    });
+            compositeSubscription.add(confirmArchiveSubscription);
+        }
     }
 
     @Override
-    public void processShare(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet) {
-        if (selectedIdAlarmSet.size() == 1) {
-            Memo memo = mModel.getMemoById(selectedIdAlarmSet.valueAt(0).first);
+    public void processShare(List<Integer> selectedIds) {
+        if (selectedIds.size() == 1) {
+            Memo memo = mModel.getMemoById(selectedIds.get(0));
             if (memo != null && isViewAttached()) {
                 getView().shareMemoText(memo.getMemoText());
             }
         }
     }
+
 
     @Override
     public void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
@@ -165,6 +190,18 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
             } else {
                 view.getInteractionListener().onBackButtonPressed();
             }
+        }
+    }
+
+    private void shutDownActionMode() {
+        if (isViewAttached() && getView().getActionMode() != null) {
+            getView().getActionMode().finish();
+        }
+    }
+
+    private void removeAlarmNotification(int memoId, boolean isAlarmSet) {
+        if (isViewAttached() && isAlarmSet) {
+            getView().removeAlarm(memoId);
         }
     }
 }

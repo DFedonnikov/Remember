@@ -1,8 +1,5 @@
 package com.gnest.remember.model;
 
-import android.support.v4.util.Pair;
-import android.util.SparseArray;
-
 import com.gnest.remember.model.db.data.Memo;
 
 import java.util.List;
@@ -15,9 +12,11 @@ public interface IListFragmentModel {
 
     Memo getMemoById(int id);
 
-    Observable<Pair<Boolean, List<Integer>>> deleteSelectedMemosFromDB(SparseArray<Pair<Integer, Boolean>> selectedIdAlarmSet);
+    Observable<Memo> deleteSelected(List<Integer> selectedIds);
 
-    Observable<Memo> deleteMemo(int memoId);
+    Observable<Memo> moveBetweenRealms(List<Integer> ids);
+
+    void revertArchived(Memo toRevert);
 
     void revertDeleteMemo(Memo toRevert);
 
