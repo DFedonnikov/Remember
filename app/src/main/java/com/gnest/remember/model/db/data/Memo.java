@@ -40,6 +40,10 @@ public class Memo extends RealmObject {
         this.mExpanded = isExpanded;
     }
 
+    public Memo(Memo memo) {
+        this(memo.getId(), memo.getMemoText(), memo.getPosition(), memo.getColor(), memo.getAlarmDate(), memo.isAlarmSet());
+    }
+
     public int getId() {
         return mId;
     }
