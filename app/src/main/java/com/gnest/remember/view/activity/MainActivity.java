@@ -47,9 +47,9 @@ public class MainActivity extends AppCompatActivity implements
     public static final String ARG_MEMO_SIZE = "MemoSize";
     public static final String ARG_MEMO_MARGINS = "MemoMargins";
 
-    private static final String EDIT_FRAMENT_NAME = "Edit fragment";
-    private static final String ARCHIVE_FRAMENT_NAME = "Archive fragment";
-    private static final String ITEM_FRAMENT_NAME = "Item fragment";
+    private static final String EDIT_FRAGMENT_NAME = "Edit";
+    private static final String ARCHIVE_FRAGMENT_NAME = "Archive";
+    private static final String ITEM_FRAGMENT_NAME = "Notes";
     private static final String EDIT_FRAG_VISIBILITY_KEY = "Edit frag visibility key";
     private static final String ARCHIVE_FRAG_VISIBILITY_KEY = "Archive frag visibility key";
     public static final int ITEM_MARGINS_DP = 12;
@@ -73,12 +73,12 @@ public class MainActivity extends AppCompatActivity implements
             boolean isArchiveFragVisible = savedInstanceState.getBoolean(ARCHIVE_FRAG_VISIBILITY_KEY);
             FragmentManager manager = getSupportFragmentManager();
             if (isEditFragVisible) {
-                editMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAMENT_NAME);
+                editMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAGMENT_NAME);
             } else if (isArchiveFragVisible) {
-                archiveFragment = (ArchiveItemFragment) manager.getFragment(savedInstanceState, ARCHIVE_FRAMENT_NAME);
+                archiveFragment = (ArchiveItemFragment) manager.getFragment(savedInstanceState, ARCHIVE_FRAGMENT_NAME);
                 setDimenArgs(archiveFragment);
             } else {
-                itemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAMENT_NAME);
+                itemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAGMENT_NAME);
                 setDimenArgs(itemFragment);
             }
         } else {
@@ -143,10 +143,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private void insertItemFragment(Bundle bundle) {
         insertFragment(ListItemFragment.class, bundle);
+        setTitle(ITEM_FRAGMENT_NAME);
     }
 
     private void insertArchiveFragment() {
         insertFragment(ArchiveItemFragment.class, null);
+        setTitle(ARCHIVE_FRAGMENT_NAME);
     }
 
     private void insertEditFragment(Bundle state) {
@@ -249,8 +251,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
 
-        setTitle(item.getTitle());
-
         if (drawerLayout != null) {
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
@@ -266,11 +266,11 @@ public class MainActivity extends AppCompatActivity implements
         boolean isArchiveFragmentVisible = archiveFragment != null && archiveFragment.isVisible();
         FragmentManager manager = getSupportFragmentManager();
         if (isEditFragmentVisible) {
-            manager.putFragment(outState, EDIT_FRAMENT_NAME, editMemoFragment);
+            manager.putFragment(outState, EDIT_FRAGMENT_NAME, editMemoFragment);
         } else if (isArchiveFragmentVisible) {
-            manager.putFragment(outState, ARCHIVE_FRAMENT_NAME, archiveFragment);
+            manager.putFragment(outState, ARCHIVE_FRAGMENT_NAME, archiveFragment);
         } else {
-            manager.putFragment(outState, ITEM_FRAMENT_NAME, itemFragment);
+            manager.putFragment(outState, ITEM_FRAGMENT_NAME, itemFragment);
         }
         outState.putBoolean(EDIT_FRAG_VISIBILITY_KEY, isEditFragmentVisible);
         outState.putBoolean(ARCHIVE_FRAG_VISIBILITY_KEY, isArchiveFragmentVisible);
