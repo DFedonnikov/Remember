@@ -27,7 +27,7 @@ public interface IListFragmentView extends MvpView {
 
     ActionMode getActionMode();
 
-    Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject);
+    Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject, int numOfNotes);
 
-    Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject);
+    Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject, int numOfNotes);
 }

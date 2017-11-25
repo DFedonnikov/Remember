@@ -37,8 +37,14 @@ public class ArchiveItemFragment extends ListItemFragment {
     }
 
     @Override
-    void setUpCancelArchiveActionMessage(View layout) {
-        TextView cancelMessage = layout.findViewById(R.id.cancelText);
-        cancelMessage.setText(R.string.note_unarchived_message);
+    String getArchiveActionPluralForm(int plural) {
+        switch (plural) {
+            case 2:
+                return getString(R.string.note_unarchived_message_2);
+            case 1:
+                return getString(R.string.note_unarchived_message_1);
+            default:
+                return getString(R.string.note_unarchived_message);
+        }
     }
 }

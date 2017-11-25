@@ -70,7 +70,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription removeSelectedSubscription = mModel.deleteSelected(selectedIds)
-                    .zipWith(getView().showConfirmRemovePopup(subject), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .zipWith(getView().showConfirmRemovePopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
                             getView().getAdapter().notifyDataSetChanged();
@@ -97,7 +97,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription confirmDismissSubscription = mModel.moveBetweenRealms(Collections.singletonList(memoId))
-                    .zipWith(getView().showConfirmArchiveActionPopup(subject), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .zipWith(getView().showConfirmArchiveActionPopup(subject, 1), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
                             getView().getAdapter().notifyItemRemoved(memoPosition);
@@ -125,7 +125,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription confirmArchiveSubscription = mModel.moveBetweenRealms(selectedIds)
-                    .zipWith(getView().showConfirmArchiveActionPopup(subject), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .zipWith(getView().showConfirmArchiveActionPopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
                             getView().getAdapter().notifyDataSetChanged();

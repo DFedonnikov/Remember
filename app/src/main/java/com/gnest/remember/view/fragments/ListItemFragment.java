@@ -41,6 +41,7 @@ import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmResults;
@@ -228,18 +229,18 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
-    public Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject) {
+    public Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject, int numOfNotes) {
         View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
         PopupWindow popupWindow = setUpPopupWindow(layout, subject);
-        setUpCancelArchiveActionMessage(layout);
+        setUpCancelArchiveActionMessage(layout, numOfNotes);
         return getPopUpObservable(subject, popupWindow);
     }
 
     @Override
-    public Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject) {
+    public Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject, int numOfNotes) {
         View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
         PopupWindow popupWindow = setUpPopupWindow(layout, subject);
-        setUpCancelRemoveMessage(layout);
+        setUpCancelRemoveMessage(layout, numOfNotes);
         return getPopUpObservable(subject, popupWindow);
     }
 
@@ -259,14 +260,53 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         return popupWindow;
     }
 
-    void setUpCancelArchiveActionMessage(View layout) {
+    void setUpCancelArchiveActionMessage(View layout, int numOfNotes) {
         TextView cancelMessage = layout.findViewById(R.id.cancelText);
-        cancelMessage.setText(R.string.note_archived_message);
+        int plural = getPlural(numOfNotes);
+        String text = numOfNotes + " " + getArchiveActionPluralForm(plural);
+        cancelMessage.setText(text);
     }
 
-    void setUpCancelRemoveMessage(View layout) {
+    void setUpCancelRemoveMessage(View layout, int numOfNotes) {
         TextView cancelMessage = layout.findViewById(R.id.cancelText);
-        cancelMessage.setText(R.string.note_removed_message);
+        int plural = getPlural(numOfNotes);
+        String text = numOfNotes + " " + getRemovePluralForm(plural);
+        cancelMessage.setText(text);
+    }
+
+    String getArchiveActionPluralForm(int plural) {
+        switch (plural) {
+            case 2:
+                return getString(R.string.note_archived_message_2);
+            case 1:
+                return getString(R.string.note_archived_message_1);
+            default:
+                return getString(R.string.note_archived_message);
+        }
+    }
+
+    private String getRemovePluralForm(int plural) {
+        switch (plural) {
+            case 2:
+                return getString(R.string.note_removed_message_2);
+            case 1:
+                return getString(R.string.note_removed_message_1);
+            default:
+                return getString(R.string.note_removed_message);
+        }
+    }
+
+    private int getPlural(int numOfNotes) {
+        switch (Locale.getDefault().getLanguage()) {
+            case "en":
+                return numOfNotes == 1 ? 0 : 1;
+            case "ru":
+                return (numOfNotes % 10 == 1 && numOfNotes % 100 != 11 ?
+                        0 : numOfNotes % 10 >= 2 && numOfNotes % 10 <= 4 &&
+                        (numOfNotes % 100 < 10 || numOfNotes % 100 >= 20) ? 1 : 2);
+            default:
+                return 0;
+        }
     }
 
     @NonNull
