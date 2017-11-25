@@ -312,7 +312,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @NonNull
     private Observable<Boolean> getPopUpObservable(PublishSubject<Boolean> subject, PopupWindow popupWindow) {
         return Observable
-                .timer(1500, TimeUnit.MILLISECONDS)
+                .timer(1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(aLong -> {
