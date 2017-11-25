@@ -69,7 +69,6 @@ public class EditMemoModelImpl implements IEditMemoModel {
         }
 
         return dataSavedSubject
-                .subscribeOn(Schedulers.computation())
                 .distinctUntilChanged()
                 .flatMap(dataSaved -> {
                     {
