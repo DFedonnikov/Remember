@@ -18,7 +18,7 @@
         android:paddingEnd="8dp"
         android:paddingStart="8dp"
         android:text="@string/note_archived_message"
-        android:textSize="20sp"
+        android:textSize="@dimen/text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
