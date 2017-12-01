@@ -13,10 +13,6 @@ import android.widget.TextView;
 
 import com.gnest.remember.R;
 
-/**
- * Created by DFedonnikov on 19.07.2017.
- */
-
 public class ColorSpinnerAdapter implements SpinnerAdapter {
 
     public enum Colors {
@@ -83,12 +79,12 @@ public class ColorSpinnerAdapter implements SpinnerAdapter {
 
     @Override
     public void registerDataSetObserver(DataSetObserver dataSetObserver) {
-
+        //No implementation needed
     }
 
     @Override
     public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
-
+        //No implementation needed
     }
 
     @Override

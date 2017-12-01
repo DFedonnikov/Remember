@@ -21,12 +21,12 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     private static final long TRANSITION_DURATION_MS = 300;
     private static final float SCALE_THRESHOLD_PERCENT = 1f;
-    private static int sScreenWidth;
-
     private final BehaviorSubject<Boolean> childrenLayoutCompleteSubject = BehaviorSubject.create();
-    private SparseArray<View> mViewCache = new SparseArray<>();
 
+    private SparseArray<View> mViewCache = new SparseArray<>();
     private int mMemoSize;
+
+    private int mScreenWidth;
     private int mMagrings;
     private int mAncorPos;
     private int mCurrentOrientation;
@@ -36,7 +36,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
     public MyGridLayoutManager(Context context, int spanCount, int memoSize, int margins) {
         super(context, spanCount);
         DisplayMetrics metrics = App.self().getResources().getDisplayMetrics();
-        sScreenWidth = metrics.widthPixels;
+        mScreenWidth = metrics.widthPixels;
         this.mMemoSize = memoSize;
         this.mMagrings = margins;
     }
@@ -327,7 +327,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
             int left = getDecoratedLeft(view);
             int right = getDecoratedRight(view);
             left = left > 0 ? left : 0;
-            right = right <= sScreenWidth ? right : sScreenWidth;
+            right = right <= mScreenWidth ? right : mScreenWidth;
             Rect viewRect = new Rect(left, top, right, bottom);
 
             int square = Math.abs(viewRect.height() * viewRect.width());
@@ -389,7 +389,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-
+                //No implementation needed
             }
 
             @Override
@@ -400,12 +400,12 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
+                //No implementation needed
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
+                //No implementation needed
             }
         });
         animator.start();

@@ -64,7 +64,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private MySelectableAdapter mAdapter;
     private View mView;
     private ItemTouchHelper itemTouchHelper;
-    private android.support.v7.view.ActionMode actionMode;
+    private ActionMode actionMode;
     private ActionMenu actionMenu;
     private MyGridLayoutManager mMyGridLayoutManager;
 

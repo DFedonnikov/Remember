@@ -16,10 +16,6 @@ public class App extends Application {
 
     private static App sSelf;
 
-    public static Context self() {
-        return sSelf;
-    }
-
     public static final Map<String, RealmConfiguration> REALM_CONFIG_MAP = new HashMap<>();
 
     @Override
@@ -48,5 +44,9 @@ public class App extends Application {
 
     public static RealmConfiguration getConfigurationByName(String name) {
         return REALM_CONFIG_MAP.get(name);
+    }
+
+    public static Context self() {
+        return sSelf;
     }
 }

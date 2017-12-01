@@ -4,10 +4,6 @@ import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-/**
- * Created by DFedonnikov on 12.07.2017.
- */
-
 public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private static final float ALPHA_FULL = 1.0f;
@@ -42,7 +38,6 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
 
-
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
         mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
@@ -56,12 +51,9 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-
-        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder instanceof ItemTouchHelperViewHolder) {
-                ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-                itemViewHolder.setSelectedState();
-            }
+        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE && viewHolder instanceof ItemTouchHelperViewHolder) {
+            ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
+            itemViewHolder.setSelectedState();
         }
         super.onSelectedChanged(viewHolder, actionState);
     }

@@ -11,7 +11,6 @@ import java.util.Date;
 
 import io.realm.Realm;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 public class EditMemoModelImpl implements IEditMemoModel {
