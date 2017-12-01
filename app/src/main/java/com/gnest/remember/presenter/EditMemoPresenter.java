@@ -18,7 +18,7 @@ import rx.android.schedulers.AndroidSchedulers;
 
 public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implements IEditMemoPresenter {
 
-    private SimpleDateFormat mCalendarDateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
+    private SimpleDateFormat mCalendarDateFormat = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
     private SimpleDateFormat mCalendarAlarmSetFormat = new SimpleDateFormat("d MMMM yyyy hh:mm", Locale.ENGLISH);
 
     private IEditMemoModel mModel;

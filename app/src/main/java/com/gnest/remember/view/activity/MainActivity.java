@@ -143,12 +143,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private void insertItemFragment(Bundle bundle) {
         insertFragment(ListItemFragment.class, bundle);
-        setTitle(ITEM_FRAGMENT_NAME);
+        setTitle(getString(R.string.notes));
     }
 
     private void insertArchiveFragment() {
         insertFragment(ArchiveItemFragment.class, null);
-        setTitle(ARCHIVE_FRAGMENT_NAME);
+        setTitle(R.string.archive);
     }
 
     private void insertEditFragment(Bundle state) {

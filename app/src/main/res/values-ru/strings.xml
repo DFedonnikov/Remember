@@ -1,0 +1,30 @@
+<resources>
+    <string name="btn_delete">Удалить</string>
+    <string name="btn_add">Добавить</string>
+    <string name="memo_text_hint">Введите текст заметки</string>
+    <string name="btn_remove_alert">Удалить напоминание</string>
+    <string name="alarm_set_text">Напоминание установлено в</string>
+    <string name="alarm_remove_text">Напоминание удалено</string>
+    <string name="send_memo_intent_title">Отправить заметку&#8230;,</string>
+    <string name="notes">Заметки</string>
+    <string name="archive">Архив</string>
+    <string name="drawer_item_add">Добавить заметку</string>
+    <string name="drawer_item_actions">Действия</string>
+    <string name="btn_archive">Архивировать</string>
+    <string name="btn_unarchive">Разархивировать</string>
+    <string name="note_archived_message">заметка была помещена в архив</string>
+    <string name="note_archived_message_1">заметки была помещена в архив</string>
+    <string name="note_archived_message_2">заметок была помещена в архив</string>
+    <string name="note_unarchived_message">заметка была разархивирована</string>
+    <string name="note_unarchived_message_1">заметки была разархивирована</string>
+    <string name="note_unarchived_message_2">заметок была разархивирована</string>
+    <string name="note_removed_message">заметка была удалена</string>
+    <string name="note_removed_message_1">заметки была удалена</string>
+    <string name="note_removed_message_2">заметок была удалена</string>
+    <string-array name="memo_colors">
+        <item>Желтый</item>
+        <item>Голубой</item>
+        <item>Оливковый</item>
+        <item>Пурпур</item>
+    </string-array>
+</resources>
