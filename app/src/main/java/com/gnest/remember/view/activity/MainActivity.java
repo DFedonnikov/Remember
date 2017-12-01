@@ -135,7 +135,9 @@ public class MainActivity extends AppCompatActivity implements
                             itemFragment.getLayoutManager().openItem(clickableMemo.getPosition());
                             itemFragment.shutdownMemoAlarm(clickableMemo.getPosition());
                             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                            notificationManager.cancel(clickableMemo.getId());
+                            if (notificationManager != null) {
+                                notificationManager.cancel(clickableMemo.getId());
+                            }
                         });
             }
         }
@@ -215,8 +217,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void configureDrawer() {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.nav_open_drawer, R.string.nav_close_drawer);
@@ -231,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.drawer_item_notes:
-                //TODO
                 if (editMemoFragment != null && editMemoFragment.isVisible()) {
                     editMemoFragment.saveMemo(true);
                 }
@@ -249,6 +252,8 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 onAddButtonPressed();
                 break;
+            default:
+                return false;
         }
 
         if (drawerLayout != null) {
