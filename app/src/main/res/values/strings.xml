@@ -1,42 +1,37 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Remember</string>
-    <string name="save_memo_button">Save memo</string>
-    <string name="action_edit">Edit memo</string>
-    <string name="action_delete">Delete memo</string>
     <string name="memo_note_background">memo note background</string>
-    <string name="add_button">Добавить</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_delete">Delete memo</string>
+    <string name="btn_share">Share memo</string>
+    <string name="btn_archive">Archive</string>
+    <string name="btn_unarchive">Unarchive</string>
     <string name="memo_text_hint">Type your memo here</string>
     <string name="pin_descr">pin for sticky note</string>
     <string name="color_choice_spinner">Color choice spinner</string>
     <string name="color_name">Color name</string>
-    <string name="memo_color">Memo color</string>
-    <string name="btn_add_alert">Add alert to memo button</string>
     <string name="btn_remove_alert">Remove memo alert button</string>
     <string name="alarm_set_text">Note alarm set to</string>
     <string name="alarm_remove_text">Alarm was removed</string>
     <string name="selected_memo_color">Selected memo color</string>
     <string name="spinner_list_item_color_image">Spinner list item color image</string>
     <string name="send_memo_intent_title">Send Memo&#8230;,</string>
-    <string name="preference_file_key">com.gnest.remember.PREFERENCE_FILE_KEY</string>
-    <string name="drawer_item_notes">Notes</string>
-    <string name="drawer_item_archive">Archive</string>
+    <string name="notes">Notes</string>
+    <string name="archive">Archive</string>
     <string name="nav_open_drawer">open drawer</string>
     <string name="nav_close_drawer">close drawer</string>
     <string name="drawer_item_add">Add note</string>
-    <string name="drawer_item_share">Share</string>
     <string name="iv_ct_drawer_header_image">Drawer Header Image</string>
     <string name="drawer_item_actions">Actions</string>
-    <string name="choose_to_share_message">Please choose note to share</string>
-    <string name="action_archive">Archive</string>
     <string name="note_archived_message">note has been archived</string>
     <string name="note_archived_message_1">notes has been archived</string>
     <string name="note_archived_message_2">notes has been archived</string>
     <string name="note_unarchived_message">note has been unarchived</string>
     <string name="note_unarchived_message_1">notes has been unarchived</string>
+    <string name="note_unarchived_message_2">notes has been unarchived</string>
     <string name="note_removed_message">note has been deleted</string>
     <string name="note_removed_message_1">notes has been removed</string>
     <string name="note_removed_message_2">notes has been removed</string>
-    <string name="note_unarchived_message_2">notes has been unarchived</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>

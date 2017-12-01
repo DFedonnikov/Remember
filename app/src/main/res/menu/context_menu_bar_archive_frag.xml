@@ -5,20 +5,20 @@
     <item
         android:id="@+id/archive"
         android:icon="@drawable/btn_unarchive"
-        android:title="@string/action_archive"
+        android:title="@string/btn_unarchive"
         app:showAsAction="ifRoom" />
 
 
     <item
         android:id="@+id/delete"
         android:icon="@drawable/btn_delete"
-        android:title="@string/action_delete"
+        android:title="@string/btn_delete"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/share"
         android:icon="@drawable/btn_share"
-        android:title="@string/action_delete"
+        android:title="@string/btn_share"
         app:showAsAction="ifRoom" />
 
 </menu>
