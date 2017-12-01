@@ -12,15 +12,15 @@
     <string name="drawer_item_actions">Действия</string>
     <string name="btn_archive">Архивировать</string>
     <string name="btn_unarchive">Разархивировать</string>
-    <string name="note_archived_message">заметка была помещена в архив</string>
-    <string name="note_archived_message_1">заметки были помещены в архив</string>
-    <string name="note_archived_message_2">заметок были помещены в архив</string>
-    <string name="note_unarchived_message">заметка была разархивирована</string>
-    <string name="note_unarchived_message_1">заметки были разархивированы</string>
-    <string name="note_unarchived_message_2">заметок были разархивированы</string>
-    <string name="note_removed_message">заметка была удалена</string>
-    <string name="note_removed_message_1">заметки были удалены</string>
-    <string name="note_removed_message_2">заметок были удалены</string>
+    <string name="note_archived_message">заметка архивирована</string>
+    <string name="note_archived_message_1">заметки архивированы</string>
+    <string name="note_archived_message_2">заметок архивировано</string>
+    <string name="note_unarchived_message">заметка разархивирована</string>
+    <string name="note_unarchived_message_1">заметки разархивированы</string>
+    <string name="note_unarchived_message_2">заметок разархивировано</string>
+    <string name="note_removed_message">заметка удалена</string>
+    <string name="note_removed_message_1">заметки удалены</string>
+    <string name="note_removed_message_2">заметок удалено</string>
     <string-array name="memo_colors">
         <item>Желтый</item>
         <item>Голубой</item>
