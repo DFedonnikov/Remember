@@ -13,14 +13,14 @@
     <string name="btn_archive">Архивировать</string>
     <string name="btn_unarchive">Разархивировать</string>
     <string name="note_archived_message">заметка была помещена в архив</string>
-    <string name="note_archived_message_1">заметки была помещена в архив</string>
-    <string name="note_archived_message_2">заметок была помещена в архив</string>
+    <string name="note_archived_message_1">заметки были помещены в архив</string>
+    <string name="note_archived_message_2">заметок были помещены в архив</string>
     <string name="note_unarchived_message">заметка была разархивирована</string>
-    <string name="note_unarchived_message_1">заметки была разархивирована</string>
-    <string name="note_unarchived_message_2">заметок была разархивирована</string>
+    <string name="note_unarchived_message_1">заметки были разархивированы</string>
+    <string name="note_unarchived_message_2">заметок были разархивированы</string>
     <string name="note_removed_message">заметка была удалена</string>
-    <string name="note_removed_message_1">заметки была удалена</string>
-    <string name="note_removed_message_2">заметок была удалена</string>
+    <string name="note_removed_message_1">заметки были удалены</string>
+    <string name="note_removed_message_2">заметок были удалены</string>
     <string-array name="memo_colors">
         <item>Желтый</item>
         <item>Голубой</item>
