@@ -190,7 +190,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
             }
 
             //If view is rightmost we should check if we need to layout next row of elements
-            if (isViewRightmost(view, pos)) {
+            if (isViewRightmost(pos)) {
                 viewTop = getDecoratedBottom(view);
                 fillDown = viewTop <= height;
             }
@@ -312,7 +312,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
         return (viewPosition) % getSpanCount() == 0;
     }
 
-    private boolean isViewRightmost(View view, int viewPosition) {
+    private boolean isViewRightmost(int viewPosition) {
         return (viewPosition + 1) % getSpanCount() == 0;
     }
 

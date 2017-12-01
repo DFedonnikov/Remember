@@ -71,10 +71,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     private OnEditMemoFragmentInteractionListener mListener;
 
-    public EditMemoFragment() {
-        // Required empty public constructor
-    }
-
     public static EditMemoFragment newInstance() {
         return new EditMemoFragment();
     }

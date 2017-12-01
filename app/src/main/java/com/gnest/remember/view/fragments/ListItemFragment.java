@@ -68,13 +68,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private ActionMenu actionMenu;
     private MyGridLayoutManager mMyGridLayoutManager;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public ListItemFragment() {
-    }
-
     public static ListItemFragment newInstance(int columnCount, int memoSize, int margins) {
         ListItemFragment fragment = new ListItemFragment();
         Bundle args = new Bundle();
@@ -212,6 +205,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
                 return true;
             case android.R.id.home:
                 ((DrawerLayout) getActivity().findViewById(R.id.drawer_layout)).openDrawer(GravityCompat.START);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
