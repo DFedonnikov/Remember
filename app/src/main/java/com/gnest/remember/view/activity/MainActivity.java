@@ -36,17 +36,6 @@ public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
         ListItemFragment.OnListItemFragmentInteractionListener, NavigationView.OnNavigationItemSelectedListener {
 
-    public static final int LM_HORIZONTAL_ORIENTATION = 0;
-    public static final int LM_VERTICAL_ORIENTATION = 1;
-    public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManager orientation key";
-    public static final String POSITION_KEY = "Position key";
-    public static final String BUNDLE_KEY = "Bundle key";
-    public static final String EXPANDED_KEY = "Expanded key";
-
-    public static final String ARG_COLUMN_COUNT = "ColumnCount";
-    public static final String ARG_MEMO_SIZE = "MemoSize";
-    public static final String ARG_MEMO_MARGINS = "MemoMargins";
-
     private static final String EDIT_FRAGMENT_NAME = "Edit";
     private static final String ARCHIVE_FRAGMENT_NAME = "Archive";
     private static final String ITEM_FRAGMENT_NAME = "Notes";
@@ -88,9 +77,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private <T extends Fragment> void setDimenArgs(T fragment) {
         Bundle args = fragment.getArguments();
-        args.putInt(ARG_COLUMN_COUNT, COLUMNS);
-        args.putInt(ARG_MEMO_SIZE, MEMO_SIZE_PX);
-        args.putInt(ARG_MEMO_MARGINS, MARGINS_PX);
+        args.putInt(ListItemFragment.ARG_COLUMN_COUNT, COLUMNS);
+        args.putInt(ListItemFragment.ARG_MEMO_SIZE, MEMO_SIZE_PX);
+        args.putInt(ListItemFragment.ARG_MEMO_MARGINS, MARGINS_PX);
     }
 
     private void calculateColumnsAndMemoSize() {
@@ -169,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             fragment = itemFragment = ListItemFragment.newInstance(COLUMNS, MEMO_SIZE_PX, MARGINS_PX);
             if (bundle != null) {
-                itemFragment.getArguments().putBundle(BUNDLE_KEY, bundle);
+                itemFragment.getArguments().putBundle(ListItemFragment.BUNDLE_KEY, bundle);
             }
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

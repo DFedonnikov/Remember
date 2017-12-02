@@ -33,7 +33,6 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 import com.gnest.remember.presenter.ListFragmentPresenter;
 import com.gnest.remember.view.IListFragmentView;
-import com.gnest.remember.view.activity.MainActivity;
 import com.gnest.remember.view.helper.ItemTouchHelperCallback;
 import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.view.menu.ActionMenu;
@@ -55,6 +54,11 @@ import rx.subjects.PublishSubject;
 public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragmentPresenter>
         implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView {
 
+    public static final String BUNDLE_KEY = "Bundle key";
+    public static final String EXPANDED_KEY = "Expanded key";
+    public static final String ARG_COLUMN_COUNT = "ColumnCount";
+    public static final String ARG_MEMO_SIZE = "MemoSize";
+    public static final String ARG_MEMO_MARGINS = "MemoMargins";
     private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
 
     private int mColumnCount;
@@ -71,9 +75,9 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public static ListItemFragment newInstance(int columnCount, int memoSize, int margins) {
         ListItemFragment fragment = new ListItemFragment();
         Bundle args = new Bundle();
-        args.putInt(MainActivity.ARG_COLUMN_COUNT, columnCount);
-        args.putInt(MainActivity.ARG_MEMO_SIZE, memoSize);
-        args.putInt(MainActivity.ARG_MEMO_MARGINS, margins);
+        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_MEMO_SIZE, memoSize);
+        args.putInt(ARG_MEMO_MARGINS, margins);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,9 +100,9 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(MainActivity.ARG_COLUMN_COUNT);
-            mMemoSize = getArguments().getInt(MainActivity.ARG_MEMO_SIZE);
-            mMargins = getArguments().getInt(MainActivity.ARG_MEMO_MARGINS);
+            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mMemoSize = getArguments().getInt(ARG_MEMO_SIZE);
+            mMargins = getArguments().getInt(ARG_MEMO_MARGINS);
         }
         RecyclerView recyclerView = mView.findViewById(R.id.memo_list);
         Context context = mView.getContext();
@@ -175,11 +179,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     private void returnFromEditMode() {
         if (getArguments() != null) {
-            Bundle bundle = getArguments().getBundle(MainActivity.BUNDLE_KEY);
+            Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
             if (bundle != null) {
-                int lastPosition = bundle.getInt(MainActivity.POSITION_KEY);
-                int lastOrientation = bundle.getInt(MainActivity.LM_SCROLL_ORIENTATION_KEY);
-                boolean isExpanded = bundle.getBoolean(MainActivity.EXPANDED_KEY);
+                int lastPosition = bundle.getInt(MyGridLayoutManager.POSITION_KEY);
+                int lastOrientation = bundle.getInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY);
+                boolean isExpanded = bundle.getBoolean(EXPANDED_KEY);
                 presenter.processReturnFromEditMode(lastPosition, lastOrientation, isExpanded);
             }
         }
@@ -188,14 +192,14 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Bundle bundle = getArguments().getBundle(MainActivity.BUNDLE_KEY);
+        Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
         if (bundle == null) {
             bundle = new Bundle();
         }
-        bundle.putInt(MainActivity.LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
-        bundle.putInt(MainActivity.POSITION_KEY, mMyGridLayoutManager.getLastPosition());
-        bundle.putBoolean(MainActivity.EXPANDED_KEY, mAdapter.isItemsExpanded());
-        getArguments().putBundle(MainActivity.BUNDLE_KEY, bundle);
+        bundle.putInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
+        bundle.putInt(MyGridLayoutManager.POSITION_KEY, mMyGridLayoutManager.getLastPosition());
+        bundle.putBoolean(EXPANDED_KEY, mAdapter.isItemsExpanded());
+        getArguments().putBundle(BUNDLE_KEY, bundle);
     }
 
     @Override

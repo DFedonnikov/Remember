@@ -37,7 +37,7 @@ import com.gnest.remember.presenter.EditMemoPresenter;
 import com.gnest.remember.presenter.IEditMemoPresenter;
 import com.gnest.remember.view.adapters.ColorSpinnerAdapter;
 import com.gnest.remember.view.IEditMemoView;
-import com.gnest.remember.view.activity.MainActivity;
+import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby.mvp.MvpFragment;
 
 import java.util.Calendar;
@@ -218,9 +218,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
             Bundle bundle = null;
             if (memoPosition != -1) {
                 bundle = new Bundle();
-                bundle.putInt(MainActivity.LM_SCROLL_ORIENTATION_KEY, MainActivity.LM_HORIZONTAL_ORIENTATION);
-                bundle.putInt(MainActivity.POSITION_KEY, memoPosition);
-                bundle.putBoolean(MainActivity.EXPANDED_KEY, true);
+                bundle.putInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY, MyGridLayoutManager.HORIZONTAL);
+                bundle.putInt(MyGridLayoutManager.POSITION_KEY, memoPosition);
+                bundle.putBoolean(ListItemFragment.EXPANDED_KEY, true);
             }
             mListener.onSaveEditMemoFragmentInteraction(bundle, isTriggeredByDrawerItem);
         }

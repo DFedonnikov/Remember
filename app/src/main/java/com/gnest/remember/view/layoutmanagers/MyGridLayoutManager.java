@@ -19,6 +19,8 @@ import rx.subjects.BehaviorSubject;
 
 public class MyGridLayoutManager extends GridLayoutManager {
 
+    public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManager orientation key";
+    public static final String POSITION_KEY = "Position key";
     private static final long TRANSITION_DURATION_MS = 300;
     private static final float SCALE_THRESHOLD_PERCENT = 1f;
     private final BehaviorSubject<Boolean> childrenLayoutCompleteSubject = BehaviorSubject.create();
