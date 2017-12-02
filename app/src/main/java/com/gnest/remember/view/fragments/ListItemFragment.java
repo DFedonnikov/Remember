@@ -154,6 +154,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        shutDownActionMode();
     }
 
 
@@ -225,7 +226,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject, int numOfNotes) {
         View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
-        PopupWindow popupWindow = setUpPopupWindow(layout, subject);
+        PopupWindow popupWindow = setUpPopupWindow(layout, subject, numOfNotes);
         setUpCancelArchiveActionMessage(layout, numOfNotes);
         return getPopUpObservable(subject, popupWindow);
     }
@@ -233,19 +234,21 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject, int numOfNotes) {
         View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
-        PopupWindow popupWindow = setUpPopupWindow(layout, subject);
+        PopupWindow popupWindow = setUpPopupWindow(layout, subject, numOfNotes);
         setUpCancelRemoveMessage(layout, numOfNotes);
         return getPopUpObservable(subject, popupWindow);
     }
 
     @NonNull
-    private PopupWindow setUpPopupWindow(View layout, PublishSubject<Boolean> subject) {
+    private PopupWindow setUpPopupWindow(View layout, PublishSubject<Boolean> subject, int numOfNotes) {
         TextView cancel = layout.findViewById(R.id.btn_cancel_dismiss);
 
         PopupWindow popupWindow = new PopupWindow(layout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
 
         cancel.setOnClickListener(v -> {
-            subject.onNext(true);
+            for (int x = 0; x < numOfNotes; x++) {
+                subject.onNext(true);
+            }
             subject.onCompleted();
             popupWindow.dismiss();
         });
@@ -305,16 +308,10 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @NonNull
     private Observable<Boolean> getPopUpObservable(PublishSubject<Boolean> subject, PopupWindow popupWindow) {
-        return Observable
-                .timer(1500, TimeUnit.MILLISECONDS)
+        return subject
+                .take(2000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(aLong -> {
-                    if (popupWindow.isShowing()) {
-                        popupWindow.dismiss();
-                    }
-                    return Observable.just(subject.hasCompleted()).repeat();
-                })
                 .doOnUnsubscribe(popupWindow::dismiss);
     }
 
