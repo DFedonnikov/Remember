@@ -1,5 +1,6 @@
 package com.gnest.remember.view.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -22,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -90,6 +92,11 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_edit_memo, container, false);
         mMemoEditTextView = mView.findViewById(R.id.editTextMemo);
+        mMemoEditTextView.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                hideKeyboard(v);
+            }
+        });
         mRemoveAlert = mView.findViewById(R.id.bt_remove_alert);
         mRemoveAlert.setOnClickListener(view -> {
             presenter.processRemoveAlarm(getString(R.string.alarm_remove_text));
@@ -97,7 +104,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         });
         return mView;
     }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -154,6 +160,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         }
     }
 
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -169,8 +176,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
         public static final String HOUR_KEY = "HOUR_KEY";
-        public static final String MINUTE_KEY = "MINUTE_KEY";
 
+        public static final String MINUTE_KEY = "MINUTE_KEY";
         private TimeSetListener mListener;
 
         @NonNull
@@ -195,6 +202,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         public void setTimeSetListener(TimeSetListener listener) {
             this.mListener = listener;
         }
+
     }
 
     public void onBackButtonPressed() {
@@ -309,6 +317,13 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         mRemoveAlert.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
     }
 
+    private void hideKeyboard(View v) {
+        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+            inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -319,6 +334,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
+
     public interface OnEditMemoFragmentInteractionListener {
         void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem);
 
