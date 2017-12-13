@@ -130,7 +130,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         Toolbar toolbar = mView.findViewById(R.id.ItemFragmentToolbar);
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
-        mListener.configureDrawer();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            mListener.syncDrawerToggleState();
+        }
     }
 
     @Override
@@ -314,6 +319,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private Observable<Boolean> getPopUpObservable(PublishSubject<Boolean> subject, PopupWindow popupWindow) {
         return subject
                 .take(2000, TimeUnit.MILLISECONDS)
+                .onBackpressureDrop()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnUnsubscribe(popupWindow::dismiss);
@@ -453,6 +459,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
         void onEnterEditMode(int memoId);
 
-        void configureDrawer();
+        void syncDrawerToggleState();
     }
 }

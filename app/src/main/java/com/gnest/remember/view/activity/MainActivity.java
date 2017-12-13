@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements
     private EditMemoFragment editMemoFragment;
     private ArchiveItemFragment archiveFragment;
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle actionBarDrawerToggle;
     private static int COLUMNS;
     private static int MEMO_SIZE_PX;
     private static int MARGINS_PX;
@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         calculateColumnsAndMemoSize();
+        configureDrawer();
         if (savedInstanceState != null) {
             boolean isEditFragVisible = savedInstanceState.getBoolean(EDIT_FRAG_VISIBILITY_KEY);
             boolean isArchiveFragVisible = savedInstanceState.getBoolean(ARCHIVE_FRAG_VISIBILITY_KEY);
@@ -88,6 +89,15 @@ public class MainActivity extends AppCompatActivity implements
         float density = getResources().getDisplayMetrics().density;
         MEMO_SIZE_PX = (int) (((screenWidthDP - 2 * ITEM_MARGINS_DP * COLUMNS) / COLUMNS) * density + 0.5);
         MARGINS_PX = (int) (ITEM_MARGINS_DP * density + 0.5);
+    }
+
+    private void configureDrawer() {
+        drawerLayout = findViewById(R.id.drawer_layout);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.nav_open_drawer, R.string.nav_close_drawer);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -204,20 +214,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void configureDrawer() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
+    public void syncDrawerToggleState() {
+        if (actionBarDrawerToggle != null) {
+            actionBarDrawerToggle.syncState();
         }
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.nav_open_drawer, R.string.nav_close_drawer);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override

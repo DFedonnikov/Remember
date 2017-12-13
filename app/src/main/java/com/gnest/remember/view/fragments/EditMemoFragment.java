@@ -13,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
@@ -112,7 +113,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         toolbar.setTitle("");
         activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
-        mListener.configureDrawer();
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            mListener.syncDrawerToggleState();
+        }
 
         mAppBarLayout = mView.findViewById(R.id.app_bar_layout);
 
@@ -338,6 +344,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public interface OnEditMemoFragmentInteractionListener {
         void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem);
 
-        void configureDrawer();
+        void syncDrawerToggleState();
     }
 }
