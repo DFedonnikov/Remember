@@ -17,12 +17,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -261,9 +263,22 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             subject.onCompleted();
             popupWindow.dismiss();
         });
-        popupWindow.showAtLocation(layout, Gravity.BOTTOM, 0, 0);
+        popupWindow.showAtLocation(layout, Gravity.BOTTOM, 0, getYOffset());
 
         return popupWindow;
+    }
+
+    private int getYOffset() {
+        //Checking if device has on screen buttons and calculating offset;
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int usableHeight = metrics.heightPixels;
+        getActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        int realHeight = metrics.heightPixels;
+        if (realHeight > usableHeight)
+            return realHeight - usableHeight;
+        else
+            return 0;
     }
 
     void setUpCancelArchiveActionMessage(View layout, int numOfNotes) {
