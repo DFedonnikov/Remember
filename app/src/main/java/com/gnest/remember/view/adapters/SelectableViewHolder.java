@@ -3,6 +3,8 @@ package com.gnest.remember.view.adapters;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.util.Linkify;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
+
+import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 
 class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
@@ -74,8 +78,18 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mTextViewBackgroundExpandedId = color.getMemoBackgroundExpandedId();
     }
 
+    /*
+    Using https://github.com/Saketme/Better-Link-Movement-Method for linking urls, email,
+    phone and etc instead of built-in LinkMovementMethod due to bug described in link above
+    */
     private void setUpTextField(String memoText, boolean isExpanded, boolean isSelected) {
         mTextView.setText(memoText);
+        if (Patterns.WEB_URL.matcher(memoText).find()
+                || Patterns.EMAIL_ADDRESS.matcher(memoText).find()
+                || Patterns.PHONE.matcher(memoText).find()) {
+            mTextView.setMovementMethod(BetterLinkMovementMethod.newInstance());
+            Linkify.addLinks(mTextView, Linkify.ALL);
+        }
         if (isExpanded) {
             setDeselectedAndExpandedState();
             mTextView.setMaxLines(Integer.MAX_VALUE);
