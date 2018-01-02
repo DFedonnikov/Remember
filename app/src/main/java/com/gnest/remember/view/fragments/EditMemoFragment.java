@@ -48,6 +48,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -62,16 +66,30 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     private AppCompatActivity activity;
 
-    private View mView;
-    private EditText mMemoEditTextView;
-    private ImageView mRemoveAlert;
-    private ImageView arrow;
+    @BindView(R.id.editTextMemo)
+    EditText mMemoEditTextView;
+    @BindView(R.id.bt_remove_alert)
+    ImageView mRemoveAlert;
+    @BindView(R.id.date_picker_arrow)
+    ImageView arrow;
+    @BindView(R.id.app_bar_layout)
+    AppBarLayout mAppBarLayout;
+    @BindView(R.id.compactcalendar_view)
+    CompactCalendarView mCompactCalendarView;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.date_picker_button)
+    RelativeLayout datePickerButton;
+    @BindView(R.id.date_picker_text_view)
+    TextView datePickerTextView;
+
+    @BindString(R.string.alarm_remove_text)
+    String alarmRemoveText;
+    @BindString(R.string.alarm_set_text)
+    String alarmSetText;
 
     private int memoId = -1;
     private String mColor;
-    private AppBarLayout mAppBarLayout;
-    private CompactCalendarView mCompactCalendarView;
-
     private OnEditMemoFragmentInteractionListener mListener;
 
     public static EditMemoFragment newInstance() {
@@ -91,16 +109,15 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_edit_memo, container, false);
-        mMemoEditTextView = mView.findViewById(R.id.editTextMemo);
+        View mView = inflater.inflate(R.layout.fragment_edit_memo, container, false);
+        ButterKnife.bind(this, mView);
         mMemoEditTextView.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 hideKeyboard(v);
             }
         });
-        mRemoveAlert = mView.findViewById(R.id.bt_remove_alert);
         mRemoveAlert.setOnClickListener(view -> {
-            presenter.processRemoveAlarm(getString(R.string.alarm_remove_text));
+            presenter.processRemoveAlarm(alarmRemoveText);
             setAlarmVisibility(false);
         });
         return mView;
@@ -109,7 +126,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Toolbar toolbar = mView.findViewById(R.id.toolbar);
         toolbar.setTitle("");
         activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
@@ -119,10 +135,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
             actionBar.setHomeButtonEnabled(true);
             mListener.syncDrawerToggleState();
         }
-
-        mAppBarLayout = mView.findViewById(R.id.app_bar_layout);
-
-        mCompactCalendarView = mView.findViewById(R.id.compactcalendar_view);
 
         mCompactCalendarView.setLocale(TimeZone.getDefault(), Locale.getDefault());
 
@@ -139,11 +151,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
                 presenter.processMonthScroll(firstDayOfNewMonth);
             }
         });
-
-
-        arrow = mView.findViewById(R.id.date_picker_arrow);
-
-        RelativeLayout datePickerButton = mView.findViewById(R.id.date_picker_button);
 
         datePickerButton.setOnClickListener(v -> presenter.processDatePicker());
 
@@ -223,7 +230,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     }
 
     public void saveMemo(boolean isTriggeredByDrawerItem) {
-        presenter.processSaveMemo(mMemoEditTextView.getText().toString(), mColor, getString(R.string.alarm_set_text), isTriggeredByDrawerItem);
+        presenter.processSaveMemo(mMemoEditTextView.getText().toString(), mColor, alarmSetText, isTriggeredByDrawerItem);
     }
 
     @Override
@@ -299,8 +306,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     @Override
     public void setSubtitle(String subtitle) {
-        TextView datePickerTextView = mView.findViewById(R.id.date_picker_text_view);
-
         if (datePickerTextView != null) {
             datePickerTextView.setText(subtitle);
         }
