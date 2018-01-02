@@ -9,7 +9,16 @@ import com.gnest.remember.R;
 import com.gnest.remember.presenter.ArchiveFragmentPresenter;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 
+import butterknife.BindString;
+
 public class ArchiveItemFragment extends ListItemFragment {
+
+    @BindString(R.string.note_unarchived_message)
+    String noteUnarchiveMessage;
+    @BindString(R.string.note_unarchived_message_1)
+    String noteUnarchiveMessage1;
+    @BindString(R.string.note_unarchived_message_2)
+    String noteUnarchiveMessage2;
 
 
     public static ArchiveItemFragment newInstance(int columnCount, int memoSize, int margins) {
@@ -37,11 +46,11 @@ public class ArchiveItemFragment extends ListItemFragment {
     String getArchiveActionPluralForm(int plural) {
         switch (plural) {
             case 2:
-                return getString(R.string.note_unarchived_message_2);
+                return noteUnarchiveMessage2;
             case 1:
-                return getString(R.string.note_unarchived_message_1);
+                return noteUnarchiveMessage1;
             default:
-                return getString(R.string.note_unarchived_message);
+                return noteUnarchiveMessage;
         }
     }
 }
