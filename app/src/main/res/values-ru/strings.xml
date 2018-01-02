@@ -3,7 +3,7 @@
     <string name="btn_add">Добавить</string>
     <string name="memo_text_hint">Введите текст заметки</string>
     <string name="btn_remove_alert">Удалить напоминание</string>
-    <string name="alarm_set_text">Напоминание установлено в</string>
+    <string name="alarm_set_text">Напоминание установлено на</string>
     <string name="alarm_remove_text">Напоминание удалено</string>
     <string name="send_memo_intent_title">Отправить заметку&#8230;,</string>
     <string name="notes">Заметки</string>
