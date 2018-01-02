@@ -45,6 +45,10 @@ import com.hannesdorfmann.mosby.mvp.MvpFragment;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.realm.RealmResults;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -63,16 +67,43 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public static final String ARG_MEMO_MARGINS = "MemoMargins";
     private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
 
+    @BindView(R.id.memo_list)
+    RecyclerView recyclerView;
+    @BindView(R.id.ItemFragmentToolbar)
+    Toolbar toolbar;
+
+    @BindString(R.string.note_archived_message)
+    String noteArchivedMessage;
+    @BindString(R.string.note_archived_message_1)
+    String noteArchivedMessage1;
+    @BindString(R.string.note_archived_message_2)
+    String noteArchivedMessage2;
+    @BindString(R.string.note_removed_message)
+    String noteRemovedMessage;
+    @BindString(R.string.note_removed_message_1)
+    String noteRemovedMessage1;
+    @BindString(R.string.note_removed_message_2)
+    String noteRemovedMessage2;
+    @BindString(R.string.send_memo_intent_title)
+    String sendMemoIntentTitle;
+
+    private View mView;
+    private View popupLayout;
+    private Unbinder unbinder;
+    private int mYOffset;
     private int mColumnCount;
     private int mMemoSize;
     private int mMargins;
     private OnListItemFragmentInteractionListener mListener;
     private MySelectableAdapter mAdapter;
-    private View mView;
     private ItemTouchHelper itemTouchHelper;
     private ActionMode actionMode;
     private ActionMenu actionMenu;
     private MyGridLayoutManager mMyGridLayoutManager;
+    private DrawerLayout drawerLayout;
+    private TextView cancel;
+    private TextView cancelMessage;
+
 
     public static ListItemFragment newInstance(int columnCount, int memoSize, int margins) {
         ListItemFragment fragment = new ListItemFragment();
@@ -95,6 +126,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_item_list, container, false);
+        popupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
+        unbinder = ButterKnife.bind(this, mView);
+        drawerLayout = getActivity().findViewById(R.id.drawer_layout);
+
+        cancel = popupLayout.findViewById(R.id.btn_cancel_dismiss);
+        cancelMessage = popupLayout.findViewById(R.id.cancelText);
         return mView;
     }
 
@@ -106,7 +143,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             mMemoSize = getArguments().getInt(ARG_MEMO_SIZE);
             mMargins = getArguments().getInt(ARG_MEMO_MARGINS);
         }
-        RecyclerView recyclerView = mView.findViewById(R.id.memo_list);
         Context context = mView.getContext();
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -123,13 +159,14 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
+        mYOffset = getYOffset();
+
         presenter.loadData();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Toolbar toolbar = mView.findViewById(R.id.ItemFragmentToolbar);
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
         ActionBar actionBar = activity.getSupportActionBar();
@@ -168,6 +205,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         shutDownActionMode();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
     @Override
     @NonNull
@@ -216,7 +258,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
                 mListener.onAddButtonPressed();
                 return true;
             case android.R.id.home:
-                ((DrawerLayout) getActivity().findViewById(R.id.drawer_layout)).openDrawer(GravityCompat.START);
+                drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -236,25 +278,21 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject, int numOfNotes) {
-        View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
-        PopupWindow popupWindow = setUpPopupWindow(layout, subject, numOfNotes);
-        setUpCancelArchiveActionMessage(layout, numOfNotes);
+        PopupWindow popupWindow = setUpPopupWindow(subject, numOfNotes);
+        setUpCancelArchiveActionMessage(numOfNotes);
         return getPopUpObservable(subject, popupWindow);
     }
 
     @Override
     public Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject, int numOfNotes) {
-        View layout = getLayoutInflater().inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
-        PopupWindow popupWindow = setUpPopupWindow(layout, subject, numOfNotes);
-        setUpCancelRemoveMessage(layout, numOfNotes);
+        PopupWindow popupWindow = setUpPopupWindow(subject, numOfNotes);
+        setUpCancelRemoveMessage(numOfNotes);
         return getPopUpObservable(subject, popupWindow);
     }
 
     @NonNull
-    private PopupWindow setUpPopupWindow(View layout, PublishSubject<Boolean> subject, int numOfNotes) {
-        TextView cancel = layout.findViewById(R.id.btn_cancel_dismiss);
-
-        PopupWindow popupWindow = new PopupWindow(layout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
+    private PopupWindow setUpPopupWindow(PublishSubject<Boolean> subject, int numOfNotes) {
+        PopupWindow popupWindow = new PopupWindow(popupLayout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
 
         cancel.setOnClickListener(v -> {
             for (int x = 0; x < numOfNotes; x++) {
@@ -263,7 +301,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             subject.onCompleted();
             popupWindow.dismiss();
         });
-        popupWindow.showAtLocation(layout, Gravity.BOTTOM, 0, getYOffset());
+        popupWindow.showAtLocation(popupLayout, Gravity.BOTTOM, 0, mYOffset);
 
         return popupWindow;
     }
@@ -281,15 +319,13 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             return 0;
     }
 
-    void setUpCancelArchiveActionMessage(View layout, int numOfNotes) {
-        TextView cancelMessage = layout.findViewById(R.id.cancelText);
+    void setUpCancelArchiveActionMessage(int numOfNotes) {
         int plural = getPlural(numOfNotes);
         String text = numOfNotes + " " + getArchiveActionPluralForm(plural);
         cancelMessage.setText(text);
     }
 
-    void setUpCancelRemoveMessage(View layout, int numOfNotes) {
-        TextView cancelMessage = layout.findViewById(R.id.cancelText);
+    void setUpCancelRemoveMessage(int numOfNotes) {
         int plural = getPlural(numOfNotes);
         String text = numOfNotes + " " + getRemovePluralForm(plural);
         cancelMessage.setText(text);
@@ -298,22 +334,22 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     String getArchiveActionPluralForm(int plural) {
         switch (plural) {
             case 2:
-                return getString(R.string.note_archived_message_2);
+                return noteArchivedMessage2;
             case 1:
-                return getString(R.string.note_archived_message_1);
+                return noteArchivedMessage1;
             default:
-                return getString(R.string.note_archived_message);
+                return noteArchivedMessage;
         }
     }
 
     private String getRemovePluralForm(int plural) {
         switch (plural) {
             case 2:
-                return getString(R.string.note_removed_message_2);
+                return noteRemovedMessage2;
             case 1:
-                return getString(R.string.note_removed_message_1);
+                return noteRemovedMessage1;
             default:
-                return getString(R.string.note_removed_message);
+                return noteRemovedMessage;
         }
     }
 
@@ -366,7 +402,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, memoText);
-        Intent chooserIntent = Intent.createChooser(intent, getString(R.string.send_memo_intent_title));
+        Intent chooserIntent = Intent.createChooser(intent, sendMemoIntentTitle);
         actionMode.finish();
         startActivity(chooserIntent);
     }
