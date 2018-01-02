@@ -48,9 +48,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import butterknife.BindColor;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,6 +67,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public static final String MEMO_ID_KEY = "memo_param";
 
     private AppCompatActivity activity;
+    private Unbinder unbinder;
 
     @BindView(R.id.editTextMemo)
     EditText mMemoEditTextView;
@@ -88,6 +91,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @BindString(R.string.alarm_set_text)
     String alarmSetText;
 
+    @BindColor(R.color.colorPrimary)
+    int primaryColor;
+
     private int memoId = -1;
     private String mColor;
     private OnEditMemoFragmentInteractionListener mListener;
@@ -110,7 +116,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.fragment_edit_memo, container, false);
-        ButterKnife.bind(this, mView);
+        unbinder = ButterKnife.bind(this, mView);
         mMemoEditTextView.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 hideKeyboard(v);
@@ -178,6 +184,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -285,7 +297,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         inflater.inflate(R.menu.ab_editfragment, menu);
         MenuItem item = menu.findItem(R.id.item_color_choice_spinner);
         AppCompatSpinner colorChoiceSpinner = (AppCompatSpinner) item.getActionView();
-        colorChoiceSpinner.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        colorChoiceSpinner.setBackgroundColor(primaryColor);
         ColorSpinnerAdapter colorSpinnerAdapter = new ColorSpinnerAdapter(getContext());
         colorChoiceSpinner.setAdapter(colorSpinnerAdapter);
         colorChoiceSpinner.setOnItemSelectedListener(this);
