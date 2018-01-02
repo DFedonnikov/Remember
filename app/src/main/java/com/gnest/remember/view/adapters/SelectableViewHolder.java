@@ -14,6 +14,8 @@ import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 
 class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -22,20 +24,22 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     private OnItemSelectedListener mListener;
     private Memo mMemo;
     private int mPosition = 0;
-    private TextView mTextView;
-    private ScrollView mScrollView;
-    private int mTextViewBackgroundId;
     private int mTextViewBackgroundSelectedId;
     private int mTextViewBackgroundExpandedId;
+    private int mTextViewBackgroundId;
+
+    @BindView(R.id.memo_textView)
+    TextView mTextView;
+    @BindView(R.id.textScrollView)
+    ScrollView mScrollView;
+    @BindView(R.id.pin)
     ImageView pin;
 
     SelectableViewHolder(final View itemView, final OnItemSelectedListener onItemSelectedListener) {
         super(itemView);
+        ButterKnife.bind(this, itemView);
         mView = itemView;
         this.mListener = onItemSelectedListener;
-        mTextView = itemView.findViewById(R.id.memo_textView);
-        pin = itemView.findViewById(R.id.pin);
-        mScrollView = itemView.findViewById(R.id.textScrollView);
         mTextView.setOnClickListener(view -> mListener.onItemClicked(mPosition, mMemo, SelectableViewHolder.this));
         mTextView.setOnLongClickListener(view -> mListener.onItemLongClicked(mPosition, mMemo, SelectableViewHolder.this));
     }
