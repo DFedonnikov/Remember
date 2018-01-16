@@ -103,6 +103,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private DrawerLayout drawerLayout;
     private TextView cancel;
     private TextView cancelMessage;
+    private PopupWindow popupWindow;
 
 
     public static ListItemFragment newInstance(int columnCount, int memoSize, int margins) {
@@ -126,7 +127,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_item_list, container, false);
-        popupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
+        popupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss), false);
         unbinder = ButterKnife.bind(this, mView);
         drawerLayout = getActivity().findViewById(R.id.drawer_layout);
 
@@ -160,6 +161,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         mYOffset = getYOffset();
+
+        popupWindow = new PopupWindow(popupLayout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
 
         presenter.loadData();
     }
@@ -292,8 +295,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @NonNull
     private PopupWindow setUpPopupWindow(PublishSubject<Boolean> subject, int numOfNotes) {
-        PopupWindow popupWindow = new PopupWindow(popupLayout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
-
         cancel.setOnClickListener(v -> {
             for (int x = 0; x < numOfNotes; x++) {
                 subject.onNext(true);
@@ -302,7 +303,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             popupWindow.dismiss();
         });
         popupWindow.showAtLocation(popupLayout, Gravity.BOTTOM, 0, mYOffset);
-
         return popupWindow;
     }
 
