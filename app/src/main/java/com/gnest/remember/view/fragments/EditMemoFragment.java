@@ -65,6 +65,7 @@ import butterknife.Unbinder;
 public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresenter>
         implements AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener {
     public static final String MEMO_ID_KEY = "memo_param";
+    private static final String TEXT_KEY = "Text key";
 
     private AppCompatActivity activity;
     private Unbinder unbinder;
@@ -190,6 +191,20 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(TEXT_KEY, mMemoEditTextView.getText().toString());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            mMemoEditTextView.setText(savedInstanceState.getString(TEXT_KEY));
+        }
     }
 
     @Override
