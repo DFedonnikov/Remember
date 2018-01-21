@@ -4,15 +4,15 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
 import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> {
 
     void loadData();
 
-    void processDeleteSelectedMemos(List<Integer> selectedIds);
+    void processDeleteSelectedMemos(Collection<Integer> selectedIds);
 
-    void processShare(List<Integer> selectedIds);
+    void processShare(Collection<Integer> selectedIds);
 
     void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
 
@@ -24,5 +24,5 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
 
     void processSwipeDismiss(int memoId, int memoPosition);
 
-    void processArchiveActionOnSelected(List<Integer> selectedIds);
+    void processArchiveActionOnSelected(Collection<Integer> selectedIds);
 }

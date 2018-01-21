@@ -7,6 +7,7 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import io.realm.Realm;
@@ -50,7 +51,7 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     }
 
     @Override
-    public Observable<Memo> deleteSelected(List<Integer> selectedIds) {
+    public Observable<Memo> deleteSelected(Collection<Integer> selectedIds) {
         ArrayList<Memo> toReturnList = new ArrayList<>();
         for (Integer id : selectedIds) {
             Memo toRemove = primaryRealm.where(Memo.class)
@@ -71,7 +72,7 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     }
 
     @Override
-    public Observable<Memo> moveBetweenRealms(List<Integer> ids) {
+    public Observable<Memo> moveBetweenRealms(Collection<Integer> ids) {
         List<Memo> memos = new ArrayList<>();
         for (Integer id : ids) {
             memos.add(moveBetween(primaryRealm, secondaryRealm, id));

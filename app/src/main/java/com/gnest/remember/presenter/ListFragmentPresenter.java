@@ -9,8 +9,8 @@ import com.gnest.remember.view.IListFragmentView;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import io.realm.RealmResults;
 import rx.Subscription;
@@ -55,14 +55,14 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processDeleteSelectedMemos(List<Integer> selectedIds) {
+    public void processDeleteSelectedMemos(Collection<Integer> selectedIds) {
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription removeSelectedSubscription = mModel.deleteSelected(selectedIds)
                     .zipWith(getView().showConfirmRemovePopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
-                            getView().getAdapter().notifyDataSetChanged();
+                            getView().getAdapter().clearSelectedList();
                             shutDownActionMode();
                         }
                     })
@@ -110,14 +110,14 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processArchiveActionOnSelected(List<Integer> selectedIds) {
+    public void processArchiveActionOnSelected(Collection<Integer> selectedIds) {
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription confirmArchiveSubscription = mModel.moveBetweenRealms(selectedIds)
                     .zipWith(getView().showConfirmArchiveActionPopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
-                            getView().getAdapter().notifyDataSetChanged();
+                            getView().getAdapter().clearSelectedList();
                             shutDownActionMode();
                         }
                     })
@@ -137,9 +137,9 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processShare(List<Integer> selectedIds) {
+    public void processShare(Collection<Integer> selectedIds) {
         if (selectedIds.size() == 1) {
-            Memo memo = mModel.getMemoById(selectedIds.get(0));
+            Memo memo = mModel.getMemoById(selectedIds.iterator().next());
             if (memo != null && isViewAttached()) {
                 getView().shareMemoText(memo.getMemoText());
             }
