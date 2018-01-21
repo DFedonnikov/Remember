@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -24,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -35,6 +35,7 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 import com.gnest.remember.presenter.ListFragmentPresenter;
 import com.gnest.remember.view.IListFragmentView;
+import com.gnest.remember.view.activity.MainActivity;
 import com.gnest.remember.view.helper.ItemTouchHelperCallback;
 import com.gnest.remember.model.services.AlarmService;
 import com.gnest.remember.view.menu.ActionMenu;
@@ -65,6 +66,9 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public static final String ARG_COLUMN_COUNT = "ColumnCount";
     public static final String ARG_MEMO_SIZE = "MemoSize";
     public static final String ARG_MEMO_MARGINS = "MemoMargins";
+    private static final String SAVED_LAYOUT_MANAGER = "Saved layout manager";
+    private static final String SAVED_STATE_KEY = "Saved state key";
+
     private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
 
     @BindView(R.id.memo_list)
@@ -104,6 +108,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private TextView cancel;
     private TextView cancelMessage;
     private PopupWindow popupWindow;
+    private Bundle mSavedState;
 
 
     public static ListItemFragment newInstance(int columnCount, int memoSize, int margins) {
@@ -127,7 +132,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_item_list, container, false);
-        popupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss), false);
+        popupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
         unbinder = ButterKnife.bind(this, mView);
         drawerLayout = getActivity().findViewById(R.id.drawer_layout);
 
@@ -148,7 +153,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
-            mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount, mMemoSize, mMargins);
+            mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
             recyclerView.setLayoutManager(mMyGridLayoutManager);
         }
         mAdapter = new MySelectableAdapter(mMemoSize, mMargins);
@@ -197,14 +202,15 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        if (mAdapter != null) {
+            mAdapter.setActionListener(null);
+        }
+        if (mMyGridLayoutManager != null) {
+            mMyGridLayoutManager.setExpandListener(null);
+        }
         shutDownActionMode();
     }
 
@@ -213,6 +219,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         super.onDestroyView();
         unbinder.unbind();
     }
+
 
     @Override
     @NonNull
@@ -225,33 +232,57 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void setData(RealmResults<Memo> data) {
         mAdapter.setMemos(data);
         mAdapter.notifyDataSetChanged();
-        returnFromEditMode();
+        checkStateRestore();
         dataLoadedSubject.onNext(true);
     }
 
-    private void returnFromEditMode() {
-        if (getArguments() != null) {
-            Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
-            if (bundle != null) {
-                int lastPosition = bundle.getInt(MyGridLayoutManager.POSITION_KEY);
-                int lastOrientation = bundle.getInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY);
-                boolean isExpanded = bundle.getBoolean(EXPANDED_KEY);
-                presenter.processReturnFromEditMode(lastPosition, lastOrientation, isExpanded);
-            }
+    private void checkStateRestore() {
+        Bundle bundle;
+        //Restoring state after config change
+        if (mSavedState != null) {
+            bundle = mSavedState;
         }
+        //Restoring state after returning from edit mode
+        else {
+            bundle = getArguments().getBundle(BUNDLE_KEY);
+        }
+        if (bundle != null) {
+            restoreLayoutManagerState(bundle.getInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY),
+                    bundle.getBoolean(EXPANDED_KEY),
+                    bundle.getParcelable(SAVED_LAYOUT_MANAGER),
+                    bundle.getInt(MyGridLayoutManager.POSITION_KEY));
+        }
+    }
+
+    private void restoreLayoutManagerState(int orientation, boolean isItemsExtended, @Nullable Parcelable state, int anchorPosition) {
+        if (orientation == LinearLayoutManager.HORIZONTAL) {
+            mMyGridLayoutManager.setSpanCount(1);
+        }
+        mMyGridLayoutManager.setOrientation(orientation);
+        mAdapter.setItemsExpanded(isItemsExtended);
+        if (state != null) {
+            mMyGridLayoutManager.onRestoreInstanceState(state);
+        }
+        mMyGridLayoutManager.scrollToPosition(anchorPosition);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Bundle bundle = getArguments().getBundle(BUNDLE_KEY);
-        if (bundle == null) {
-            bundle = new Bundle();
+        Bundle state = new Bundle();
+        state.putParcelable(SAVED_LAYOUT_MANAGER, mMyGridLayoutManager.onSaveInstanceState());
+        state.putBoolean(EXPANDED_KEY, mAdapter.isItemsExpanded());
+        state.putInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
+        state.putInt(MyGridLayoutManager.POSITION_KEY, mMyGridLayoutManager.getLastPosition());
+        outState.putBundle(SAVED_STATE_KEY, state);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            mSavedState = savedInstanceState.getParcelable(SAVED_STATE_KEY);
         }
-        bundle.putInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
-        bundle.putInt(MyGridLayoutManager.POSITION_KEY, mMyGridLayoutManager.getLastPosition());
-        bundle.putBoolean(EXPANDED_KEY, mAdapter.isItemsExpanded());
-        getArguments().putBundle(BUNDLE_KEY, bundle);
     }
 
     @Override
@@ -276,7 +307,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void onPerformSwipeDismiss(int memoId, int memoPosition) {
         presenter.processSwipeDismiss(memoId, memoPosition);
-
     }
 
     @Override
@@ -471,7 +501,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     public void onBackButtonPressed() {
-        presenter.processPressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL);
+        presenter.processPressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL, MainActivity.getCOLUMNS());
     }
 
     @Override
