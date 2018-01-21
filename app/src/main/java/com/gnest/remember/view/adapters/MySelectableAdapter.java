@@ -2,7 +2,6 @@ package com.gnest.remember.view.adapters;
 
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,8 +12,9 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import io.realm.RealmResults;
 
@@ -23,7 +23,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     private RealmResults<Memo> mMemos;
     private boolean multiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
-    private SparseIntArray mSelectedList = new SparseIntArray();
+    private Map<Integer, Integer> mSelectedMap = new LinkedHashMap<>();
     private boolean mItemsExpanded;
     private int mMemoSize;
     private int mMargins;
@@ -47,7 +47,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     @Override
     public void onBindViewHolder(SelectableViewHolder viewHolder, int position) {
         final SelectableViewHolder holder = viewHolder;
-        boolean isSelected = multiChoiceEnabled && mSelectedList.indexOfKey(position) >= 0;
+        boolean isSelected = multiChoiceEnabled && mSelectedMap.get(position) != null;
         holder.bind(mMemos.get(position), position, mItemsExpanded, isSelected, mMemoSize, mMargins);
         holder.pin.setOnTouchListener((view, motionEvent) -> {
             if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
@@ -96,18 +96,18 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
 
     @Override
     public void updateSelectedList(int pos, Memo memo, SelectableViewHolder viewHolder) {
-        if (mSelectedList.indexOfKey(pos) >= 0) {
-            mSelectedList.delete(pos);
+        if (mSelectedMap.get(pos) != null) {
+            mSelectedMap.remove(pos);
             viewHolder.setDeselectedState();
         } else {
-            mSelectedList.put(pos, memo.getId());
+            mSelectedMap.put(pos, memo.getId());
             viewHolder.setSelectedState();
         }
-        if (mSelectedList.size() == 0) {
+        if (mSelectedMap.size() == 0) {
             mListener.shutDownActionMode();
             viewHolder.setDeselectedState();
         }
-        mListener.updateContextActionMenu(mSelectedList.size());
+        mListener.updateContextActionMenu(mSelectedMap.size());
     }
 
     public void switchMultiSelect(boolean switchedOn) {
@@ -115,23 +115,19 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     }
 
     public void clearSelectedList() {
-        mSelectedList.clear();
+        mSelectedMap.clear();
         notifyDataSetChanged();
     }
 
-    public List<Integer> getSelectedIds() {
-        List<Integer> selectedIds = new ArrayList<>();
-        for (int i = 0; i < mSelectedList.size(); i++) {
-            selectedIds.add(mSelectedList.valueAt(i));
-        }
-        return selectedIds;
+    public Collection<Integer> getSelectedIds() {
+        return mSelectedMap.values();
     }
 
     @Override
     public void onItemClicked(int mPosition, Memo mMemo, SelectableViewHolder viewHolder) {
         if (isMultiChoiceEnabled()) {
             updateSelectedList(mPosition, mMemo, viewHolder);
-            if (mSelectedList.size() < 2) {
+            if (mSelectedMap.size() < 2) {
                 mListener.setShareButtonVisibility(true);
             } else {
                 mListener.setShareButtonVisibility(false);
