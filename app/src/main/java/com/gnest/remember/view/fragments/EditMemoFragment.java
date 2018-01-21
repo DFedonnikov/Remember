@@ -11,8 +11,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
@@ -95,6 +96,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @BindColor(R.color.colorPrimary)
     int primaryColor;
 
+    private DrawerLayout drawerLayout;
+
     private int memoId = -1;
     private String mColor;
     private OnEditMemoFragmentInteractionListener mListener;
@@ -142,6 +145,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
             actionBar.setHomeButtonEnabled(true);
             mListener.syncDrawerToggleState();
         }
+
+        drawerLayout = getActivity().findViewById(R.id.drawer_layout);
 
         mCompactCalendarView.setLocale(TimeZone.getDefault(), Locale.getDefault());
 
@@ -318,6 +323,17 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         colorChoiceSpinner.setOnItemSelectedListener(this);
         if (mColor != null) {
             colorChoiceSpinner.setSelection(ColorSpinnerAdapter.Colors.valueOf(mColor).ordinal());
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
