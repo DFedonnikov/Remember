@@ -6,6 +6,7 @@ import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
+import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.Collections;
@@ -51,18 +52,6 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     }
                 });
         compositeSubscription.add(getDataSubscription);
-    }
-
-    @Override
-    public void processReturnFromEditMode(int lastPosition, int lastOrientation, boolean isExpanded) {
-        if (isViewAttached()) {
-            IListFragmentView view = getView();
-            if (view != null) {
-                view.getLayoutManager().setAncorPos(lastPosition);
-                view.getLayoutManager().setOrientation(lastOrientation);
-                view.getAdapter().setItemsExpanded(isExpanded);
-            }
-        }
     }
 
     @Override
@@ -181,11 +170,14 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode) {
+    public void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode, int spanCount) {
         if (isViewAttached()) {
             IListFragmentView view = getView();
-            if (view.getLayoutManager().getOrientation() == horizontalOrientationCode) {
-                view.getLayoutManager().setOrientation(verticalOrientationCode);
+            MyGridLayoutManager manager = view.getLayoutManager();
+            if (manager.getOrientation() == horizontalOrientationCode) {
+                manager.setOrientation(verticalOrientationCode);
+                manager.setSpanCount(spanCount);
+                manager.scrollToPosition(manager.getLastPosition());
                 view.getAdapter().setItemsExpanded(false);
             } else {
                 view.getInteractionListener().onBackButtonPressed();
