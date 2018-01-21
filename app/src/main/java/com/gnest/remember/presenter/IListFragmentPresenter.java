@@ -20,9 +20,7 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
 
     void processSingleChoiceClick(Memo mMemo, int verticalOrientationCode);
 
-    void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode);
-
-    void processReturnFromEditMode(int lastOrientation, int lastPosition, boolean isExpanded);
+    void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode, int spanCount);
 
     void processSwipeDismiss(int memoId, int memoPosition);
 
