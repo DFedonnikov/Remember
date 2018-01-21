@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.util.Patterns;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -64,13 +65,15 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     void bind(Memo memo, int position, boolean isExpanded, boolean isSelected, int memoSize, int margins) {
         mMemo = memo;
         mPosition = position;
-        setUpViewSizesAndMargins(memoSize, margins);
+        setUpViewSizesAndMargins(memoSize, margins, isExpanded);
         setUpBackgroundColors(memo.getColor());
         setUpTextField(memo.getMemoText(), isExpanded, isSelected);
     }
 
-    private void setUpViewSizesAndMargins(int memoSize, int margins) {
-        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(memoSize, memoSize);
+    private void setUpViewSizesAndMargins(int memoSize, int margins, boolean isExpanded) {
+        ConstraintLayout.LayoutParams layoutParams = isExpanded ?
+                new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT) :
+                new ConstraintLayout.LayoutParams(memoSize, memoSize);
         layoutParams.setMargins(margins, margins, margins, margins);
         mView.setLayoutParams(layoutParams);
     }
