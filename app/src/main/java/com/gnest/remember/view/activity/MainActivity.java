@@ -269,4 +269,8 @@ public class MainActivity extends AppCompatActivity implements
         outState.putBoolean(EDIT_FRAG_VISIBILITY_KEY, isEditFragmentVisible);
         outState.putBoolean(ARCHIVE_FRAG_VISIBILITY_KEY, isArchiveFragmentVisible);
     }
+
+    public static int getCOLUMNS() {
+        return COLUMNS;
+    }
 }
