@@ -21,6 +21,7 @@
     <string name="note_removed_message">заметка удалена</string>
     <string name="note_removed_message_1">заметки удалены</string>
     <string name="note_removed_message_2">заметок удалено</string>
+    <string name="notification_title">Вы хотели, чтобы я вам напомнил о&#8230;</string>
     <string-array name="memo_colors">
         <item>Желтый</item>
         <item>Голубой</item>

@@ -32,6 +32,7 @@
     <string name="note_removed_message">note has been deleted</string>
     <string name="note_removed_message_1">notes has been removed</string>
     <string name="note_removed_message_2">notes has been removed</string>
+    <string name="notification_title">You wanted me to remind you about&#8230;</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>
