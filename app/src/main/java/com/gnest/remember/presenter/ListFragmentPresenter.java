@@ -1,22 +1,30 @@
 package com.gnest.remember.presenter;
 
 import android.support.v4.util.Pair;
+import android.support.v7.widget.RecyclerView;
 
 import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
+import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmResults;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
+
+import static android.widget.GridLayout.HORIZONTAL;
 
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
@@ -149,15 +157,50 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         }
     }
 
+    @Override
+    public void processOpenFromNotification(long id) {
+        if (isViewAttached()) {
+            getView().getDataLoadedSubject()
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .distinctUntilChanged(dataLoaded -> dataLoaded)
+                    .zipWith(getComputingLayoutOrScrollingSubject().distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
+                    .map(subjectsCompletedPair -> mModel.getMemoById((int) id))
+                    .subscribe(memo -> {
+                        MyGridLayoutManager manager = getView().getLayoutManager();
+                        MySelectableAdapter adapter = getView().getAdapter();
+                        manager.setSpanCount(1);
+                        adapter.expandItems();
+                        manager.setOrientation(HORIZONTAL);
+                        manager.scrollToPositionWithOffset(memo.getPosition(), 0);
+                        mModel.setMemoAlarmFalse(memo.getId());
+                        getView().closeNotification(memo.getId());
+                    });
+        }
+    }
+
+    private Observable<Boolean> getComputingLayoutOrScrollingSubject() {
+        BehaviorSubject<Boolean> computingLayoutOrScrollingSubject = BehaviorSubject.create();
+        Subscription subscription = Observable.timer(50, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+                    if (isViewAttached()) {
+                        RecyclerView recyclerView = getView().getRecyclerView();
+                        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE
+                                && !recyclerView.isComputingLayout()) {
+                            computingLayoutOrScrollingSubject.onNext(true);
+                            computingLayoutOrScrollingSubject.onCompleted();
+                        }
+                    }
+                });
+        compositeSubscription.add(subscription);
+        return computingLayoutOrScrollingSubject;
+    }
 
     @Override
     public void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
         mModel.swapMemos(fromId, fromPosition, toId, toPosition);
-    }
-
-    @Override
-    public void processMemoAlarmShutdown(Memo memo) {
-        mModel.setMemoAlarmFalse(memo.getId());
     }
 
     @Override

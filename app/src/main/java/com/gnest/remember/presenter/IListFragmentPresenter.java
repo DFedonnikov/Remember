@@ -14,9 +14,9 @@ public interface IListFragmentPresenter extends MvpPresenter<IListFragmentView> 
 
     void processShare(Collection<Integer> selectedIds);
 
-    void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
+    void processOpenFromNotification(long id);
 
-    void processMemoAlarmShutdown(Memo memo);
+    void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition);
 
     void processSingleChoiceClick(Memo mMemo, int verticalOrientationCode);
 
