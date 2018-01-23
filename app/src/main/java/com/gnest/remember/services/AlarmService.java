@@ -18,7 +18,6 @@ public class AlarmService extends IntentService {
 
     public static final String NOTIFICATION_TEXT = "NotificationText";
     public static final String NOTIFICATION_MEMO_ID = "NotificationMemoPosition";
-    public static final String NOTIFICATION_TITLE = "Memo event notification";
 
     public static Intent getServiceIntent(Context context, String notificationText, long savedId) {
         Intent intent = new Intent(context, AlarmService.class);
@@ -36,7 +35,7 @@ public class AlarmService extends IntentService {
         if (intent != null) {
             NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.ic_note)
-                    .setContentTitle(NOTIFICATION_TITLE)
+                    .setContentTitle(getString(R.string.notification_title))
                     .setContentText(intent.getStringExtra(NOTIFICATION_TEXT));
 
             Intent resultIntent = new Intent(this, MainActivity.class);
