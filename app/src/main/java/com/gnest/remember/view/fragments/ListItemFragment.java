@@ -1,6 +1,7 @@
 package com.gnest.remember.view.fragments;
 
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -438,6 +439,19 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
+    public void openFromNotification(long id) {
+        presenter.processOpenFromNotification(id);
+    }
+
+    @Override
+    public void closeNotification(int id) {
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.cancel(id);
+        }
+    }
+
+    @Override
     public void swapMemos(int fromId, int fromPosition, int toId, int toPosition) {
         presenter.processMemoSwap(fromId, fromPosition, toId, toPosition);
     }
@@ -495,11 +509,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         presenter.processSingleChoiceClick(memo, LinearLayoutManager.VERTICAL);
     }
 
-    public void shutdownMemoAlarm(int position) {
-        presenter.processMemoAlarmShutdown(mAdapter.getMemos().get(position));
-        mAdapter.notifyItemChanged(position);
-    }
-
     public void onBackButtonPressed() {
         presenter.processPressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL, MainActivity.getCOLUMNS());
     }
@@ -515,12 +524,18 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
-    public OnListItemFragmentInteractionListener getInteractionListener() {
-        return mListener;
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 
-    public BehaviorSubject<Boolean> getDataLodingSubject() {
+    @Override
+    public BehaviorSubject<Boolean> getDataLoadedSubject() {
         return dataLoadedSubject;
+    }
+
+    @Override
+    public OnListItemFragmentInteractionListener getInteractionListener() {
+        return mListener;
     }
 
     /**

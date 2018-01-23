@@ -1,6 +1,7 @@
 package com.gnest.remember.view;
 
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.RecyclerView;
 
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
@@ -10,6 +11,7 @@ import com.hannesdorfmann.mosby.mvp.MvpView;
 
 import io.realm.RealmResults;
 import rx.Observable;
+import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public interface IListFragmentView extends MvpView {
@@ -19,7 +21,15 @@ public interface IListFragmentView extends MvpView {
 
     void shareMemoText(String memoText);
 
+    void openFromNotification(long id);
+
+    void closeNotification(int id);
+
     MyGridLayoutManager getLayoutManager();
+
+    RecyclerView getRecyclerView();
+
+    BehaviorSubject<Boolean> getDataLoadedSubject();
 
     ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
 
