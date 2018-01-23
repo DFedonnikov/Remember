@@ -51,7 +51,7 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     }
 
     @Override
-    public Observable<Memo> deleteSelected(Collection<Integer> selectedIds) {
+    public Observable<List<Memo>> deleteSelected(Collection<Integer> selectedIds) {
         ArrayList<Memo> toReturnList = new ArrayList<>();
         for (Integer id : selectedIds) {
             Memo toRemove = primaryRealm.where(Memo.class)
@@ -68,17 +68,17 @@ public class ListFragmentModelImpl implements IListFragmentModel {
         }
 
         validatePositions(primaryRealm);
-        return Observable.from(toReturnList);
+        return Observable.just(toReturnList);
     }
 
     @Override
-    public Observable<Memo> moveBetweenRealms(Collection<Integer> ids) {
+    public Observable<List<Memo>> moveBetweenRealms(Collection<Integer> ids) {
         List<Memo> memos = new ArrayList<>();
         for (Integer id : ids) {
             memos.add(moveBetween(primaryRealm, secondaryRealm, id));
         }
         validatePositions(primaryRealm);
-        return Observable.from(memos);
+        return Observable.just(memos);
     }
 
     @Override

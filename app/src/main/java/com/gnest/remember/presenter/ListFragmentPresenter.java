@@ -68,12 +68,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     })
                     .subscribe(cancelMemoPair -> {
                         if (isViewAttached()) {
-                            Memo processed = cancelMemoPair.second;
-                            if (!cancelMemoPair.first) {
-                                removeAlarmNotification(processed.getId(), processed.isAlarmSet());
-                            } else {
-                                mModel.revertDeleteMemo(processed);
-                                getView().getAdapter().notifyDataSetChanged();
+                            for (Memo processed : cancelMemoPair.second) {
+                                if (!cancelMemoPair.first) {
+                                    removeAlarmNotification(processed.getId(), processed.isAlarmSet());
+                                } else {
+                                    mModel.revertDeleteMemo(processed);
+                                    getView().getAdapter().notifyDataSetChanged();
+                                }
                             }
                         }
                     });
@@ -96,12 +97,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     })
                     .subscribe(cancelMemoPair -> {
                         if (isViewAttached()) {
-                            Memo processed = cancelMemoPair.second;
-                            if (!cancelMemoPair.first) {
-                                removeAlarmNotification(processed.getId(), processed.isAlarmSet());
-                            } else {
-                                mModel.revertArchived(processed);
-                                getView().getAdapter().notifyDataSetChanged();
+                            for (Memo processed : cancelMemoPair.second) {
+                                if (!cancelMemoPair.first) {
+                                    removeAlarmNotification(processed.getId(), processed.isAlarmSet());
+                                } else {
+                                    mModel.revertArchived(processed);
+                                    getView().getAdapter().notifyDataSetChanged();
+                                }
                             }
                         }
                     });
@@ -123,12 +125,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     })
                     .subscribe(cancelMemoPair -> {
                         if (isViewAttached()) {
-                            Memo processed = cancelMemoPair.second;
-                            if (!cancelMemoPair.first) {
-                                removeAlarmNotification(processed.getId(), processed.isAlarmSet());
-                            } else {
-                                mModel.revertArchived(processed);
-                                getView().getAdapter().notifyDataSetChanged();
+                            for (Memo processed : cancelMemoPair.second) {
+                                if (!cancelMemoPair.first) {
+                                    removeAlarmNotification(processed.getId(), processed.isAlarmSet());
+                                } else {
+                                    mModel.revertArchived(processed);
+                                    getView().getAdapter().notifyDataSetChanged();
+                                }
                             }
                         }
                     });

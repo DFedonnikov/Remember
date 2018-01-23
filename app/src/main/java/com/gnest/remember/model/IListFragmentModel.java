@@ -3,6 +3,7 @@ package com.gnest.remember.model;
 import com.gnest.remember.model.db.data.Memo;
 
 import java.util.Collection;
+import java.util.List;
 
 import io.realm.RealmResults;
 import rx.Observable;
@@ -12,9 +13,9 @@ public interface IListFragmentModel {
 
     Memo getMemoById(int id);
 
-    Observable<Memo> deleteSelected(Collection<Integer> selectedIds);
+    Observable<List<Memo>> deleteSelected(Collection<Integer> selectedIds);
 
-    Observable<Memo> moveBetweenRealms(Collection<Integer> ids);
+    Observable<List<Memo>> moveBetweenRealms(Collection<Integer> ids);
 
     void revertArchived(Memo toRevert);
 
