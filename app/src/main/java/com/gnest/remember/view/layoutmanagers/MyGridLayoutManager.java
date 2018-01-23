@@ -5,7 +5,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
 
@@ -28,12 +27,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
         super(context, spanCount);
         DisplayMetrics metrics = App.self().getResources().getDisplayMetrics();
         mScreenWidth = metrics.widthPixels;
-    }
-
-    @Override
-    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        super.onLayoutChildren(recycler, state);
-        childrenLayoutCompleteSubject.onNext(true);
     }
 
     private int getLargestSquareViewPosition() {
@@ -149,10 +142,6 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     public void setExpandListener(ExpandListener expandListener) {
         this.mExpandListener = expandListener;
-    }
-
-    public BehaviorSubject<Boolean> getChildrenLayoutCompleteSubject() {
-        return childrenLayoutCompleteSubject;
     }
 
     public interface ExpandListener {
