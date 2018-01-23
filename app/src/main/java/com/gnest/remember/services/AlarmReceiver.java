@@ -1,4 +1,4 @@
-package com.gnest.remember.model.services;
+package com.gnest.remember.services;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

@@ -23,12 +23,12 @@
         </activity>
 
         <service
-            android:name=".model.services.AlarmService"
+            android:name=".services.AlarmService"
             android:enabled="true">
 
         </service>
         <receiver
-            android:name=".model.services.AlarmReceiver"
+            android:name=".services.AlarmReceiver"
             android:enabled="true"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>

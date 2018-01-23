@@ -17,7 +17,7 @@ import com.gnest.remember.R;
 import com.gnest.remember.view.fragments.ArchiveItemFragment;
 import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
-import com.gnest.remember.model.services.AlarmService;
+import com.gnest.remember.services.AlarmService;
 
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,

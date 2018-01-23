@@ -1,4 +1,4 @@
-package com.gnest.remember.model.services;
+package com.gnest.remember.services;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -13,10 +13,6 @@ import android.support.v7.app.NotificationCompat;
 
 import com.gnest.remember.R;
 import com.gnest.remember.view.activity.MainActivity;
-
-/**
- * Created by DFedonnikov on 08.08.2017.
- */
 
 public class AlarmService extends IntentService {
 

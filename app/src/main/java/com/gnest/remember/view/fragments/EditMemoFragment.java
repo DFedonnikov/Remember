@@ -36,7 +36,7 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.gnest.remember.R;
-import com.gnest.remember.model.services.AlarmReceiver;
+import com.gnest.remember.services.AlarmReceiver;
 import com.gnest.remember.presenter.EditMemoPresenter;
 import com.gnest.remember.presenter.IEditMemoPresenter;
 import com.gnest.remember.view.adapters.ColorSpinnerAdapter;
