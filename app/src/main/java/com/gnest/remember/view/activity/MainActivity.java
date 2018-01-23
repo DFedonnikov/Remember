@@ -1,14 +1,11 @@
 package com.gnest.remember.view.activity;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,19 +14,10 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.gnest.remember.R;
-import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.view.fragments.ArchiveItemFragment;
 import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.model.services.AlarmService;
-
-import io.realm.Realm;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subjects.BehaviorSubject;
-
 
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
@@ -103,41 +91,16 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        checkRunFromNotification(); //To be executed if activity launched from notification
+    }
 
-        //To be executed if activity launched from notification
+    private void checkRunFromNotification() {
         Intent intent = getIntent();
         if (intent != null) {
             long id = intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
+            intent.removeExtra(AlarmService.NOTIFICATION_MEMO_ID);
             if (itemFragment != null && id != -1) {
-                BehaviorSubject<Boolean> dataLoadedSubject = itemFragment.getDataLodingSubject();
-                BehaviorSubject<Boolean> childrenLayoutCompleteSubject = itemFragment.getLayoutManager().getChildrenLayoutCompleteSubject();
-
-                dataLoadedSubject
-                        .distinctUntilChanged(dataLoaded -> dataLoaded)
-                        .zipWith(childrenLayoutCompleteSubject.distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
-                        .subscribeOn(Schedulers.computation())
-                        .flatMap(pair -> {
-                            Realm realm = null;
-                            try {
-                                realm = Realm.getDefaultInstance();
-                                return Observable.from(realm.where(Memo.class)
-                                        .findAllSortedAsync(MemoRealmFields.POSITION));
-                            } finally {
-                                if (realm != null) {
-                                    realm.close();
-                                }
-                            }
-                        })
-                        .filter(clickableMemo -> clickableMemo.getId() == id)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(clickableMemo -> {
-                            itemFragment.getLayoutManager().openItem(clickableMemo.getPosition());
-                            itemFragment.shutdownMemoAlarm(clickableMemo.getPosition());
-                            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                            if (notificationManager != null) {
-                                notificationManager.cancel(clickableMemo.getId());
-                            }
-                        });
+                itemFragment.openFromNotification(id);
             }
         }
     }
