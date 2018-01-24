@@ -40,6 +40,7 @@
                 android:paddingTop="10dp"
                 android:typeface="monospace"
                 android:textColorLink="@color/urlLinkColor"
+                android:textSize="16sp"
                 tools:text="123" />
         </LinearLayout>
     </ScrollView>
