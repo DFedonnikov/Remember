@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.gnest.remember.App;
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
@@ -43,6 +44,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         this.mListener = onItemSelectedListener;
         mTextView.setOnClickListener(view -> mListener.onItemClicked(mPosition, mMemo, SelectableViewHolder.this));
         mTextView.setOnLongClickListener(view -> mListener.onItemLongClicked(mPosition, mMemo, SelectableViewHolder.this));
+        mTextView.setTypeface(App.FONT);
     }
 
     @Override
@@ -107,7 +109,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
             } else {
                 setDeselectedState();
             }
-            mTextView.setMaxLines(5);
+            mTextView.setMaxLines(4);
             mScrollView.setEnabled(false);
         }
     }
