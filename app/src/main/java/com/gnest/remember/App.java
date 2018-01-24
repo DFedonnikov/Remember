@@ -2,6 +2,7 @@ package com.gnest.remember;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Typeface;
 
 import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.model.db.migration.RealmMigration;
@@ -16,6 +17,9 @@ public class App extends Application {
 
     private static App sSelf;
 
+    public static final String FONT_PATH = "fonts/CaviarDreams.ttf";
+    public static Typeface FONT = Typeface.DEFAULT;
+
     public static final Map<String, RealmConfiguration> REALM_CONFIG_MAP = new HashMap<>();
 
     @Override
@@ -24,6 +28,7 @@ public class App extends Application {
         sSelf = this;
         Realm.init(this);
         configRealm();
+        FONT = Typeface.createFromAsset(getAssets(), FONT_PATH);
     }
 
     private void configRealm() {
