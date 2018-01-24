@@ -35,6 +35,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.gnest.remember.App;
 import com.gnest.remember.R;
 import com.gnest.remember.services.AlarmReceiver;
 import com.gnest.remember.presenter.EditMemoPresenter;
@@ -126,6 +127,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
                 hideKeyboard(v);
             }
         });
+        mMemoEditTextView.setTypeface(App.FONT);
         mRemoveAlert.setOnClickListener(view -> {
             presenter.processRemoveAlarm(alarmRemoveText);
             setAlarmVisibility(false);
