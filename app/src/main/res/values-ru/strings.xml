@@ -10,6 +10,7 @@
     <string name="archive">Архив</string>
     <string name="drawer_item_add">Добавить заметку</string>
     <string name="drawer_item_actions">Действия</string>
+    <string name="settings">Настройки</string>
     <string name="btn_archive">Архивировать</string>
     <string name="btn_unarchive">Разархивировать</string>
     <string name="note_archived_message">заметка архивирована</string>
@@ -22,10 +23,12 @@
     <string name="note_removed_message_1">заметки удалены</string>
     <string name="note_removed_message_2">заметок удалено</string>
     <string name="notification_title">Вы хотели, чтобы я вам напомнил о&#8230;</string>
+    <string name="sound_preference_title">Звук уведомления</string>
+    <string name="font_size_preference_title">Размер шрифта</string>
     <string-array name="memo_colors">
         <item>Желтый</item>
         <item>Голубой</item>
-        <item>Оливковый</item>
+        <item>Изумрудный</item>
         <item>Пурпур</item>
     </string-array>
 </resources>

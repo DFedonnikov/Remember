@@ -18,6 +18,7 @@
     <string name="send_memo_intent_title">Send Memo&#8230;,</string>
     <string name="notes">Notes</string>
     <string name="archive">Archive</string>
+    <string name="settings">Settings</string>
     <string name="nav_open_drawer">open drawer</string>
     <string name="nav_close_drawer">close drawer</string>
     <string name="drawer_item_add">Add note</string>
@@ -33,10 +34,30 @@
     <string name="note_removed_message_1">notes has been removed</string>
     <string name="note_removed_message_2">notes has been removed</string>
     <string name="notification_title">You wanted me to remind you about&#8230;</string>
+    <string name="notification_default_value">content://settings/system/notification_sound</string>
+    <string name="sound_preference_title">Notification sound</string>
+    <string name="font_size_preference_title">Font size</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>
-        <item>Olive</item>
+        <item>Emerald</item>
         <item>Purple</item>
     </string-array>
+    <string-array name="font_size">
+        <item>12</item>
+        <item>14</item>
+        <item>16</item>
+        <item>18</item>
+        <item>20</item>
+        <item>22</item>
+        <item>24</item>
+        <item>26</item>
+    </string-array>
+    <integer-array name="numOfLines">
+        <item>8</item>
+        <item>7</item>
+        <item>6</item>
+        <item>5</item>
+        <item>4</item>
+    </integer-array>
 </resources>

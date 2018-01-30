@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:defaultValue="@string/notification_default_value"
+        android:key="notification_sound"
+        android:ringtoneType="notification"
+        android:title="@string/sound_preference_title"
+        />
+
+    <ListPreference
+        android:defaultValue="16"
+        android:entries="@array/font_size"
+        android:entryValues="@array/font_size"
+        android:key="font_size"
+        android:title="@string/font_size_preference_title"
+        />
+</PreferenceScreen>
