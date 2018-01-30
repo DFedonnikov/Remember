@@ -128,6 +128,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
             }
         });
         mMemoEditTextView.setTypeface(App.FONT);
+        mMemoEditTextView.setTextSize(App.FONT_SIZE);
         mRemoveAlert.setOnClickListener(view -> {
             presenter.processRemoveAlarm(alarmRemoveText);
             setAlarmVisibility(false);
