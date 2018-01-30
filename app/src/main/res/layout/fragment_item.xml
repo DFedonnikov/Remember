@@ -32,15 +32,15 @@
                 android:id="@+id/memo_textView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:ellipsize="end"
                 android:fontFamily="casual"
-                android:maxLines="5"
-                android:paddingBottom="30dp"
                 android:paddingEnd="10dp"
                 android:paddingStart="8dp"
-                android:paddingTop="10dp"
-                android:typeface="monospace"
+                android:paddingTop="14dp"
+                android:textColor="@android:color/black"
                 android:textColorLink="@color/urlLinkColor"
                 android:textSize="16sp"
+                android:typeface="monospace"
                 tools:text="123" />
         </LinearLayout>
     </ScrollView>
