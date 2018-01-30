@@ -18,7 +18,7 @@ public class ColorSpinnerAdapter implements SpinnerAdapter {
     public enum Colors {
         YELLOW(R.color.memo_yellow, R.drawable.textview_background_yellow, R.drawable.textview_background_select_yellow, R.drawable.textview_background_yellow_expanded),
         BLUE(R.color.memo_blue, R.drawable.textview_background_blue, R.drawable.textview_background_select_blue, R.drawable.textview_background_blue_expanded),
-        OLIVE(R.color.memo_olive, R.drawable.textview_background_olive, R.drawable.textview_background_select_olive, R.drawable.textview_background_olive_expanded),
+        OLIVE(R.color.memo_olive, R.drawable.textview_background_olive, R.drawable.textview_background_select_emerald, R.drawable.textview_background_olive_expanded),
         PURPLE(R.color.memo_purple, R.drawable.textview_background_purple, R.drawable.textview_background_select_purple, R.drawable.textview_background_purple_expanded);
 
         private int mColorId;
