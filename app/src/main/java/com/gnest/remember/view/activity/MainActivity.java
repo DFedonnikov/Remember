@@ -228,21 +228,12 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.drawer_item_notes:
-                if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.saveMemo(true);
-                }
                 insertItemFragment(null);
                 break;
             case R.id.drawer_item_archive:
-                if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.saveMemo(true);
-                }
                 insertArchiveFragment();
                 break;
             case R.id.drawer_item_add:
-                if (editMemoFragment != null && editMemoFragment.isVisible()) {
-                    editMemoFragment.saveMemo(true);
-                }
                 onAddButtonPressed();
                 break;
             case R.id.drawer_settings:
@@ -250,6 +241,10 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             default:
                 return false;
+        }
+
+        if (editMemoFragment != null && editMemoFragment.isVisible()) {
+            editMemoFragment.saveMemo(true);
         }
 
         if (drawerLayout != null) {
