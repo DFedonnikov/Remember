@@ -1,7 +1,9 @@
 package com.gnest.remember.view.adapters;
 
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.util.Patterns;
@@ -11,6 +13,9 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.gnest.remember.App;
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
@@ -26,9 +31,10 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     private OnItemSelectedListener mListener;
     private Memo mMemo;
     private int mPosition = 0;
-    private int mTextViewBackgroundSelectedId;
-    private int mTextViewBackgroundExpandedId;
-    private int mTextViewBackgroundId;
+    private int mBackgroundId;
+    private int mBackgroundSelectedId;
+    private int mBackgroundExpandedId;
+    private SimpleTarget<Drawable> memoBackgroundTarget;
 
     @BindView(R.id.memo_textView)
     TextView mTextView;
@@ -42,26 +48,37 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         ButterKnife.bind(this, itemView);
         mView = itemView;
         this.mListener = onItemSelectedListener;
+        this.memoBackgroundTarget = getTarget(mView);
+        Glide.with(App.self()).load(R.drawable.imageview_pin).into(pin);
         mTextView.setOnClickListener(view -> mListener.onItemClicked(mPosition, mMemo, SelectableViewHolder.this));
         mTextView.setOnLongClickListener(view -> mListener.onItemLongClicked(mPosition, mMemo, SelectableViewHolder.this));
         mTextView.setTypeface(App.FONT);
         mTextView.setTextSize(App.FONT_SIZE);
     }
 
+    private SimpleTarget<Drawable> getTarget(View view) {
+        return new SimpleTarget<Drawable>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                view.setBackground(resource);
+            }
+        };
+    }
+
     @Override
     public void setSelectedState() {
-        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundSelectedId));
+        Glide.with(App.self()).load(mBackgroundSelectedId).into(memoBackgroundTarget);
         pin.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDeselectedState() {
-        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundId));
+        Glide.with(App.self()).load(mBackgroundId).into(memoBackgroundTarget);
         pin.setVisibility(View.VISIBLE);
     }
 
     private void setDeselectedAndExpandedState() {
-        mView.setBackground(ContextCompat.getDrawable(mView.getContext(), mTextViewBackgroundExpandedId));
+        Glide.with(App.self()).load(mBackgroundExpandedId).into(memoBackgroundTarget);
         pin.setVisibility(View.INVISIBLE);
     }
 
@@ -83,9 +100,9 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     private void setUpBackgroundColors(String memoColor) {
         ColorSpinnerAdapter.Colors color = ColorSpinnerAdapter.Colors.valueOf(memoColor);
-        mTextViewBackgroundId = color.getMemoBackgroundId();
-        mTextViewBackgroundSelectedId = color.getMemoBackgroundSelectedId();
-        mTextViewBackgroundExpandedId = color.getMemoBackgroundExpandedId();
+        mBackgroundId = color.getMemoBackgroundId();
+        mBackgroundSelectedId = color.getMemoBackgroundSelectedId();
+        mBackgroundExpandedId = color.getMemoBackgroundExpandedId();
     }
 
     /*

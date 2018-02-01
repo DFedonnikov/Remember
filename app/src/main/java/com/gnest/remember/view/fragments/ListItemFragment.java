@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -27,9 +28,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.gnest.remember.R;
 
 import com.gnest.remember.model.db.data.Memo;
@@ -72,6 +77,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
 
+    @BindView(R.id.items_fragment)
+    LinearLayout layout;
     @BindView(R.id.memo_list)
     RecyclerView recyclerView;
     @BindView(R.id.ItemFragmentToolbar)
@@ -136,9 +143,14 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         popupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
         unbinder = ButterKnife.bind(this, mView);
         drawerLayout = getActivity().findViewById(R.id.drawer_layout);
-
         cancel = popupLayout.findViewById(R.id.btn_cancel_dismiss);
         cancelMessage = popupLayout.findViewById(R.id.cancelText);
+        Glide.with(this).load(R.drawable.itemfragment_background_pin_board).into(new SimpleTarget<Drawable>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                layout.setBackground(resource);
+            }
+        });
         return mView;
     }
 

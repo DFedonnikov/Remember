@@ -1,8 +1,10 @@
 package com.gnest.remember.view.activity;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,7 +15,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.gnest.remember.R;
 import com.gnest.remember.view.fragments.ArchiveItemFragment;
 import com.gnest.remember.view.fragments.EditMemoFragment;
@@ -21,10 +27,19 @@ import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.fragments.SettingsFragment;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
         ListItemFragment.OnListItemFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener, NavigationView.OnNavigationItemSelectedListener {
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+
+    @BindView(R.id.navigation_view)
+    NavigationView navigationView;
 
     private static final String EDIT_FRAGMENT_NAME = "Edit";
     private static final String ARCHIVE_FRAGMENT_NAME = "Archive";
@@ -40,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements
     private EditMemoFragment editMemoFragment;
     private ArchiveItemFragment archiveFragment;
     private SettingsFragment settingsFragment;
-    private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private static int COLUMNS;
     private static int MEMO_SIZE_PX;
@@ -50,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         calculateColumnsAndMemoSize();
         configureDrawer();
@@ -93,12 +108,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void configureDrawer() {
-        drawerLayout = findViewById(R.id.drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.nav_open_drawer, R.string.nav_close_drawer);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
-
-        NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+        ImageView headerImageView = navigationView.getHeaderView(0).findViewById(R.id.navigation_header_image);
+        Glide.with(this).load(R.drawable.nav_bar).into(new SimpleTarget<Drawable>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                headerImageView.setBackground(resource);
+            }
+        });
     }
 
     @Override
