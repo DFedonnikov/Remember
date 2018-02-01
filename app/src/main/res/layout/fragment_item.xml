@@ -8,7 +8,6 @@
     android:layout_marginEnd="16dp"
     android:layout_marginStart="16dp"
     android:layout_marginTop="8dp"
-    android:background="@drawable/textview_background_yellow"
     android:orientation="vertical">
 
     <ScrollView
@@ -36,7 +35,7 @@
                 android:fontFamily="casual"
                 android:paddingEnd="10dp"
                 android:paddingStart="8dp"
-                android:paddingTop="14dp"
+                android:paddingTop="8dp"
                 android:textColor="@android:color/black"
                 android:textColorLink="@color/urlLinkColor"
                 android:textSize="16sp"
@@ -48,15 +47,14 @@
     <ImageView
         android:id="@+id/pin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_height="25dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:contentDescription="@string/pin_descr"
-        android:scaleType="center"
-        android:src="@drawable/imageview_pin"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.471"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 

@@ -8,6 +8,7 @@
 
 
     <ImageView
+        android:id="@+id/navigation_header_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -15,7 +16,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/nav_bar"
         android:contentDescription="@string/iv_ct_drawer_header_image"
         />
 </android.support.constraint.ConstraintLayout>
