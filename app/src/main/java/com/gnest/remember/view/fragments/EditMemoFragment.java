@@ -96,9 +96,11 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     public static EditMemoFragment newInstance(Bundle bundle) {
         EditMemoFragment fragment = new EditMemoFragment();
-        if (bundle != null) {
-            fragment.setArguments(bundle);
+        if (bundle == null) {
+            bundle = new Bundle();
+            bundle.putInt(MEMO_ID_KEY, -1);
         }
+        fragment.setArguments(bundle);
         return fragment;
     }
 
