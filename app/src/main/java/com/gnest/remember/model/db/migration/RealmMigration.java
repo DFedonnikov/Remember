@@ -22,15 +22,8 @@ public class RealmMigration implements io.realm.RealmMigration {
                     .addField(MemoRealmFields.COLOR, String.class)
                     .addField(MemoRealmFields.IS_ALARM_SET, boolean.class)
                     .addField(MemoRealmFields.IS_SELECTED, boolean.class)
-                    .addField(MemoRealmFields.IS_EXPANDED, boolean.class);
-
-            oldVersion++;
-        }
-        if (oldVersion == 1) {
-            schema.get(MemoRealmFields.SCHEMA_NAME)
+                    .addField(MemoRealmFields.IS_EXPANDED, boolean.class)
                     .addField(MemoRealmFields.ALARM_DATE, long.class);
-
-            oldVersion++;
         }
     }
 }

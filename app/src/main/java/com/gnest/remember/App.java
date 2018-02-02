@@ -49,13 +49,13 @@ public class App extends Application {
     private void configRealm() {
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .name(MemoRealmFields.DEFAULT_CONFIG_NAME)
-                .schemaVersion(2)
+                .schemaVersion(1)
                 .migration(new RealmMigration())
                 .build();
         Realm.setDefaultConfiguration(config);
         RealmConfiguration archive = new RealmConfiguration.Builder()
                 .name(MemoRealmFields.ARCHIVE_CONFIG_NAME)
-                .schemaVersion(2)
+                .schemaVersion(1)
                 .migration(new RealmMigration())
                 .build();
         REALM_CONFIG_MAP.put(MemoRealmFields.DEFAULT_CONFIG_NAME, config);
