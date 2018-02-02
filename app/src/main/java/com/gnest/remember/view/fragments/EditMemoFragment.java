@@ -42,7 +42,7 @@ import com.gnest.remember.presenter.IEditMemoPresenter;
 import com.gnest.remember.view.adapters.ColorSpinnerAdapter;
 import com.gnest.remember.view.IEditMemoView;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
-import com.hannesdorfmann.mosby.mvp.MvpFragment;
+import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -90,22 +90,26 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     private DrawerLayout mDrawerLayout;
 
-    private int mMemoId = -1;
+    private int mMemoId;
     private String mColor;
     private OnEditMemoFragmentInteractionListener mListener;
 
-    public static EditMemoFragment newInstance() {
-        return new EditMemoFragment();
+    public static EditMemoFragment newInstance(Bundle bundle) {
+        EditMemoFragment fragment = new EditMemoFragment();
+        if (bundle != null) {
+            fragment.setArguments(bundle);
+        }
+        return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         if (getArguments() != null) {
             Bundle arguments = getArguments();
-            mMemoId = arguments.getInt(MEMO_ID_KEY);
+            mMemoId = arguments.getInt(MEMO_ID_KEY, -1);
         }
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override

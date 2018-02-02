@@ -1,5 +1,6 @@
 package com.gnest.remember.presenter;
 
+import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 
@@ -9,7 +10,7 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
-import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
+import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,16 +37,16 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void attachView(IListFragmentView view) {
+    public void attachView(@NonNull IListFragmentView view) {
         model.openDB();
         super.attachView(view);
     }
 
     @Override
-    public void detachView(boolean retainInstance) {
+    public void detachView() {
         model.closeDB();
         compositeSubscription.unsubscribe();
-        super.detachView(retainInstance);
+        super.detachView();
     }
 
     @Override
@@ -54,144 +55,134 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(RealmResults::isLoaded)
                 .first()
-                .subscribe(memos -> {
-                    if (isViewAttached()) {
-                        getView().setData(memos);
-                    }
-                });
+                .subscribe(memos -> ifViewAttached(view -> view.setData(memos)));
         compositeSubscription.add(getDataSubscription);
     }
 
     @Override
     public void processDeleteSelectedMemos(Collection<Integer> selectedIds) {
-        if (isViewAttached()) {
+        ifViewAttached(view -> {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription removeSelectedSubscription = model.deleteSelected(selectedIds)
-                    .zipWith(getView().showConfirmRemovePopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .zipWith(view.showConfirmRemovePopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
-                        if (isViewAttached()) {
-                            getView().getAdapter().clearSelectedList();
-                            shutDownActionMode();
-                        }
+                        view.getAdapter().clearSelectedList();
+                        shutDownActionMode();
                     })
                     .subscribe(cancelMemoPair -> {
-                        if (isViewAttached() && cancelMemoPair.first != null && cancelMemoPair.second != null) {
+                        if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
+
                             for (Memo processed : cancelMemoPair.second) {
                                 if (!cancelMemoPair.first) {
                                     removeAlarmNotification(processed.getId(), processed.isAlarmSet());
                                 } else {
                                     model.revertDeleteMemo(processed);
-                                    getView().getAdapter().notifyDataSetChanged();
+                                    view.getAdapter().notifyDataSetChanged();
                                 }
                             }
                         }
                     });
             compositeSubscription.add(removeSelectedSubscription);
-        }
+        });
     }
 
     @Override
     public void processSwipeDismiss(int memoId, int memoPosition) {
-        if (isViewAttached()) {
+        ifViewAttached(view -> {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription confirmDismissSubscription = model.moveBetweenRealms(Collections.singletonList(memoId))
-                    .zipWith(getView().showConfirmArchiveActionPopup(subject, 1), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .zipWith(view.showConfirmArchiveActionPopup(subject, 1), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
-                        if (isViewAttached()) {
-                            getView().getAdapter().notifyItemRemoved(memoPosition);
-                            getView().getAdapter().notifyItemRangeChanged(memoPosition, getView().getAdapter().getItemCount() > 1 ? 1 : 0);
-                            shutDownActionMode();
-                        }
+                        view.getAdapter().notifyItemRemoved(memoPosition);
+                        view.getAdapter().notifyItemRangeChanged(memoPosition, view.getAdapter().getItemCount() > 1 ? 1 : 0);
+                        shutDownActionMode();
                     })
                     .subscribe(cancelMemoPair -> {
-                        if (isViewAttached() && cancelMemoPair.first != null && cancelMemoPair.second != null) {
+                        if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
                             for (Memo processed : cancelMemoPair.second) {
                                 if (!cancelMemoPair.first) {
                                     removeAlarmNotification(processed.getId(), processed.isAlarmSet());
                                 } else {
                                     model.revertArchived(processed);
-                                    getView().getAdapter().notifyDataSetChanged();
+                                    view.getAdapter().notifyDataSetChanged();
                                 }
                             }
                         }
                     });
             compositeSubscription.add(confirmDismissSubscription);
-        }
+        });
     }
 
     @Override
     public void processArchiveActionOnSelected(Collection<Integer> selectedIds) {
-        if (isViewAttached()) {
+        ifViewAttached(view -> {
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription confirmArchiveSubscription = model.moveBetweenRealms(selectedIds)
-                    .zipWith(getView().showConfirmArchiveActionPopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
+                    .zipWith(view.showConfirmArchiveActionPopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
-                        if (isViewAttached()) {
-                            getView().getAdapter().clearSelectedList();
-                            shutDownActionMode();
-                        }
+                        view.getAdapter().clearSelectedList();
+                        shutDownActionMode();
                     })
                     .subscribe(cancelMemoPair -> {
-                        if (isViewAttached() && cancelMemoPair.first != null && cancelMemoPair.second != null) {
+                        if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
                             for (Memo processed : cancelMemoPair.second) {
                                 if (!cancelMemoPair.first) {
                                     removeAlarmNotification(processed.getId(), processed.isAlarmSet());
                                 } else {
                                     model.revertArchived(processed);
-                                    getView().getAdapter().notifyDataSetChanged();
+                                    view.getAdapter().notifyDataSetChanged();
                                 }
                             }
                         }
                     });
             compositeSubscription.add(confirmArchiveSubscription);
-        }
+        });
     }
 
     @Override
     public void processShare(Collection<Integer> selectedIds) {
-        if (selectedIds.size() == 1) {
-            Memo memo = model.getMemoById(selectedIds.iterator().next());
-            if (memo != null && isViewAttached()) {
-                getView().shareMemoText(memo.getMemoText());
+        ifViewAttached(view -> {
+            if (selectedIds.size() == 1) {
+                Memo memo = model.getMemoById(selectedIds.iterator().next());
+                if (memo != null) {
+                    view.shareMemoText(memo.getMemoText());
+                }
             }
-        }
+        });
     }
 
     @Override
     public void processOpenFromNotification(long id) {
-        if (isViewAttached()) {
-            getView().getDataLoadedSubject()
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .distinctUntilChanged(dataLoaded -> dataLoaded)
-                    .zipWith(getComputingLayoutOrScrollingSubject().distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
-                    .map(subjectsCompletedPair -> model.getMemoById((int) id))
-                    .subscribe(memo -> {
-                        MyGridLayoutManager manager = getView().getLayoutManager();
-                        MySelectableAdapter adapter = getView().getAdapter();
-                        manager.setSpanCount(1);
-                        adapter.expandItems();
-                        manager.setOrientation(HORIZONTAL);
-                        manager.scrollToPositionWithOffset(memo.getPosition(), 0);
-                        model.setMemoAlarmFalse(memo.getId());
-                        getView().closeNotification(memo.getId());
-                    });
-        }
+        ifViewAttached(view ->
+                view.getDataLoadedSubject()
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .distinctUntilChanged(dataLoaded -> dataLoaded)
+                        .zipWith(getComputingLayoutOrScrollingSubject(view).distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
+                        .map(subjectsCompletedPair -> model.getMemoById((int) id))
+                        .subscribe(memo -> {
+                            MyGridLayoutManager manager = view.getLayoutManager();
+                            MySelectableAdapter adapter = view.getAdapter();
+                            manager.setSpanCount(1);
+                            adapter.expandItems();
+                            manager.setOrientation(HORIZONTAL);
+                            manager.scrollToPositionWithOffset(memo.getPosition(), 0);
+                            model.setMemoAlarmFalse(memo.getId());
+                            view.closeNotification(memo.getId());
+                        }));
     }
 
-    private Observable<Boolean> getComputingLayoutOrScrollingSubject() {
+    private Observable<Boolean> getComputingLayoutOrScrollingSubject(IListFragmentView view) {
         BehaviorSubject<Boolean> computingLayoutOrScrollingSubject = BehaviorSubject.create();
         Subscription subscription = Observable.timer(50, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-                    if (isViewAttached()) {
-                        RecyclerView recyclerView = getView().getRecyclerView();
-                        if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE
-                                && !recyclerView.isComputingLayout()) {
-                            computingLayoutOrScrollingSubject.onNext(true);
-                            computingLayoutOrScrollingSubject.onCompleted();
-                        }
+                    RecyclerView recyclerView = view.getRecyclerView();
+                    if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE
+                            && !recyclerView.isComputingLayout()) {
+                        computingLayoutOrScrollingSubject.onNext(true);
+                        computingLayoutOrScrollingSubject.onCompleted();
                     }
                 });
         compositeSubscription.add(subscription);
@@ -205,20 +196,18 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void processSingleChoiceClick(Memo memo, int verticalOrientationCode) {
-        if (isViewAttached()) {
-            IListFragmentView view = getView();
+        ifViewAttached(view -> {
             if (view.getLayoutManager().getOrientation() == verticalOrientationCode) {
                 view.getLayoutManager().openItem(memo.getPosition());
             } else {
                 view.getInteractionListener().onEnterEditMode(memo.getId());
             }
-        }
+        });
     }
 
     @Override
     public void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode, int spanCount) {
-        if (isViewAttached()) {
-            IListFragmentView view = getView();
+        ifViewAttached(view -> {
             MyGridLayoutManager manager = view.getLayoutManager();
             if (manager.getOrientation() == horizontalOrientationCode) {
                 manager.setOrientation(verticalOrientationCode);
@@ -228,18 +217,21 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
             } else {
                 view.getInteractionListener().onBackButtonPressed();
             }
-        }
+        });
     }
 
     private void shutDownActionMode() {
-        if (isViewAttached() && getView().getActionMode() != null) {
-            getView().getActionMode().finish();
-        }
+        ifViewAttached(view -> {
+            if (view.getActionMode() != null)
+                view.getActionMode().finish();
+        });
     }
 
     private void removeAlarmNotification(int memoId, boolean isAlarmSet) {
-        if (isViewAttached() && isAlarmSet) {
-            getView().removeAlarm(memoId);
-        }
+        ifViewAttached(view -> {
+            if (isAlarmSet) {
+                view.removeAlarm(memoId);
+            }
+        });
     }
 }

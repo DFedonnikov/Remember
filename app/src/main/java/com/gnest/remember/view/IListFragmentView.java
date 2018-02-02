@@ -7,7 +7,7 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
-import com.hannesdorfmann.mosby.mvp.MvpView;
+import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 import io.realm.RealmResults;
 import rx.Observable;

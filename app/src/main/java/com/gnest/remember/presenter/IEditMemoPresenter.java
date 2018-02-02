@@ -1,7 +1,7 @@
 package com.gnest.remember.presenter;
 
 import com.gnest.remember.view.IEditMemoView;
-import com.hannesdorfmann.mosby.mvp.MvpPresenter;
+import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 
 import java.util.Calendar;
 import java.util.Date;

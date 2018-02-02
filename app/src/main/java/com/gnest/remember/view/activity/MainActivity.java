@@ -164,10 +164,7 @@ public class MainActivity extends AppCompatActivity implements
         if (fragmentClass.equals(ArchiveItemFragment.class)) {
             fragment = mArchiveFragment = ArchiveItemFragment.newInstance(sColumns, sMemoSizePx, sMarginsPx);
         } else if (fragmentClass.equals(EditMemoFragment.class)) {
-            fragment = mEditMemoFragment = EditMemoFragment.newInstance();
-            if (bundle != null) {
-                mEditMemoFragment.setArguments(bundle);
-            }
+            fragment = mEditMemoFragment = EditMemoFragment.newInstance(bundle);
         } else if (fragmentClass.equals(SettingsFragment.class)) {
             fragment = mSettingsFragment = SettingsFragment.newInstance();
         } else {

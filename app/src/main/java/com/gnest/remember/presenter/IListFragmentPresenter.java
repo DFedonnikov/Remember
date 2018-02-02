@@ -2,7 +2,7 @@ package com.gnest.remember.presenter;
 
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
-import com.hannesdorfmann.mosby.mvp.MvpPresenter;
+import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 
 import java.util.Collection;
 

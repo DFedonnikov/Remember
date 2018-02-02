@@ -1,6 +1,5 @@
 package com.gnest.remember.view.fragments;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -49,7 +48,7 @@ import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.menu.ActionMenu;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
-import com.hannesdorfmann.mosby.mvp.MvpFragment;
+import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
