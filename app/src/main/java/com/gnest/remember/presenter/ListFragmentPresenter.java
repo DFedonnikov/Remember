@@ -45,8 +45,14 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     @Override
     public void detachView() {
         model.closeDB();
-        compositeSubscription.unsubscribe();
+        compositeSubscription.clear();
         super.detachView();
+    }
+
+    @Override
+    public void destroy() {
+        compositeSubscription.unsubscribe();
+        super.destroy();
     }
 
     @Override

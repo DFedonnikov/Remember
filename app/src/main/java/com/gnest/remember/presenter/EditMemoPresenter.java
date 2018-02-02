@@ -40,8 +40,14 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     @Override
     public void detachView() {
         mModel.closeDB();
-        mSubscriptions.unsubscribe();
+        mSubscriptions.clear();
         super.detachView();
+    }
+
+    @Override
+    public void destroy() {
+        mSubscriptions.unsubscribe();
+        super.destroy();
     }
 
     @Override
