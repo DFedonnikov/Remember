@@ -2,9 +2,6 @@ package com.gnest.remember.view.helper;
 
 import android.support.v7.widget.RecyclerView;
 
-/**
- * Created by DFedonnikov on 12.07.2017.
- */
 
 public interface ItemTouchHelperAdapter {
     /**

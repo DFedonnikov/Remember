@@ -18,10 +18,10 @@ public class EditMemoModelImpl implements IEditMemoModel {
     private static Calendar sSelectedDate = Calendar.getInstance();
     private final BehaviorSubject<Boolean> dataSavedSubject = BehaviorSubject.create();
 
-    private Realm realm;
+    private Realm mRealm;
     private int mMemoId;
     private boolean isNew;
-    private boolean wasAlarmSet;
+    private boolean isAlarmPreviouslySet;
     private boolean isAlarmSet;
 
 
@@ -33,25 +33,25 @@ public class EditMemoModelImpl implements IEditMemoModel {
 
     @Override
     public void openDB() {
-        realm = Realm.getDefaultInstance();
+        mRealm = Realm.getDefaultInstance();
     }
 
     @Override
     public void closeDB() {
-        realm.close();
+        mRealm.close();
     }
 
     @Override
     public Memo getData() {
         Memo memo = getEditedMemo();
-        wasAlarmSet = memo.isAlarmSet();
+        isAlarmPreviouslySet = memo.isAlarmSet();
         sSelectedDate.setTimeInMillis(memo.getAlarmDate());
         return memo;
     }
 
     @Override
     public Memo getEditedMemo() {
-        return realm.where(Memo.class)
+        return mRealm.where(Memo.class)
                 .equalTo(MemoRealmFields.ID, mMemoId)
                 .findFirst();
     }
@@ -73,7 +73,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
                     {
                         if (isNew) {
                             int id = -1;
-                            Number idNumber = realm.where(Memo.class)
+                            Number idNumber = mRealm.where(Memo.class)
                                     .max(MemoRealmFields.ID);
                             if (idNumber != null) {
                                 id = idNumber.intValue();
@@ -88,7 +88,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
     }
 
     private void insertNewMemo(String memoText, String memoColor) {
-        realm.executeTransactionAsync(realm1 -> {
+        mRealm.executeTransactionAsync(realm1 -> {
             int idMain = 0;
             int idArchived = 0;
             int position = 0;
@@ -119,7 +119,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
 
 
     private void updateMemo(String memoText, String memoColor) {
-        realm.executeTransactionAsync(realm1 -> {
+        mRealm.executeTransactionAsync(realm1 -> {
             Memo toUpdate = realm1.
                     where(Memo.class)
                     .equalTo(MemoRealmFields.ID, mMemoId)
@@ -127,12 +127,12 @@ public class EditMemoModelImpl implements IEditMemoModel {
             if (toUpdate != null) {
                 toUpdate.setMemoText(memoText);
                 toUpdate.setColor(memoColor);
-                if (isAlarmSet || wasAlarmSet) {
+                if (isAlarmSet || isAlarmPreviouslySet) {
                     toUpdate.setAlarmDate(sSelectedDate.getTimeInMillis());
                 } else {
                     toUpdate.setAlarmDate(-1);
                 }
-                toUpdate.setAlarm(isAlarmSet || wasAlarmSet);
+                toUpdate.setAlarm(isAlarmSet || isAlarmPreviouslySet);
                 realm1.insertOrUpdate(toUpdate);
             }
         }, () -> dataSavedSubject.onNext(true));
@@ -149,8 +149,8 @@ public class EditMemoModelImpl implements IEditMemoModel {
     }
 
     @Override
-    public void setWasAlarmSet(boolean isSet) {
-        wasAlarmSet = isSet;
+    public void setIsAlarmPreviouslySet(boolean isSet) {
+        isAlarmPreviouslySet = isSet;
     }
 
     @Override

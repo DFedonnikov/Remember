@@ -34,12 +34,12 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     private int mBackgroundId;
     private int mBackgroundSelectedId;
     private int mBackgroundExpandedId;
-    private SimpleTarget<Drawable> memoBackgroundTarget;
+    private SimpleTarget<Drawable> mBackgroundTarget;
 
     @BindView(R.id.memo_textView)
-    TextView mTextView;
+    TextView textView;
     @BindView(R.id.textScrollView)
-    ScrollView mScrollView;
+    ScrollView scrollView;
     @BindView(R.id.pin)
     ImageView pin;
 
@@ -48,12 +48,12 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         ButterKnife.bind(this, itemView);
         mView = itemView;
         this.mListener = onItemSelectedListener;
-        this.memoBackgroundTarget = getTarget(mView);
+        this.mBackgroundTarget = getTarget(mView);
         Glide.with(App.self()).load(R.drawable.imageview_pin).into(pin);
-        mTextView.setOnClickListener(view -> mListener.onItemClicked(mPosition, mMemo, SelectableViewHolder.this));
-        mTextView.setOnLongClickListener(view -> mListener.onItemLongClicked(mPosition, mMemo, SelectableViewHolder.this));
-        mTextView.setTypeface(App.FONT);
-        mTextView.setTextSize(App.FONT_SIZE);
+        textView.setOnClickListener(view -> mListener.onItemClicked(mPosition, mMemo, SelectableViewHolder.this));
+        textView.setOnLongClickListener(view -> mListener.onItemLongClicked(mPosition, mMemo, SelectableViewHolder.this));
+        textView.setTypeface(App.FONT);
+        textView.setTextSize(App.FONT_SIZE);
     }
 
     private SimpleTarget<Drawable> getTarget(View view) {
@@ -67,18 +67,18 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     @Override
     public void setSelectedState() {
-        Glide.with(App.self()).load(mBackgroundSelectedId).into(memoBackgroundTarget);
+        Glide.with(App.self()).load(mBackgroundSelectedId).into(mBackgroundTarget);
         pin.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDeselectedState() {
-        Glide.with(App.self()).load(mBackgroundId).into(memoBackgroundTarget);
+        Glide.with(App.self()).load(mBackgroundId).into(mBackgroundTarget);
         pin.setVisibility(View.VISIBLE);
     }
 
     private void setDeselectedAndExpandedState() {
-        Glide.with(App.self()).load(mBackgroundExpandedId).into(memoBackgroundTarget);
+        Glide.with(App.self()).load(mBackgroundExpandedId).into(mBackgroundTarget);
         pin.setVisibility(View.INVISIBLE);
     }
 
@@ -110,17 +110,17 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     phone and etc instead of built-in LinkMovementMethod due to bug described in link above
     */
     private void setUpTextField(String memoText, boolean isExpanded, boolean isSelected) {
-        mTextView.setText(memoText);
+        textView.setText(memoText);
         if (Patterns.WEB_URL.matcher(memoText).find()
                 || Patterns.EMAIL_ADDRESS.matcher(memoText).find()
                 || Patterns.PHONE.matcher(memoText).find()) {
-            mTextView.setMovementMethod(BetterLinkMovementMethod.newInstance());
-            Linkify.addLinks(mTextView, Linkify.ALL);
+            textView.setMovementMethod(BetterLinkMovementMethod.newInstance());
+            Linkify.addLinks(textView, Linkify.ALL);
         }
         if (isExpanded) {
             setDeselectedAndExpandedState();
-            mTextView.setMaxLines(Integer.MAX_VALUE);
-            mScrollView.setEnabled(true);
+            textView.setMaxLines(Integer.MAX_VALUE);
+            scrollView.setEnabled(true);
         } else {
             if (isSelected) {
                 setSelectedState();
@@ -128,7 +128,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
                 setDeselectedState();
             }
             setMaxLinesOnFontSize(App.FONT_SIZE);
-            mScrollView.setEnabled(false);
+            scrollView.setEnabled(false);
         }
     }
 
@@ -153,7 +153,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
                 maxLines = numOfLines[4];
                 break;
         }
-        mTextView.setMaxLines(maxLines);
+        textView.setMaxLines(maxLines);
     }
 
     interface OnItemSelectedListener {

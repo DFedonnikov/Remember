@@ -2,10 +2,6 @@ package com.gnest.remember.view.helper;
 
 import android.support.v7.widget.helper.ItemTouchHelper;
 
-/**
- * Created by DFedonnikov on 16.07.2017.
- */
-
 public interface ItemTouchHelperViewHolder {
     /**
      * Called when the {@link ItemTouchHelper} first registers an item as being moved or swiped.

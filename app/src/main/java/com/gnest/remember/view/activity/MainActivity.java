@@ -51,14 +51,15 @@ public class MainActivity extends AppCompatActivity implements
     public static final int ITEM_MARGINS_DP = 12;
     public static final int MAX_MEMO_SIZE_DP = 180;
 
-    private ListItemFragment itemFragment;
-    private EditMemoFragment editMemoFragment;
-    private ArchiveItemFragment archiveFragment;
-    private SettingsFragment settingsFragment;
-    private ActionBarDrawerToggle actionBarDrawerToggle;
-    private static int COLUMNS;
-    private static int MEMO_SIZE_PX;
-    private static int MARGINS_PX;
+    private ListItemFragment mItemFragment;
+    private EditMemoFragment mEditMemoFragment;
+    private ArchiveItemFragment mArchiveFragment;
+    private SettingsFragment mSettingsFragment;
+    private ActionBarDrawerToggle mActionBarDrawerToggle;
+
+    private static int sColumns;
+    private static int sMemoSizePx;
+    private static int sMarginsPx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,17 +75,17 @@ public class MainActivity extends AppCompatActivity implements
             boolean isSettingsFragVisible = savedInstanceState.getBoolean(SETTINGS_FRAGMENT_VISIBILITY_KEY);
             FragmentManager manager = getSupportFragmentManager();
             if (isEditFragVisible) {
-                editMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAGMENT_NAME);
+                mEditMemoFragment = (EditMemoFragment) manager.getFragment(savedInstanceState, EDIT_FRAGMENT_NAME);
             } else if (isArchiveFragVisible) {
-                archiveFragment = (ArchiveItemFragment) manager.getFragment(savedInstanceState, ARCHIVE_FRAGMENT_NAME);
-                setDimenArgs(archiveFragment);
+                mArchiveFragment = (ArchiveItemFragment) manager.getFragment(savedInstanceState, ARCHIVE_FRAGMENT_NAME);
+                setDimenArgs(mArchiveFragment);
                 setTitle(R.string.archive);
             } else if (isSettingsFragVisible) {
-                settingsFragment = (SettingsFragment) manager.getFragment(savedInstanceState, SETTINGS_FRAGMENT_NAME);
+                mSettingsFragment = (SettingsFragment) manager.getFragment(savedInstanceState, SETTINGS_FRAGMENT_NAME);
                 setTitle(R.string.settings);
             } else {
-                itemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAGMENT_NAME);
-                setDimenArgs(itemFragment);
+                mItemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAGMENT_NAME);
+                setDimenArgs(mItemFragment);
                 setTitle(getString(R.string.notes));
             }
         } else {
@@ -94,22 +95,24 @@ public class MainActivity extends AppCompatActivity implements
 
     private <T extends Fragment> void setDimenArgs(T fragment) {
         Bundle args = fragment.getArguments();
-        args.putInt(ListItemFragment.ARG_COLUMN_COUNT, COLUMNS);
-        args.putInt(ListItemFragment.ARG_MEMO_SIZE, MEMO_SIZE_PX);
-        args.putInt(ListItemFragment.ARG_MEMO_MARGINS, MARGINS_PX);
+        if (args != null) {
+            args.putInt(ListItemFragment.ARG_COLUMN_COUNT, sColumns);
+            args.putInt(ListItemFragment.ARG_MEMO_SIZE, sMemoSizePx);
+            args.putInt(ListItemFragment.ARG_MEMO_MARGINS, sMarginsPx);
+        }
     }
 
     private void calculateColumnsAndMemoSize() {
         int screenWidthDP = getResources().getConfiguration().screenWidthDp;
-        COLUMNS = screenWidthDP / MAX_MEMO_SIZE_DP;
+        sColumns = screenWidthDP / MAX_MEMO_SIZE_DP;
         float density = getResources().getDisplayMetrics().density;
-        MEMO_SIZE_PX = (int) (((screenWidthDP - 2 * ITEM_MARGINS_DP * COLUMNS) / COLUMNS) * density + 0.5);
-        MARGINS_PX = (int) (ITEM_MARGINS_DP * density + 0.5);
+        sMemoSizePx = (int) (((screenWidthDP - 2 * ITEM_MARGINS_DP * sColumns) / sColumns) * density + 0.5);
+        sMarginsPx = (int) (ITEM_MARGINS_DP * density + 0.5);
     }
 
     private void configureDrawer() {
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.nav_open_drawer, R.string.nav_close_drawer);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        mActionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, findViewById(R.id.toolbar), R.string.nav_open_drawer, R.string.nav_close_drawer);
+        drawerLayout.addDrawerListener(mActionBarDrawerToggle);
         navigationView.setNavigationItemSelectedListener(this);
         ImageView headerImageView = navigationView.getHeaderView(0).findViewById(R.id.navigation_header_image);
         Glide.with(this).load(R.drawable.nav_bar).into(new SimpleTarget<Drawable>() {
@@ -131,8 +134,8 @@ public class MainActivity extends AppCompatActivity implements
         if (intent != null) {
             long id = intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
             intent.removeExtra(AlarmService.NOTIFICATION_MEMO_ID);
-            if (itemFragment != null && id != -1) {
-                itemFragment.openFromNotification(id);
+            if (mItemFragment != null && id != -1) {
+                mItemFragment.openFromNotification(id);
             }
         }
     }
@@ -159,18 +162,18 @@ public class MainActivity extends AppCompatActivity implements
     private <T extends Class<? extends Fragment>> void insertFragment(T fragmentClass, Bundle bundle) {
         Fragment fragment;
         if (fragmentClass.equals(ArchiveItemFragment.class)) {
-            fragment = archiveFragment = ArchiveItemFragment.newInstance(COLUMNS, MEMO_SIZE_PX, MARGINS_PX);
+            fragment = mArchiveFragment = ArchiveItemFragment.newInstance(sColumns, sMemoSizePx, sMarginsPx);
         } else if (fragmentClass.equals(EditMemoFragment.class)) {
-            fragment = editMemoFragment = EditMemoFragment.newInstance();
+            fragment = mEditMemoFragment = EditMemoFragment.newInstance();
             if (bundle != null) {
-                editMemoFragment.setArguments(bundle);
+                mEditMemoFragment.setArguments(bundle);
             }
         } else if (fragmentClass.equals(SettingsFragment.class)) {
-            fragment = settingsFragment = SettingsFragment.newInstance();
+            fragment = mSettingsFragment = SettingsFragment.newInstance();
         } else {
-            fragment = itemFragment = ListItemFragment.newInstance(COLUMNS, MEMO_SIZE_PX, MARGINS_PX);
-            if (bundle != null) {
-                itemFragment.getArguments().putBundle(ListItemFragment.BUNDLE_KEY, bundle);
+            fragment = mItemFragment = ListItemFragment.newInstance(sColumns, sMemoSizePx, sMarginsPx);
+            if (bundle != null && mItemFragment.getArguments() != null) {
+                mItemFragment.getArguments().putBundle(ListItemFragment.BUNDLE_KEY, bundle);
             }
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -189,13 +192,13 @@ public class MainActivity extends AppCompatActivity implements
     public void onBackPressed() {
         if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else if (itemFragment != null && itemFragment.isVisible()) {
-            itemFragment.onBackButtonPressed();
-        } else if (editMemoFragment != null && editMemoFragment.isVisible()) {
-            editMemoFragment.onBackButtonPressed();
-        } else if (archiveFragment != null && archiveFragment.isVisible()) {
-            archiveFragment.onBackButtonPressed();
-        } else if (settingsFragment != null && settingsFragment.isVisible()) {
+        } else if (mItemFragment != null && mItemFragment.isVisible()) {
+            mItemFragment.onBackButtonPressed();
+        } else if (mEditMemoFragment != null && mEditMemoFragment.isVisible()) {
+            mEditMemoFragment.onBackButtonPressed();
+        } else if (mArchiveFragment != null && mArchiveFragment.isVisible()) {
+            mArchiveFragment.onBackButtonPressed();
+        } else if (mSettingsFragment != null && mSettingsFragment.isVisible()) {
             insertItemFragment(null);
         }
     }
@@ -219,8 +222,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void syncDrawerToggleState() {
-        if (actionBarDrawerToggle != null) {
-            actionBarDrawerToggle.syncState();
+        if (mActionBarDrawerToggle != null) {
+            mActionBarDrawerToggle.syncState();
         }
     }
 
@@ -243,8 +246,8 @@ public class MainActivity extends AppCompatActivity implements
                 return false;
         }
 
-        if (editMemoFragment != null && editMemoFragment.isVisible()) {
-            editMemoFragment.saveMemo(true);
+        if (mEditMemoFragment != null && mEditMemoFragment.isVisible()) {
+            mEditMemoFragment.saveMemo(true);
         }
 
         if (drawerLayout != null) {
@@ -258,25 +261,25 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        boolean isEditFragmentVisible = editMemoFragment != null && editMemoFragment.isVisible();
-        boolean isArchiveFragmentVisible = archiveFragment != null && archiveFragment.isVisible();
-        boolean isSettingsFragmentVisible = settingsFragment != null && settingsFragment.isVisible();
+        boolean isEditFragmentVisible = mEditMemoFragment != null && mEditMemoFragment.isVisible();
+        boolean isArchiveFragmentVisible = mArchiveFragment != null && mArchiveFragment.isVisible();
+        boolean isSettingsFragmentVisible = mSettingsFragment != null && mSettingsFragment.isVisible();
         FragmentManager manager = getSupportFragmentManager();
         if (isEditFragmentVisible) {
-            manager.putFragment(outState, EDIT_FRAGMENT_NAME, editMemoFragment);
+            manager.putFragment(outState, EDIT_FRAGMENT_NAME, mEditMemoFragment);
         } else if (isArchiveFragmentVisible) {
-            manager.putFragment(outState, ARCHIVE_FRAGMENT_NAME, archiveFragment);
+            manager.putFragment(outState, ARCHIVE_FRAGMENT_NAME, mArchiveFragment);
         } else if (isSettingsFragmentVisible) {
-            manager.putFragment(outState, SETTINGS_FRAGMENT_NAME, settingsFragment);
+            manager.putFragment(outState, SETTINGS_FRAGMENT_NAME, mSettingsFragment);
         } else {
-            manager.putFragment(outState, ITEM_FRAGMENT_NAME, itemFragment);
+            manager.putFragment(outState, ITEM_FRAGMENT_NAME, mItemFragment);
         }
         outState.putBoolean(EDIT_FRAG_VISIBILITY_KEY, isEditFragmentVisible);
         outState.putBoolean(ARCHIVE_FRAG_VISIBILITY_KEY, isArchiveFragmentVisible);
         outState.putBoolean(SETTINGS_FRAGMENT_VISIBILITY_KEY, isSettingsFragmentVisible);
     }
 
-    public static int getCOLUMNS() {
-        return COLUMNS;
+    public static int getColumns() {
+        return sColumns;
     }
 }

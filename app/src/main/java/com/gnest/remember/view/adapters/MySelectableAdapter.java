@@ -21,10 +21,10 @@ import io.realm.RealmResults;
 public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHolder> implements SelectableViewHolder.OnItemSelectedListener, ItemTouchHelperAdapter, MyGridLayoutManager.ExpandListener {
 
     private RealmResults<Memo> mMemos;
-    private boolean multiChoiceEnabled = false;
+    private boolean isMultiChoiceEnabled = false;
     private OnItemActionPerformed mListener;
     private Map<Integer, Integer> mSelectedMap = new LinkedHashMap<>();
-    private boolean mItemsExpanded;
+    private boolean isItemsExpanded;
     private int mMemoSize;
     private int mMargins;
 
@@ -47,13 +47,13 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     @Override
     public void onBindViewHolder(SelectableViewHolder viewHolder, int position) {
         final SelectableViewHolder holder = viewHolder;
-        boolean isSelected = multiChoiceEnabled && mSelectedMap.get(position) != null;
-        holder.bind(mMemos.get(position), position, mItemsExpanded, isSelected, mMemoSize, mMargins);
+        boolean isSelected = isMultiChoiceEnabled && mSelectedMap.get(position) != null;
+        holder.bind(mMemos.get(position), position, isItemsExpanded, isSelected, mMemoSize, mMargins);
         holder.pin.setOnTouchListener((view, motionEvent) -> {
-            if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 mListener.onStartDrag(holder);
             }
-            return false;
+            return view.performClick();
         });
     }
 
@@ -91,7 +91,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
 
     @Override
     public boolean isMultiChoiceEnabled() {
-        return multiChoiceEnabled;
+        return isMultiChoiceEnabled;
     }
 
     @Override
@@ -111,7 +111,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     }
 
     public void switchMultiSelect(boolean switchedOn) {
-        multiChoiceEnabled = switchedOn;
+        isMultiChoiceEnabled = switchedOn;
     }
 
     public void clearSelectedList() {
@@ -139,7 +139,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
 
     @Override
     public boolean onItemLongClicked(int mPosition, Memo mMemo, SelectableViewHolder viewHolder) {
-        if (!isMultiChoiceEnabled() && !mItemsExpanded) {
+        if (!isMultiChoiceEnabled() && !isItemsExpanded) {
             mListener.showActionMode();
             updateSelectedList(mMemo.getPosition(), mMemo, viewHolder);
             return true;
@@ -156,7 +156,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     }
 
     public boolean isItemsExpanded() {
-        return mItemsExpanded;
+        return isItemsExpanded;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     }
 
     public void setItemsExpanded(boolean itemsExpanded) {
-        this.mItemsExpanded = itemsExpanded;
+        this.isItemsExpanded = itemsExpanded;
         notifyDataSetChanged();
     }
 

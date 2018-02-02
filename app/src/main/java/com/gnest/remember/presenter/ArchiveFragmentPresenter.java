@@ -7,7 +7,7 @@ import com.gnest.remember.view.IListFragmentView;
 public class ArchiveFragmentPresenter extends ListFragmentPresenter {
 
     public ArchiveFragmentPresenter() {
-        mModel = new ArchiveMemoModelImpl();
+        model = new ArchiveMemoModelImpl();
     }
 
     @Override

@@ -40,8 +40,7 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
-        mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
-        return true;
+        return mAdapter.onItemMove(source.getAdapterPosition(), target.getAdapterPosition());
     }
 
     @Override
@@ -63,7 +62,6 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
         if (viewHolder instanceof ItemTouchHelperViewHolder) {
             ItemTouchHelperViewHolder itemViewHolder = (ItemTouchHelperViewHolder) viewHolder;
-//            itemViewHolder.setSelectedState();
             itemViewHolder.setDeselectedState();
         }
         super.clearView(recyclerView, viewHolder);

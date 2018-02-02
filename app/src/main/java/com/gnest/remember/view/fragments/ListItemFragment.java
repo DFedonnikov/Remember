@@ -1,5 +1,6 @@
 package com.gnest.remember.view.fragments;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -35,6 +36,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.gnest.remember.App;
 import com.gnest.remember.R;
 
 import com.gnest.remember.model.db.data.Memo;
@@ -75,7 +77,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private static final String SAVED_LAYOUT_MANAGER = "Saved layout manager";
     private static final String SAVED_STATE_KEY = "Saved state key";
 
-    private final BehaviorSubject<Boolean> dataLoadedSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> mDataLoadedSubject = BehaviorSubject.create();
 
     @BindView(R.id.items_fragment)
     LinearLayout layout;
@@ -100,22 +102,22 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     String sendMemoIntentTitle;
 
     private View mView;
-    private View popupLayout;
-    private Unbinder unbinder;
+    private View mPopupLayout;
+    private Unbinder mUnbinder;
     private int mYOffset;
     private int mColumnCount;
     private int mMemoSize;
     private int mMargins;
     private OnListItemFragmentInteractionListener mListener;
     private MySelectableAdapter mAdapter;
-    private ItemTouchHelper itemTouchHelper;
-    private ActionMode actionMode;
-    private ActionMenu actionMenu;
+    private ItemTouchHelper mItemTouchHelper;
+    private ActionMode mActionMode;
+    private ActionMenu mActionMenu;
     private MyGridLayoutManager mMyGridLayoutManager;
-    private DrawerLayout drawerLayout;
-    private TextView cancel;
-    private TextView cancelMessage;
-    private PopupWindow popupWindow;
+    private DrawerLayout mDrawerLayout;
+    private TextView mCancel;
+    private TextView mCancelMessage;
+    private PopupWindow mPopupWindow;
     private Bundle mSavedState;
 
 
@@ -133,18 +135,20 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        actionMenu = new ActionMenu(this);
+        mActionMenu = new ActionMenu(this);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_item_list, container, false);
-        popupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, getActivity().findViewById(R.id.container_popup_cancel_dismiss));
-        unbinder = ButterKnife.bind(this, mView);
-        drawerLayout = getActivity().findViewById(R.id.drawer_layout);
-        cancel = popupLayout.findViewById(R.id.btn_cancel_dismiss);
-        cancelMessage = popupLayout.findViewById(R.id.cancelText);
+        mPopupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, mView.findViewById(R.id.container_popup_cancel_dismiss));
+        mUnbinder = ButterKnife.bind(this, mView);
+        if (getActivity() != null) {
+            mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
+        }
+        mCancel = mPopupLayout.findViewById(R.id.btn_cancel_dismiss);
+        mCancelMessage = mPopupLayout.findViewById(R.id.cancelText);
         Glide.with(this).load(R.drawable.itemfragment_background_pin_board).into(new SimpleTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
@@ -175,12 +179,12 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
         recyclerView.setAdapter(mAdapter);
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mAdapter);
-        itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
 
         mYOffset = getYOffset();
 
-        popupWindow = new PopupWindow(popupLayout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
+        mPopupWindow = new PopupWindow(mPopupLayout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
 
         presenter.loadData();
     }
@@ -189,12 +193,14 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
-        activity.setSupportActionBar(toolbar);
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            mListener.syncDrawerToggleState();
+        if (activity != null) {
+            activity.setSupportActionBar(toolbar);
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeButtonEnabled(true);
+                mListener.syncDrawerToggleState();
+            }
         }
     }
 
@@ -230,7 +236,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnbinder.unbind();
     }
 
 
@@ -246,17 +252,17 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         mAdapter.setMemos(data);
         mAdapter.notifyDataSetChanged();
         checkStateRestore();
-        dataLoadedSubject.onNext(true);
+        mDataLoadedSubject.onNext(true);
     }
 
     private void checkStateRestore() {
-        Bundle bundle;
+        Bundle bundle = null;
         //Restoring state after config change
         if (mSavedState != null) {
             bundle = mSavedState;
         }
         //Restoring state after returning from edit mode
-        else {
+        else if (getArguments() != null) {
             bundle = getArguments().getBundle(BUNDLE_KEY);
         }
         if (bundle != null) {
@@ -305,7 +311,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
                 mListener.onAddButtonPressed();
                 return true;
             case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+                mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -338,40 +344,44 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @NonNull
     private PopupWindow setUpPopupWindow(PublishSubject<Boolean> subject, int numOfNotes) {
-        cancel.setOnClickListener(v -> {
+        mCancel.setOnClickListener(v -> {
             for (int x = 0; x < numOfNotes; x++) {
                 subject.onNext(true);
             }
             subject.onCompleted();
-            popupWindow.dismiss();
+            mPopupWindow.dismiss();
         });
-        popupWindow.showAtLocation(popupLayout, Gravity.BOTTOM, 0, mYOffset);
-        return popupWindow;
+        mPopupWindow.showAtLocation(mPopupLayout, Gravity.BOTTOM, 0, mYOffset);
+        return mPopupWindow;
     }
 
     private int getYOffset() {
         //Checking if device has on screen buttons and calculating offset;
-        DisplayMetrics metrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int usableHeight = metrics.heightPixels;
-        getActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-        int realHeight = metrics.heightPixels;
-        if (realHeight > usableHeight)
-            return realHeight - usableHeight;
-        else
-            return 0;
+        FragmentActivity activity = getActivity();
+        if (activity != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int usableHeight = metrics.heightPixels;
+            getActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+            int realHeight = metrics.heightPixels;
+            if (realHeight > usableHeight)
+                return realHeight - usableHeight;
+            else
+                return 0;
+        }
+        return 0;
     }
 
     void setUpCancelArchiveActionMessage(int numOfNotes) {
         int plural = getPlural(numOfNotes);
         String text = numOfNotes + " " + getArchiveActionPluralForm(plural);
-        cancelMessage.setText(text);
+        mCancelMessage.setText(text);
     }
 
     void setUpCancelRemoveMessage(int numOfNotes) {
         int plural = getPlural(numOfNotes);
         String text = numOfNotes + " " + getRemovePluralForm(plural);
-        cancelMessage.setText(text);
+        mCancelMessage.setText(text);
     }
 
     String getArchiveActionPluralForm(int plural) {
@@ -422,11 +432,13 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void removeAlarm(int memoId) {
         FragmentActivity activity = getActivity();
-        AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = AlarmService.getServiceIntent(activity, null, memoId);
-        PendingIntent pendingIntent = PendingIntent.getService(activity, memoId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if (manager != null) {
-            manager.cancel(pendingIntent);
+        if (activity != null) {
+            AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
+            Intent intent = AlarmService.getServiceIntent(activity, null, memoId);
+            PendingIntent pendingIntent = PendingIntent.getService(activity, memoId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            if (manager != null) {
+                manager.cancel(pendingIntent);
+            }
         }
     }
 
@@ -446,7 +458,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, memoText);
         Intent chooserIntent = Intent.createChooser(intent, sendMemoIntentTitle);
-        actionMode.finish();
+        mActionMode.finish();
         startActivity(chooserIntent);
     }
 
@@ -457,7 +469,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void closeNotification(int id) {
-        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) App.self().getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
             notificationManager.cancel(id);
         }
@@ -470,32 +482,32 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        itemTouchHelper.startDrag(viewHolder);
+        mItemTouchHelper.startDrag(viewHolder);
     }
 
     @Override
     public ActionMode getActionMode() {
-        return actionMode;
+        return mActionMode;
     }
 
     @Override
     public void showActionMode() {
-        if (actionMenu != null) {
-            actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionMenu);
+        if (mActionMenu != null && getActivity() != null) {
+            mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(mActionMenu);
         }
     }
 
     @Override
     public void shutDownActionMode() {
-        if (actionMode != null) {
-            actionMode.finish();
+        if (mActionMode != null) {
+            mActionMode.finish();
         }
     }
 
     @Override
     public void updateContextActionMenu(int numOfSelectedItems) {
-        if (actionMode != null) {
-            actionMode.setTitle(String.valueOf(numOfSelectedItems != 0 ? numOfSelectedItems : ""));
+        if (mActionMode != null) {
+            mActionMode.setTitle(String.valueOf(numOfSelectedItems != 0 ? numOfSelectedItems : ""));
         }
     }
 
@@ -511,8 +523,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public void setShareButtonVisibility(boolean isVisible) {
-        if (actionMenu != null) {
-            actionMenu.setShareButtonVisibility(isVisible);
+        if (mActionMenu != null) {
+            mActionMenu.setShareButtonVisibility(isVisible);
         }
     }
 
@@ -522,7 +534,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     public void onBackButtonPressed() {
-        presenter.processPressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL, MainActivity.getCOLUMNS());
+        presenter.processPressBackButton(LinearLayoutManager.VERTICAL, LinearLayoutManager.HORIZONTAL, MainActivity.getColumns());
     }
 
     @Override
@@ -542,7 +554,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
 
     @Override
     public BehaviorSubject<Boolean> getDataLoadedSubject() {
-        return dataLoadedSubject;
+        return mDataLoadedSubject;
     }
 
     @Override

@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -56,32 +55,24 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnEditMemoFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link EditMemoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresenter>
         implements AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener {
     public static final String MEMO_ID_KEY = "memo_param";
     private static final String TEXT_KEY = "Text key";
 
-    private AppCompatActivity activity;
-    private Unbinder unbinder;
+    private AppCompatActivity mActivity;
+    private Unbinder mUnbinder;
 
     @BindView(R.id.editTextMemo)
-    EditText mMemoEditTextView;
+    EditText memoEditTextView;
     @BindView(R.id.bt_remove_alert)
-    ImageView mRemoveAlert;
+    ImageView removeAlert;
     @BindView(R.id.date_picker_arrow)
     ImageView arrow;
     @BindView(R.id.app_bar_layout)
-    AppBarLayout mAppBarLayout;
+    AppBarLayout appBarLayout;
     @BindView(R.id.compactcalendar_view)
-    CompactCalendarView mCompactCalendarView;
+    CompactCalendarView compactCalendarView;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.date_picker_button)
@@ -97,9 +88,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @BindColor(R.color.colorPrimary)
     int primaryColor;
 
-    private DrawerLayout drawerLayout;
+    private DrawerLayout mDrawerLayout;
 
-    private int memoId = -1;
+    private int mMemoId = -1;
     private String mColor;
     private OnEditMemoFragmentInteractionListener mListener;
 
@@ -113,23 +104,23 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         setHasOptionsMenu(true);
         if (getArguments() != null) {
             Bundle arguments = getArguments();
-            memoId = arguments.getInt(MEMO_ID_KEY);
+            mMemoId = arguments.getInt(MEMO_ID_KEY);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.fragment_edit_memo, container, false);
-        unbinder = ButterKnife.bind(this, mView);
-        mMemoEditTextView.setOnFocusChangeListener((v, hasFocus) -> {
+        mUnbinder = ButterKnife.bind(this, mView);
+        memoEditTextView.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
                 hideKeyboard(v);
             }
         });
-        mMemoEditTextView.setTypeface(App.FONT);
-        mMemoEditTextView.setTextSize(App.FONT_SIZE);
-        mRemoveAlert.setOnClickListener(view -> {
+        memoEditTextView.setTypeface(App.FONT);
+        memoEditTextView.setTextSize(App.FONT_SIZE);
+        removeAlert.setOnClickListener(view -> {
             presenter.processRemoveAlarm(alarmRemoveText);
             setAlarmVisibility(false);
         });
@@ -140,22 +131,23 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         toolbar.setTitle("");
-        activity = ((AppCompatActivity) getActivity());
-        activity.setSupportActionBar(toolbar);
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            mListener.syncDrawerToggleState();
+        mActivity = ((AppCompatActivity) getActivity());
+        if (mActivity != null) {
+            mActivity.setSupportActionBar(toolbar);
+            ActionBar actionBar = mActivity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeButtonEnabled(true);
+                mListener.syncDrawerToggleState();
+            }
+            mDrawerLayout = mActivity.findViewById(R.id.drawer_layout);
         }
 
-        drawerLayout = getActivity().findViewById(R.id.drawer_layout);
+        compactCalendarView.setLocale(TimeZone.getDefault(), Locale.getDefault());
 
-        mCompactCalendarView.setLocale(TimeZone.getDefault(), Locale.getDefault());
+        compactCalendarView.setShouldDrawDaysHeader(true);
 
-        mCompactCalendarView.setShouldDrawDaysHeader(true);
-
-        mCompactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+        compactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
                 presenter.processDayClicked(dateClicked);
@@ -169,7 +161,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
         datePickerButton.setOnClickListener(v -> presenter.processDatePicker());
 
-        if (memoId != -1) {
+        if (mMemoId != -1) {
             presenter.loadData();
         } else {
             presenter.processSetCurrentDate(Calendar.getInstance());
@@ -198,27 +190,27 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnbinder.unbind();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(TEXT_KEY, mMemoEditTextView.getText().toString());
+        outState.putString(TEXT_KEY, memoEditTextView.getText().toString());
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            mMemoEditTextView.setText(savedInstanceState.getString(TEXT_KEY));
+            memoEditTextView.setText(savedInstanceState.getString(TEXT_KEY));
         }
     }
 
     @Override
     @NonNull
     public IEditMemoPresenter createPresenter() {
-        return new EditMemoPresenter(memoId);
+        return new EditMemoPresenter(mMemoId);
     }
 
     public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
@@ -259,13 +251,13 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     @Override
     public void setData(String memoText, String color, boolean alarmSet) {
-        mMemoEditTextView.setText(memoText);
+        memoEditTextView.setText(memoText);
         mColor = color;
         setAlarmVisibility(alarmSet);
     }
 
     public void saveMemo(boolean isTriggeredByDrawerItem) {
-        presenter.processSaveMemo(mMemoEditTextView.getText().toString(), mColor, alarmSetText, isTriggeredByDrawerItem);
+        presenter.processSaveMemo(memoEditTextView.getText().toString(), mColor, alarmSetText, isTriggeredByDrawerItem);
     }
 
     @Override
@@ -285,17 +277,17 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @Override
     public void setAlarm(boolean isSet, long alarmDate, String notificationText, int id) {
         Intent intent = AlarmReceiver.getReceiverIntent(getContext(), id, notificationText, alarmDate, isSet);
-        activity.sendBroadcast(intent);
+        mActivity.sendBroadcast(intent);
     }
 
     @Override
     public void showAlarmToast(String alarmText) {
-        Toast.makeText(activity, alarmText, Toast.LENGTH_LONG).show();
+        Toast.makeText(mActivity, alarmText, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void setCalendarExpanded(boolean isCalendarExpanded) {
-        mAppBarLayout.setExpanded(isCalendarExpanded, true);
+        appBarLayout.setExpanded(isCalendarExpanded, true);
     }
 
     @Override
@@ -306,7 +298,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         bundle.putInt(TimePickerFragment.MINUTE_KEY, minute);
         timePickFragment.setArguments(bundle);
         timePickFragment.setTimeSetListener(this);
-        timePickFragment.show(activity.getSupportFragmentManager(), "timePicker");
+        timePickFragment.show(mActivity.getSupportFragmentManager(), "timePicker");
     }
 
     @Override
@@ -333,7 +325,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+                mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -359,8 +351,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     @Override
     public void setCurrentDate(Date date) {
-        if (mCompactCalendarView != null) {
-            mCompactCalendarView.setCurrentDate(date);
+        if (compactCalendarView != null) {
+            compactCalendarView.setCurrentDate(date);
         }
     }
 
@@ -371,11 +363,11 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     @Override
     public void setAlarmVisibility(boolean visible) {
-        mRemoveAlert.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        removeAlert.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void hideKeyboard(View v) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) App.self().getSystemService(Activity.INPUT_METHOD_SERVICE);
         if (inputMethodManager != null) {
             inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
@@ -384,8 +376,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
+     * to the mActivity and potentially other fragments contained in that
+     * mActivity.
      * <p>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"

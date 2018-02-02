@@ -28,29 +28,29 @@ import static android.widget.GridLayout.HORIZONTAL;
 
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
-    IListFragmentModel mModel;
+    IListFragmentModel model;
     private CompositeSubscription compositeSubscription = new CompositeSubscription();
 
     public ListFragmentPresenter() {
-        mModel = new ListFragmentModelImpl();
+        model = new ListFragmentModelImpl();
     }
 
     @Override
     public void attachView(IListFragmentView view) {
-        mModel.openDB();
+        model.openDB();
         super.attachView(view);
     }
 
     @Override
     public void detachView(boolean retainInstance) {
-        mModel.closeDB();
+        model.closeDB();
         compositeSubscription.unsubscribe();
         super.detachView(retainInstance);
     }
 
     @Override
     public void loadData() {
-        Subscription getDataSubscription = mModel.getData()
+        Subscription getDataSubscription = model.getData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(RealmResults::isLoaded)
                 .first()
@@ -66,7 +66,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     public void processDeleteSelectedMemos(Collection<Integer> selectedIds) {
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
-            Subscription removeSelectedSubscription = mModel.deleteSelected(selectedIds)
+            Subscription removeSelectedSubscription = model.deleteSelected(selectedIds)
                     .zipWith(getView().showConfirmRemovePopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
@@ -75,12 +75,12 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                         }
                     })
                     .subscribe(cancelMemoPair -> {
-                        if (isViewAttached()) {
+                        if (isViewAttached() && cancelMemoPair.first != null && cancelMemoPair.second != null) {
                             for (Memo processed : cancelMemoPair.second) {
                                 if (!cancelMemoPair.first) {
                                     removeAlarmNotification(processed.getId(), processed.isAlarmSet());
                                 } else {
-                                    mModel.revertDeleteMemo(processed);
+                                    model.revertDeleteMemo(processed);
                                     getView().getAdapter().notifyDataSetChanged();
                                 }
                             }
@@ -94,7 +94,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     public void processSwipeDismiss(int memoId, int memoPosition) {
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
-            Subscription confirmDismissSubscription = mModel.moveBetweenRealms(Collections.singletonList(memoId))
+            Subscription confirmDismissSubscription = model.moveBetweenRealms(Collections.singletonList(memoId))
                     .zipWith(getView().showConfirmArchiveActionPopup(subject, 1), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
@@ -104,12 +104,12 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                         }
                     })
                     .subscribe(cancelMemoPair -> {
-                        if (isViewAttached()) {
+                        if (isViewAttached() && cancelMemoPair.first != null && cancelMemoPair.second != null) {
                             for (Memo processed : cancelMemoPair.second) {
                                 if (!cancelMemoPair.first) {
                                     removeAlarmNotification(processed.getId(), processed.isAlarmSet());
                                 } else {
-                                    mModel.revertArchived(processed);
+                                    model.revertArchived(processed);
                                     getView().getAdapter().notifyDataSetChanged();
                                 }
                             }
@@ -123,7 +123,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     public void processArchiveActionOnSelected(Collection<Integer> selectedIds) {
         if (isViewAttached()) {
             PublishSubject<Boolean> subject = PublishSubject.create();
-            Subscription confirmArchiveSubscription = mModel.moveBetweenRealms(selectedIds)
+            Subscription confirmArchiveSubscription = model.moveBetweenRealms(selectedIds)
                     .zipWith(getView().showConfirmArchiveActionPopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
                     .doOnSubscribe(() -> {
                         if (isViewAttached()) {
@@ -132,12 +132,12 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                         }
                     })
                     .subscribe(cancelMemoPair -> {
-                        if (isViewAttached()) {
+                        if (isViewAttached() && cancelMemoPair.first != null && cancelMemoPair.second != null) {
                             for (Memo processed : cancelMemoPair.second) {
                                 if (!cancelMemoPair.first) {
                                     removeAlarmNotification(processed.getId(), processed.isAlarmSet());
                                 } else {
-                                    mModel.revertArchived(processed);
+                                    model.revertArchived(processed);
                                     getView().getAdapter().notifyDataSetChanged();
                                 }
                             }
@@ -150,7 +150,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     @Override
     public void processShare(Collection<Integer> selectedIds) {
         if (selectedIds.size() == 1) {
-            Memo memo = mModel.getMemoById(selectedIds.iterator().next());
+            Memo memo = model.getMemoById(selectedIds.iterator().next());
             if (memo != null && isViewAttached()) {
                 getView().shareMemoText(memo.getMemoText());
             }
@@ -165,7 +165,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     .observeOn(AndroidSchedulers.mainThread())
                     .distinctUntilChanged(dataLoaded -> dataLoaded)
                     .zipWith(getComputingLayoutOrScrollingSubject().distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
-                    .map(subjectsCompletedPair -> mModel.getMemoById((int) id))
+                    .map(subjectsCompletedPair -> model.getMemoById((int) id))
                     .subscribe(memo -> {
                         MyGridLayoutManager manager = getView().getLayoutManager();
                         MySelectableAdapter adapter = getView().getAdapter();
@@ -173,7 +173,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                         adapter.expandItems();
                         manager.setOrientation(HORIZONTAL);
                         manager.scrollToPositionWithOffset(memo.getPosition(), 0);
-                        mModel.setMemoAlarmFalse(memo.getId());
+                        model.setMemoAlarmFalse(memo.getId());
                         getView().closeNotification(memo.getId());
                     });
         }
@@ -200,7 +200,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
-        mModel.swapMemos(fromId, fromPosition, toId, toPosition);
+        model.swapMemos(fromId, fromPosition, toId, toPosition);
     }
 
     @Override

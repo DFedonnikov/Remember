@@ -27,11 +27,9 @@ public class App extends Application {
     public static int FONT_SIZE = 16;
     public static Uri NOTIFICATION_SOUND = Settings.System.DEFAULT_NOTIFICATION_URI;
     private static int[] NUM_OF_LINES;
+    public static final Map<String, RealmConfiguration> REALM_CONFIG_MAP = new HashMap<>();
 
     private static App sSelf;
-
-
-    public static final Map<String, RealmConfiguration> REALM_CONFIG_MAP = new HashMap<>();
 
     @Override
     public void onCreate() {

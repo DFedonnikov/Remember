@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -34,6 +35,7 @@ import butterknife.Unbinder;
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int REQUEST_CODE_NOTIFICATION_SOUND = 1;
+
     @BindView(R.id.settings_fragment_toolbar)
     Toolbar toolbar;
 
@@ -41,8 +43,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     private View mView;
     private OnSettingsFragmentInteractionListener mListener;
-    private DrawerLayout drawerLayout;
-    private Unbinder unbinder;
+    private DrawerLayout mDrawerLayout;
+    private Unbinder mUnbinder;
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -65,8 +67,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = super.onCreateView(inflater, container, savedInstanceState);
-        unbinder = ButterKnife.bind(this, mView);
-        drawerLayout = getActivity().findViewById(R.id.drawer_layout);
+        if (mView != null) {
+            mUnbinder = ButterKnife.bind(this, mView);
+        }
+        if (getActivity() != null) {
+            mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
+        }
         return mView;
     }
 
@@ -85,15 +91,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
-        activity.setSupportActionBar(toolbar);
-        ActionBar actionBar = activity.getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            mListener.syncDrawerToggleState();
+        if (activity != null) {
+            activity.setSupportActionBar(toolbar);
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeButtonEnabled(true);
+                mListener.syncDrawerToggleState();
+            }
+            SHARED_PREFERENCES = PreferenceManager.getDefaultSharedPreferences(activity);
+            SHARED_PREFERENCES.registerOnSharedPreferenceChangeListener(this);
         }
-        SHARED_PREFERENCES = PreferenceManager.getDefaultSharedPreferences(activity);
-        SHARED_PREFERENCES.registerOnSharedPreferenceChangeListener(this);
         setFontPrefSummary();
         setNotificationSoundPrefSummary();
     }
@@ -107,7 +115,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnbinder.unbind();
         SHARED_PREFERENCES.unregisterOnSharedPreferenceChangeListener(this);
         SHARED_PREFERENCES = null;
     }
@@ -171,7 +179,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+                mDrawerLayout.openDrawer(GravityCompat.START);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

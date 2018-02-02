@@ -9,10 +9,6 @@ import java.util.Date;
 
 import rx.Observable;
 
-/**
- * Created by DFedonnikov on 09.09.2017.
- */
-
 public interface IEditMemoModel {
     Memo getData();
 
@@ -22,7 +18,7 @@ public interface IEditMemoModel {
 
     boolean isAlarmSet();
 
-    void setWasAlarmSet(boolean isSet);
+    void setIsAlarmPreviouslySet(boolean isSet);
 
     Memo getEditedMemo();
 
