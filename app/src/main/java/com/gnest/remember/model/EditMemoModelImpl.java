@@ -1,6 +1,6 @@
 package com.gnest.remember.model;
 
-import android.support.v4.util.Pair;
+import android.support.annotation.Nullable;
 
 import com.gnest.remember.App;
 import com.gnest.remember.model.db.data.Memo;
@@ -10,16 +10,14 @@ import java.util.Calendar;
 import java.util.Date;
 
 import io.realm.Realm;
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 public class EditMemoModelImpl implements IEditMemoModel {
 
     private static Calendar sSelectedDate = Calendar.getInstance();
-    private final BehaviorSubject<Boolean> dataSavedSubject = BehaviorSubject.create();
 
     private Realm mRealm;
     private int mMemoId;
+    private int mMemoPosition;
     private boolean isNew;
     private boolean isAlarmPreviouslySet;
     private boolean isAlarmSet;
@@ -27,6 +25,7 @@ public class EditMemoModelImpl implements IEditMemoModel {
 
     public EditMemoModelImpl(int memoId) {
         this.mMemoId = memoId;
+        this.mMemoPosition = -1;
         this.isAlarmSet = false;
         this.isNew = memoId == -1;
     }
@@ -42,81 +41,76 @@ public class EditMemoModelImpl implements IEditMemoModel {
     }
 
     @Override
+    @Nullable
     public Memo getData() {
         Memo memo = getEditedMemo();
-        isAlarmPreviouslySet = memo.isAlarmSet();
-        sSelectedDate.setTimeInMillis(memo.getAlarmDate());
+        if (isNew) {
+            mMemoId = calculateNewId();
+            mMemoPosition = calculateNewPosition();
+        }
+        if (memo != null) {
+            mMemoId = memo.getId();
+            mMemoPosition = memo.getPosition();
+            isAlarmPreviouslySet = memo.isAlarmSet();
+            sSelectedDate.setTimeInMillis(memo.getAlarmDate());
+        }
         return memo;
     }
 
     @Override
+    @Nullable
     public Memo getEditedMemo() {
-        return mRealm.where(Memo.class)
+        return isNew ? null : mRealm.where(Memo.class)
                 .equalTo(MemoRealmFields.ID, mMemoId)
                 .findFirst();
     }
 
     @Override
-    public Observable<Pair<Integer, Integer>> saveMemoToDB(String memoText, String memoColor) {
-        if (isNew) {
-            if (memoText.isEmpty()) {
-                return Observable.just(new Pair<>(-1, -1));
-            }
+    public void saveMemoToDB(String memoText, String memoColor) {
+        if (isNew && !memoText.isEmpty()) {
+            isNew = false;
             insertNewMemo(memoText, memoColor);
         } else {
             updateMemo(memoText, memoColor);
         }
-
-        return dataSavedSubject
-                .distinctUntilChanged()
-                .flatMap(dataSaved -> {
-                    {
-                        if (isNew) {
-                            int id = -1;
-                            Number idNumber = mRealm.where(Memo.class)
-                                    .max(MemoRealmFields.ID);
-                            if (idNumber != null) {
-                                id = idNumber.intValue();
-                            }
-                            return Observable.just(new Pair<>(id, -1));
-                        } else {
-                            Memo memo = getEditedMemo();
-                            return Observable.just(new Pair<>(memo.getId(), memo.getPosition()));
-                        }
-                    }
-                });
     }
 
     private void insertNewMemo(String memoText, String memoColor) {
         mRealm.executeTransactionAsync(realm1 -> {
-            int idMain = 0;
-            int idArchived = 0;
-            int position = 0;
+            long alarmDate = isAlarmSet ? sSelectedDate.getTimeInMillis() : -1;
+            Memo temp = new Memo(mMemoId, memoText, mMemoPosition, memoColor, alarmDate, isAlarmSet, false, true);
+            realm1.insertOrUpdate(temp);
+        });
+    }
 
-            Number idNumberMain = realm1.where(Memo.class)
+    private int calculateNewPosition() {
+        int position = 0;
+        Number positionNumber = mRealm.where(Memo.class)
+                .max(MemoRealmFields.POSITION);
+        if (positionNumber != null) {
+            position = positionNumber.intValue() + 1;
+        }
+        return position;
+    }
+
+    private int calculateNewId() {
+        int idMain = 0;
+        int idArchived = 0;
+        Number idNumberMain = mRealm.where(Memo.class)
+                .max(MemoRealmFields.ID);
+        if (idNumberMain != null) {
+            idMain = idNumberMain.intValue() + 1;
+        }
+        try (Realm realmAchrived = Realm.getInstance(App.getConfigurationByName(MemoRealmFields.ARCHIVE_CONFIG_NAME))) {
+            Number idNumberArchived = realmAchrived
+                    .where(Memo.class)
                     .max(MemoRealmFields.ID);
-            if (idNumberMain != null) {
-                idMain = idNumberMain.intValue() + 1;
-            }
-            Realm realmAchrived = Realm.getInstance(App.getConfigurationByName(MemoRealmFields.ARCHIVE_CONFIG_NAME));
-            Number idNumberArchived = realmAchrived.where(Memo.class)
-                    .max(MemoRealmFields.ID);
-            realmAchrived.close();
             if (idNumberArchived != null) {
                 idArchived = idNumberArchived.intValue() + 1;
             }
-            int id = Math.max(idMain, idArchived);
-            Number positionNumber = realm1.where(Memo.class)
-                    .max(MemoRealmFields.POSITION);
-            if (positionNumber != null) {
-                position = positionNumber.intValue() + 1;
-            }
-            long alarmDate = isAlarmSet ? sSelectedDate.getTimeInMillis() : -1;
-            Memo temp = new Memo(id, memoText, position, memoColor, alarmDate, isAlarmSet, false, true);
-            realm1.insertOrUpdate(temp);
-        }, () -> dataSavedSubject.onNext(true));
+        }
+        return Math.max(idMain, idArchived);
     }
-
 
     private void updateMemo(String memoText, String memoColor) {
         mRealm.executeTransactionAsync(realm1 -> {
@@ -135,7 +129,22 @@ public class EditMemoModelImpl implements IEditMemoModel {
                 toUpdate.setAlarm(isAlarmSet || isAlarmPreviouslySet);
                 realm1.insertOrUpdate(toUpdate);
             }
-        }, () -> dataSavedSubject.onNext(true));
+        });
+    }
+
+    @Override
+    public int getId() {
+        return mMemoId;
+    }
+
+    @Override
+    public int getPosition() {
+        return mMemoPosition;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
     }
 
     @Override

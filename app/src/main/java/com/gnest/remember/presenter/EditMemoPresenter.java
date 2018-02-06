@@ -13,17 +13,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.subscriptions.CompositeSubscription;
-
 public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implements IEditMemoPresenter {
 
     private SimpleDateFormat mCalendarDateFormat = new SimpleDateFormat("d MMMM yyyy", Locale.getDefault());
     private SimpleDateFormat mCalendarAlarmSetFormat = new SimpleDateFormat("d MMMM yyyy HH:mm", Locale.getDefault());
 
     private IEditMemoModel mModel;
-    private CompositeSubscription mSubscriptions = new CompositeSubscription();
     private boolean isCalendarExpanded;
 
     public EditMemoPresenter(int memoId) {
@@ -33,20 +28,20 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
 
     @Override
     public void attachView(@NonNull IEditMemoView view) {
-        mModel.openDB();
         super.attachView(view);
+        mModel.openDB();
+        loadData();
     }
 
     @Override
     public void detachView() {
+        saveMemo();
         mModel.closeDB();
-        mSubscriptions.clear();
         super.detachView();
     }
 
     @Override
     public void destroy() {
-        mSubscriptions.unsubscribe();
         super.destroy();
     }
 
@@ -54,10 +49,12 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     public void loadData() {
         Memo memo = mModel.getData();
         ifViewAttached(view -> {
-            view.setData(memo.getMemoText(), memo.getColor(), memo.isAlarmSet());
             Calendar alarmDate = Calendar.getInstance();
-            if (memo.getAlarmDate() != -1) {
-                alarmDate.setTimeInMillis(memo.getAlarmDate());
+            if (memo != null) {
+                view.setData(memo.getMemoText(), memo.getColor(), memo.isAlarmSet());
+                if (memo.getAlarmDate() != -1) {
+                    alarmDate.setTimeInMillis(memo.getAlarmDate());
+                }
             }
             processSetCurrentDate(alarmDate);
         });
@@ -71,27 +68,35 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
             view.setCurrentDate(date.getTime());
         });
     }
-
+    
     @Override
-    public void processSaveMemo(String memoText, String memoColor, String alarmSetText, boolean isTriggeredByDrawerItem) {
+    public void processPressBackButton() {
         ifViewAttached(view -> {
-            Subscription saveMemoSubscription = mModel.saveMemoToDB(memoText, memoColor)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(idPositionPair -> {
-                        if (mModel.isAlarmSet() && idPositionPair.first != null) {
-                            setAlarm(view, memoText, idPositionPair.first, alarmSetText);
-                        }
-                        if (idPositionPair.second != null) {
-                            view.memoSavedInteraction(idPositionPair.second, isTriggeredByDrawerItem);
-                        }
-                    });
-            mSubscriptions.add(saveMemoSubscription);
+            Memo memo = mModel.getEditedMemo();
+            int memoPosition = memo != null ?
+                    memo.getPosition() :
+                    !view.getMemoText().isEmpty() ?
+                            mModel.getPosition() : -1;
+            view.returnFromEdit(memoPosition);
         });
     }
 
+    private void saveMemo() {
+        ifViewAttached(view -> {
+            String memoText = view.getMemoText();
+            String memoColor = view.getMemoColor();
+            if (mModel.isAlarmSet() && !(mModel.isNew() && memoText.isEmpty())) {
+                String alarmSetText = view.getAlarmSetText();
+                setAlarm(view, memoText, mModel.getId(), alarmSetText);
+            }
+            mModel.saveMemoToDB(memoText, memoColor);
+        });
+    }
+
+
     private void setAlarm(IEditMemoView view, String notificationText, int id, String alarmSetText) {
         if (id != -1) {
-            setNotification(true, notificationText, id);
+            setNotification(view, true, notificationText, id);
             String alarmSetToast = alarmSetText +
                     " " +
                     mCalendarAlarmSetFormat.format(mModel.getSelectedDate().getTime());
@@ -106,20 +111,18 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
             mModel.setIsAlarmPreviouslySet(false);
             Memo memo = mModel.getEditedMemo();
             if (memo != null) {
-                setNotification(false, null, memo.getId());
+                setNotification(view, false, null, memo.getId());
             }
             view.showAlarmToast(removeAlarmMessage);
         });
     }
 
-    private void setNotification(boolean isSet, String notificationText, int id) {
-        ifViewAttached(view -> {
-            String notificationTextLocal = notificationText;
-            if (notificationTextLocal != null && notificationTextLocal.length() > 10) {
-                notificationTextLocal = notificationText.substring(0, 10).concat("...");
-            }
-            view.setAlarm(isSet, mModel.getSelectedDate().getTimeInMillis(), notificationTextLocal, id);
-        });
+    private void setNotification(IEditMemoView view, boolean isSet, String notificationText, int id) {
+        String notificationTextLocal = notificationText;
+        if (notificationTextLocal != null && notificationTextLocal.length() > 10) {
+            notificationTextLocal = notificationText.substring(0, 10).concat("...");
+        }
+        view.setAlarm(isSet, mModel.getSelectedDate().getTimeInMillis(), notificationTextLocal, id);
     }
 
     @Override
