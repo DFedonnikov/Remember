@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -41,7 +40,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     private static SharedPreferences SHARED_PREFERENCES;
 
-    private View mView;
     private OnSettingsFragmentInteractionListener mListener;
     private DrawerLayout mDrawerLayout;
     private Unbinder mUnbinder;
@@ -66,14 +64,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = super.onCreateView(inflater, container, savedInstanceState);
-        if (mView != null) {
-            mUnbinder = ButterKnife.bind(this, mView);
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        if (view != null) {
+            mUnbinder = ButterKnife.bind(this, view);
         }
         if (getActivity() != null) {
             mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
         }
-        return mView;
+        return view;
     }
 
     @Override
