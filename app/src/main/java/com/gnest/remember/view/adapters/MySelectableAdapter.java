@@ -1,6 +1,5 @@
 package com.gnest.remember.view.adapters;
 
-import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -12,6 +11,7 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -41,7 +41,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
     public SelectableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_item, parent, false);
-        return new SelectableViewHolder(view, this);
+        return new SelectableViewHolder(view, new WeakReference<>(this));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class MySelectableAdapter extends RecyclerView.Adapter<SelectableViewHold
         holder.bind(mMemos.get(position), position, isItemsExpanded, isSelected, mMemoSize, mMargins);
         holder.pin.setOnTouchListener((view, motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                mListener.onStartDrag(holder);
+                new WeakReference<>(mListener).get().onStartDrag(holder);
             }
             return view.performClick();
         });

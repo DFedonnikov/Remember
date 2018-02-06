@@ -50,6 +50,7 @@ import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 
+import java.lang.ref.WeakReference;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -148,10 +149,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         }
         mCancel = mPopupLayout.findViewById(R.id.btn_cancel_dismiss);
         mCancelMessage = mPopupLayout.findViewById(R.id.cancelText);
+        WeakReference<LinearLayout> layoutWeakReference = new WeakReference<>(layout);
         Glide.with(this).load(R.drawable.itemfragment_background_pin_board).into(new SimpleTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                layout.setBackground(resource);
+                layoutWeakReference.get().setBackground(resource);
             }
         });
         return mView;

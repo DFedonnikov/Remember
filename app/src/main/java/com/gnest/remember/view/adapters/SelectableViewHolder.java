@@ -21,6 +21,8 @@ import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
 
+import java.lang.ref.WeakReference;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;
@@ -28,7 +30,7 @@ import me.saket.bettermovementmethod.BetterLinkMovementMethod;
 class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
     private View mView;
-    private OnItemSelectedListener mListener;
+    private WeakReference<OnItemSelectedListener> mListener;
     private Memo mMemo;
     private int mPosition = 0;
     private int mBackgroundId;
@@ -43,24 +45,24 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     @BindView(R.id.pin)
     ImageView pin;
 
-    SelectableViewHolder(final View itemView, final OnItemSelectedListener onItemSelectedListener) {
+    SelectableViewHolder(final View itemView, final WeakReference<OnItemSelectedListener> onItemSelectedListener) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         mView = itemView;
         this.mListener = onItemSelectedListener;
-        this.mBackgroundTarget = getTarget(mView);
+        this.mBackgroundTarget = getTarget(new WeakReference<>(mView));
         Glide.with(App.self()).load(R.drawable.imageview_pin).into(pin);
-        textView.setOnClickListener(view -> mListener.onItemClicked(mPosition, mMemo, SelectableViewHolder.this));
-        textView.setOnLongClickListener(view -> mListener.onItemLongClicked(mPosition, mMemo, SelectableViewHolder.this));
+        textView.setOnClickListener(view -> mListener.get().onItemClicked(mPosition, mMemo, new WeakReference<>(SelectableViewHolder.this).get()));
+        textView.setOnLongClickListener(view -> mListener.get().onItemLongClicked(mPosition, mMemo, new WeakReference<>(SelectableViewHolder.this).get()));
         textView.setTypeface(App.FONT);
         textView.setTextSize(App.FONT_SIZE);
     }
 
-    private SimpleTarget<Drawable> getTarget(View view) {
+    private SimpleTarget<Drawable> getTarget(WeakReference<View> view) {
         return new SimpleTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                view.setBackground(resource);
+                view.get().setBackground(resource);
             }
         };
     }
@@ -91,11 +93,11 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     }
 
     private void setUpViewSizesAndMargins(int memoSize, int margins, boolean isExpanded) {
-        ConstraintLayout.LayoutParams layoutParams = isExpanded ?
-                new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT) :
-                new ConstraintLayout.LayoutParams(memoSize, memoSize);
-        layoutParams.setMargins(margins, margins, margins, margins);
-        mView.setLayoutParams(layoutParams);
+        WeakReference<ConstraintLayout.LayoutParams> layoutParams = isExpanded ?
+                new WeakReference<>(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)) :
+                new WeakReference<>(new ConstraintLayout.LayoutParams(memoSize, memoSize));
+        layoutParams.get().setMargins(margins, margins, margins, margins);
+        mView.setLayoutParams(layoutParams.get());
     }
 
     private void setUpBackgroundColors(String memoColor) {

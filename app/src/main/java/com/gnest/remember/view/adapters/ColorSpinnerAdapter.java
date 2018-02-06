@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.gnest.remember.R;
 
+import java.lang.ref.WeakReference;
+
 public class ColorSpinnerAdapter implements SpinnerAdapter {
 
     public enum Colors {
@@ -56,24 +58,24 @@ public class ColorSpinnerAdapter implements SpinnerAdapter {
     }
 
     private String[] mColors;
-    private Context mContext;
+    private WeakReference<Context> mContext;
 
     public ColorSpinnerAdapter(Context context) {
-        this.mContext = context;
-        mColors = context.getResources().getStringArray(R.array.memo_colors);
+        this.mContext = new WeakReference<>(context);
+        mColors = mContext.get().getResources().getStringArray(R.array.memo_colors);
     }
 
     @Override
     public View getDropDownView(int i, View view, ViewGroup viewGroup) {
         if (view == null) {
-            LayoutInflater inflater = LayoutInflater.from(mContext);
-            view = inflater.inflate(R.layout.color_spinner_list_item, null);
+            LayoutInflater inflater = LayoutInflater.from(mContext.get());
+            view = inflater.inflate(R.layout.color_spinner_list_item, viewGroup, false);
         }
         TextView colorDesc = view.findViewById(R.id.color_text_list_item);
         colorDesc.setText(mColors[i]);
         ImageView colorImage = view.findViewById(R.id.color_image_list_item);
         GradientDrawable gd = (GradientDrawable) colorImage.getDrawable();
-        gd.setColor(ContextCompat.getColor(mContext, Colors.values()[i].getColorId()));
+        gd.setColor(ContextCompat.getColor(mContext.get(), Colors.values()[i].getColorId()));
         return view;
     }
 
@@ -110,12 +112,12 @@ public class ColorSpinnerAdapter implements SpinnerAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         if (view == null) {
-            LayoutInflater inflater = LayoutInflater.from(mContext);
-            view = inflater.inflate(R.layout.color_spinner_selected_item, null);
+            LayoutInflater inflater = LayoutInflater.from(mContext.get());
+            view = inflater.inflate(R.layout.color_spinner_selected_item, viewGroup, false);
         }
         ImageView colorSelectedImage = view.findViewById(R.id.color_image_selected_item);
         GradientDrawable gd = (GradientDrawable) colorSelectedImage.getDrawable();
-        gd.setColor(ContextCompat.getColor(mContext, Colors.values()[i].getColorId()));
+        gd.setColor(ContextCompat.getColor(mContext.get(), Colors.values()[i].getColorId()));
         return view;
     }
 
