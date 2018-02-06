@@ -27,8 +27,11 @@ import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.fragments.SettingsFragment;
 
+import java.lang.ref.WeakReference;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
@@ -37,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @BindView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
-
     @BindView(R.id.navigation_view)
     NavigationView navigationView;
 
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String ARCHIVE_FRAGMENT_NAME = "Archive";
     private static final String ITEM_FRAGMENT_NAME = "Notes";
     private static final String SETTINGS_FRAGMENT_NAME = "Settings";
+    private static final String BACK_STACKED_FRAGMENT_NAME = "BackStacked";
     private static final String EDIT_FRAG_VISIBILITY_KEY = "Edit frag visibility key";
     private static final String ARCHIVE_FRAG_VISIBILITY_KEY = "Archive frag visibility key";
     private static final String SETTINGS_FRAGMENT_VISIBILITY_KEY = "Settings frag visibility key";
@@ -56,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements
     private ArchiveItemFragment mArchiveFragment;
     private SettingsFragment mSettingsFragment;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+    private Unbinder mUnbinder;
+    private String backStackedFragmentTitle;
 
     private static int sColumns;
     private static int sMemoSizePx;
@@ -65,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         calculateColumnsAndMemoSize();
         configureDrawer();
@@ -82,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements
                 setTitle(R.string.archive);
             } else if (isSettingsFragVisible) {
                 mSettingsFragment = (SettingsFragment) manager.getFragment(savedInstanceState, SETTINGS_FRAGMENT_NAME);
+                restoreBackStackedFragment(manager, savedInstanceState);
                 setTitle(R.string.settings);
             } else {
                 mItemFragment = (ListItemFragment) manager.getFragment(savedInstanceState, ITEM_FRAGMENT_NAME);
@@ -90,6 +96,23 @@ public class MainActivity extends AppCompatActivity implements
             }
         } else {
             insertItemFragment(null);
+        }
+    }
+
+    private void restoreBackStackedFragment(FragmentManager manager, Bundle savedInstanceState) {
+        String backStackedFragmentName = savedInstanceState.getString(BACK_STACKED_FRAGMENT_NAME, "");
+        Fragment backStackedFragment = manager.getFragment(savedInstanceState, backStackedFragmentName);
+        switch (backStackedFragmentName) {
+            case ITEM_FRAGMENT_NAME:
+                mItemFragment = (ListItemFragment) backStackedFragment;
+                setDimenArgs(mItemFragment);
+                break;
+            case ARCHIVE_FRAGMENT_NAME:
+                mArchiveFragment = (ArchiveItemFragment) backStackedFragment;
+                setDimenArgs(mArchiveFragment);
+                break;
+            case EDIT_FRAGMENT_NAME:
+                mEditMemoFragment = (EditMemoFragment) backStackedFragment;
         }
     }
 
@@ -115,10 +138,11 @@ public class MainActivity extends AppCompatActivity implements
         drawerLayout.addDrawerListener(mActionBarDrawerToggle);
         navigationView.setNavigationItemSelectedListener(this);
         ImageView headerImageView = navigationView.getHeaderView(0).findViewById(R.id.navigation_header_image);
+        WeakReference<ImageView> imageViewWeakReference = new WeakReference<>(headerImageView);
         Glide.with(this).load(R.drawable.nav_bar).into(new SimpleTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                headerImageView.setBackground(resource);
+                imageViewWeakReference.get().setBackground(resource);
             }
         });
     }
@@ -138,6 +162,12 @@ public class MainActivity extends AppCompatActivity implements
                 mItemFragment.openFromNotification(id);
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mUnbinder.unbind();
     }
 
     private void insertItemFragment(Bundle bundle) {
@@ -161,28 +191,37 @@ public class MainActivity extends AppCompatActivity implements
 
     private <T extends Class<? extends Fragment>> void insertFragment(T fragmentClass, Bundle bundle) {
         Fragment fragment;
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         if (fragmentClass.equals(ArchiveItemFragment.class)) {
             fragment = mArchiveFragment = ArchiveItemFragment.newInstance(sColumns, sMemoSizePx, sMarginsPx);
+            mItemFragment = null;
+            mEditMemoFragment = null;
+            mSettingsFragment = null;
         } else if (fragmentClass.equals(EditMemoFragment.class)) {
             fragment = mEditMemoFragment = EditMemoFragment.newInstance(bundle);
+            mItemFragment = mArchiveFragment = null;
+            mSettingsFragment = null;
         } else if (fragmentClass.equals(SettingsFragment.class)) {
             fragment = mSettingsFragment = SettingsFragment.newInstance();
+            ft.addToBackStack(null);
+            backStackedFragmentTitle = getTitle().toString();
         } else {
             fragment = mItemFragment = ListItemFragment.newInstance(sColumns, sMemoSizePx, sMarginsPx);
             if (bundle != null && mItemFragment.getArguments() != null) {
                 mItemFragment.getArguments().putBundle(ListItemFragment.BUNDLE_KEY, bundle);
             }
+            mArchiveFragment = null;
+            mEditMemoFragment = null;
+            mSettingsFragment = null;
         }
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
         ft.replace(R.id.current_fragment, fragment, null);
         ft.commit();
     }
 
     @Override
-    public void onSaveEditMemoFragmentInteraction(Bundle bundle, boolean isTriggeredByDrawerItem) {
-        if (!isTriggeredByDrawerItem) {
-            insertItemFragment(bundle);
-        }
+    public void onReturnFromEditFragmentInteraction(Bundle bundle) {
+        insertItemFragment(bundle);
     }
 
     @Override
@@ -196,7 +235,12 @@ public class MainActivity extends AppCompatActivity implements
         } else if (mArchiveFragment != null && mArchiveFragment.isVisible()) {
             mArchiveFragment.onBackButtonPressed();
         } else if (mSettingsFragment != null && mSettingsFragment.isVisible()) {
-            insertItemFragment(null);
+            getSupportFragmentManager().popBackStackImmediate();
+            if (backStackedFragmentTitle != null) {
+                setTitle(backStackedFragmentTitle);
+            } else {
+                setTitle(R.string.app_name);
+            }
         }
     }
 
@@ -226,6 +270,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        if (mSettingsFragment != null && mSettingsFragment.isVisible()) {
+            getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
         switch (item.getItemId()) {
             case R.id.drawer_item_notes:
                 insertItemFragment(null);
@@ -241,10 +288,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             default:
                 return false;
-        }
-
-        if (mEditMemoFragment != null && mEditMemoFragment.isVisible()) {
-            mEditMemoFragment.saveMemo(true);
         }
 
         if (drawerLayout != null) {
@@ -268,12 +311,32 @@ public class MainActivity extends AppCompatActivity implements
             manager.putFragment(outState, ARCHIVE_FRAGMENT_NAME, mArchiveFragment);
         } else if (isSettingsFragmentVisible) {
             manager.putFragment(outState, SETTINGS_FRAGMENT_NAME, mSettingsFragment);
+            saveBackStackedFragmentToManager(manager, outState);
         } else {
             manager.putFragment(outState, ITEM_FRAGMENT_NAME, mItemFragment);
         }
         outState.putBoolean(EDIT_FRAG_VISIBILITY_KEY, isEditFragmentVisible);
         outState.putBoolean(ARCHIVE_FRAG_VISIBILITY_KEY, isArchiveFragmentVisible);
         outState.putBoolean(SETTINGS_FRAGMENT_VISIBILITY_KEY, isSettingsFragmentVisible);
+    }
+
+    private void saveBackStackedFragmentToManager(FragmentManager manager, Bundle outState) {
+        Fragment fragmentToSave = null;
+        String savedFragmentName = "";
+        if (mItemFragment != null) {
+            fragmentToSave = mItemFragment;
+            savedFragmentName = ITEM_FRAGMENT_NAME;
+        } else if (mArchiveFragment != null) {
+            fragmentToSave = mArchiveFragment;
+            savedFragmentName = ARCHIVE_FRAGMENT_NAME;
+        } else if (mEditMemoFragment != null) {
+            fragmentToSave = mEditMemoFragment;
+            savedFragmentName = EDIT_FRAGMENT_NAME;
+        }
+        if (fragmentToSave != null) {
+            outState.putString(BACK_STACKED_FRAGMENT_NAME, savedFragmentName);
+            manager.putFragment(outState, savedFragmentName, fragmentToSave);
+        }
     }
 
     public static int getColumns() {
