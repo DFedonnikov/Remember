@@ -14,6 +14,7 @@ import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmResults;
@@ -76,19 +77,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                         view.getAdapter().clearSelectedList();
                         shutDownActionMode();
                     })
-                    .subscribe(cancelMemoPair -> {
-                        if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
-                            for (Memo processed : cancelMemoPair.second) {
-                                if (cancelMemoPair.first) {
-                                    model.revertDeleteMemo(processed);
-                                    if (processed.isAlarmSet()) {
-                                        updateAlarm(processed, isReturnedToMainScreen());
-                                    }
-                                    view.getAdapter().notifyDataSetChanged();
-                                }
-                            }
-                        }
-                    });
+                    .subscribe(cancelMemoListPair -> revertChanges(view, cancelMemoListPair, true));
             compositeSubscription.add(removeSelectedSubscription);
         });
     }
@@ -105,19 +94,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                         view.getAdapter().notifyItemRangeChanged(memoPosition, view.getAdapter().getItemCount() > 1 ? 1 : 0);
                         shutDownActionMode();
                     })
-                    .subscribe(cancelMemoPair -> {
-                        if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
-                            for (Memo processed : cancelMemoPair.second) {
-                                if (cancelMemoPair.first) {
-                                    model.revertArchived(processed);
-                                    if (processed.isAlarmSet()) {
-                                        updateAlarm(processed, isReturnedToMainScreen());
-                                    }
-                                    view.getAdapter().notifyDataSetChanged();
-                                }
-                            }
-                        }
-                    });
+                    .subscribe(cancelMemoListPair -> revertChanges(view, cancelMemoListPair, false));
             compositeSubscription.add(confirmDismissSubscription);
         });
     }
@@ -133,21 +110,29 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                         view.getAdapter().clearSelectedList();
                         shutDownActionMode();
                     })
-                    .subscribe(cancelMemoPair -> {
-                        if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
-                            for (Memo processed : cancelMemoPair.second) {
-                                if (cancelMemoPair.first) {
-                                    model.revertArchived(processed);
-                                    if (processed.isAlarmSet()) {
-                                        updateAlarm(processed, isReturnedToMainScreen());
-                                    }
-                                    view.getAdapter().notifyDataSetChanged();
-                                }
-                            }
-                        }
-                    });
+                    .subscribe(cancelMemoListPair -> revertChanges(view, cancelMemoListPair, false));
             compositeSubscription.add(confirmArchiveSubscription);
         });
+    }
+
+    private void revertChanges(IListFragmentView view, Pair<Boolean, List<Memo>> cancelMemoListPair, boolean isDeleted) {
+        if (cancelMemoListPair.first != null && cancelMemoListPair.second != null) {
+            boolean canceled = cancelMemoListPair.first;
+            List<Memo> memos = cancelMemoListPair.second;
+            for (Memo processed : memos) {
+                if (canceled) {
+                    if (isDeleted) {
+                        model.revertDeleteMemo(processed);
+                    } else {
+                        model.revertArchived(processed);
+                    }
+                    if (processed.isAlarmSet()) {
+                        updateAlarm(processed, isReturnedToMainScreen());
+                    }
+                    view.getAdapter().notifyDataSetChanged();
+                }
+            }
+        }
     }
 
     @Override
