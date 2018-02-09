@@ -30,12 +30,10 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     public void attachView(@NonNull IEditMemoView view) {
         super.attachView(view);
         mModel.openDB();
-        loadData();
     }
 
     @Override
     public void detachView() {
-        saveMemo();
         mModel.closeDB();
         super.detachView();
     }
@@ -81,7 +79,8 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
         });
     }
 
-    private void saveMemo() {
+    @Override
+    public void saveData() {
         ifViewAttached(view -> {
             String memoText = view.getMemoText();
             String memoColor = view.getMemoColor();

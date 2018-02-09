@@ -22,4 +22,6 @@ public interface IEditMemoPresenter extends MvpPresenter<IEditMemoView> {
     void processTimeSet(int hour, int minute);
 
     void processPressBackButton();
+
+    void saveData();
 }

@@ -154,6 +154,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         });
 
         datePickerButton.setOnClickListener(v -> presenter.processDatePicker());
+
+        presenter.loadData();
     }
 
     @Override
@@ -260,7 +262,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         setAlarmVisibility(alarmSet);
     }
 
+    public void saveMemo() {
+        presenter.saveData();
+    }
+
     public void onBackButtonPressed() {
+        saveMemo();
         presenter.processPressBackButton();
     }
 

@@ -273,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements
         if (mSettingsFragment != null && mSettingsFragment.isVisible()) {
             getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
+        checkSaveMemo();
         switch (item.getItemId()) {
             case R.id.drawer_item_notes:
                 insertItemFragment(null);
@@ -296,6 +297,12 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return false;
+    }
+
+    private void checkSaveMemo() {
+        if (mEditMemoFragment != null && mEditMemoFragment.isVisible()) {
+            mEditMemoFragment.saveMemo();
+        }
     }
 
     @Override
