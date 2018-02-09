@@ -19,9 +19,4 @@ public class ArchiveMemoModelImpl extends ListFragmentModelImpl {
         insertToRealm(primaryRealm, toRevert);
     }
 
-    @Override
-    public void setMemoAlarmFalse(int id) {
-        //Alarm already set off when moving memo from main list to archived
-        throw new UnsupportedOperationException();
-    }
 }

@@ -120,12 +120,12 @@ public class ListFragmentModelImpl implements IListFragmentModel {
             if (positionNumber != null) {
                 position = positionNumber.intValue() + 1;
             }
-            Memo temp = new Memo(toInsert.getId(), toInsert.getMemoText(), position, toInsert.getColor(), -1, false, false, true);
+            Memo temp = new Memo(toInsert.getId(), toInsert.getMemoText(), position, toInsert.getColor(), toInsert.getAlarmDate(), toInsert.isAlarmSet(), false, true);
             realm1.insertOrUpdate(temp);
         });
     }
 
-    void removeFromRealm(Realm realmFrom, Memo toRemove) {
+    private void removeFromRealm(Realm realmFrom, Memo toRemove) {
         realmFrom.executeTransaction(realm -> toRemove.deleteFromRealm());
     }
 

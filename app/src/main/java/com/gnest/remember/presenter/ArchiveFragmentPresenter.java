@@ -17,4 +17,9 @@ public class ArchiveFragmentPresenter extends ListFragmentPresenter {
             }
         });
     }
+
+    @Override
+    boolean isReturnedToMainScreen() {
+        return false;
+    }
 }

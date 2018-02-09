@@ -302,7 +302,7 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
 
     @Override
     public void setAlarm(boolean isSet, long alarmDate, String notificationText, int id) {
-        Intent intent = AlarmReceiver.getReceiverIntent(getContext(), id, notificationText, alarmDate, isSet);
+        Intent intent = AlarmReceiver.getReceiverIntent(getContext(), id, notificationText, alarmDate, isSet, true);
         mListener.sendBroadcast(intent);
     }
 

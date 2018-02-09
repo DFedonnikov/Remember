@@ -20,12 +20,14 @@ public class AlarmService extends IntentService {
     public static final String NOTIFICATION_TEXT = "NotificationText";
     public static final String NOTIFICATION_MEMO_ID = "NotificationMemoPosition";
     public static final String NOTIFICATION_CHANNEL_ID = "com.gnest.remember.NOTIFICATION";
+    public static final String IS_ON_MAIN_SCREEN = "isOnMainScreen";
     public static final long[] VIBRATE_PATTERN = {300, 300, 300, 300};
 
-    public static Intent getServiceIntent(Context context, String notificationText, long savedId) {
+    public static Intent getServiceIntent(Context context, String notificationText, long savedId, boolean isOnMainScreen) {
         Intent intent = new Intent(context, AlarmService.class);
         intent.putExtra(NOTIFICATION_TEXT, notificationText);
         intent.putExtra(NOTIFICATION_MEMO_ID, savedId);
+        intent.putExtra(IS_ON_MAIN_SCREEN, isOnMainScreen);
         return intent;
     }
 
@@ -45,7 +47,9 @@ public class AlarmService extends IntentService {
 
             Intent resultIntent = new Intent(this, MainActivity.class);
             long memoId = intent.getLongExtra(NOTIFICATION_MEMO_ID, -1);
+            boolean isOnMainScreen = intent.getBooleanExtra(IS_ON_MAIN_SCREEN, true);
             resultIntent.putExtra(NOTIFICATION_MEMO_ID, memoId);
+            resultIntent.putExtra(IS_ON_MAIN_SCREEN, isOnMainScreen);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             stackBuilder.addParentStack(MainActivity.class);
             stackBuilder.addNextIntent(resultIntent);

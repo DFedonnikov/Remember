@@ -25,6 +25,8 @@ public interface IListFragmentView extends MvpView {
 
     void closeNotification(int id);
 
+    void setAlarm(int memoId, long alarmDate, String notificationText, boolean isAlarmSet, boolean isAlarmMovedToMainScreen);
+
     MyGridLayoutManager getLayoutManager();
 
     RecyclerView getRecyclerView();

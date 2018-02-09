@@ -10,6 +10,8 @@ import com.gnest.remember.presenter.ArchiveFragmentPresenter;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 
 import butterknife.BindString;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class ArchiveItemFragment extends ListItemFragment {
 
@@ -52,5 +54,13 @@ public class ArchiveItemFragment extends ListItemFragment {
             default:
                 return noteUnarchiveMessage;
         }
+    }
+
+    public void waitForLoadAndOpenFromNotification(long id) {
+        getDataLoadedSubject()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .distinctUntilChanged()
+                .subscribe(loaded -> openFromNotification(id));
     }
 }

@@ -157,9 +157,18 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         if (intent != null) {
             long id = intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
+            boolean isOnMainScreen = intent.getBooleanExtra(AlarmService.IS_ON_MAIN_SCREEN, true);
             intent.removeExtra(AlarmService.NOTIFICATION_MEMO_ID);
-            if (mItemFragment != null && id != -1) {
-                mItemFragment.openFromNotification(id);
+            intent.removeExtra(AlarmService.IS_ON_MAIN_SCREEN);
+            if (id != -1) {
+                if (mItemFragment != null && isOnMainScreen) {
+                    mItemFragment.openFromNotification(id);
+                } else {
+                    insertArchiveFragment();
+                    if (mArchiveFragment != null) {
+                        mArchiveFragment.waitForLoadAndOpenFromNotification(id);
+                    }
+                }
             }
         }
     }

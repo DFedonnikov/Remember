@@ -68,6 +68,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     @Override
     public void processDeleteSelectedMemos(Collection<Integer> selectedIds) {
         ifViewAttached(view -> {
+            updateAlarmNotification(selectedIds, true, isMovedToMainScreen());
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription removeSelectedSubscription = model.deleteSelected(selectedIds)
                     .zipWith(view.showConfirmRemovePopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
@@ -77,12 +78,12 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     })
                     .subscribe(cancelMemoPair -> {
                         if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
-
                             for (Memo processed : cancelMemoPair.second) {
-                                if (!cancelMemoPair.first) {
-                                    removeAlarmNotification(processed.getId(), processed.isAlarmSet());
-                                } else {
+                                if (cancelMemoPair.first) {
                                     model.revertDeleteMemo(processed);
+                                    if (processed.isAlarmSet()) {
+                                        updateAlarm(processed, isReturnedToMainScreen());
+                                    }
                                     view.getAdapter().notifyDataSetChanged();
                                 }
                             }
@@ -95,6 +96,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     @Override
     public void processSwipeDismiss(int memoId, int memoPosition) {
         ifViewAttached(view -> {
+            updateAlarmNotification(Collections.singletonList(memoId), false, isMovedToMainScreen());
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription confirmDismissSubscription = model.moveBetweenRealms(Collections.singletonList(memoId))
                     .zipWith(view.showConfirmArchiveActionPopup(subject, 1), (memo, cancel) -> new Pair<>(cancel, memo))
@@ -106,10 +108,11 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     .subscribe(cancelMemoPair -> {
                         if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
                             for (Memo processed : cancelMemoPair.second) {
-                                if (!cancelMemoPair.first) {
-                                    removeAlarmNotification(processed.getId(), processed.isAlarmSet());
-                                } else {
+                                if (cancelMemoPair.first) {
                                     model.revertArchived(processed);
+                                    if (processed.isAlarmSet()) {
+                                        updateAlarm(processed, isReturnedToMainScreen());
+                                    }
                                     view.getAdapter().notifyDataSetChanged();
                                 }
                             }
@@ -122,6 +125,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     @Override
     public void processArchiveActionOnSelected(Collection<Integer> selectedIds) {
         ifViewAttached(view -> {
+            updateAlarmNotification(selectedIds, false, isMovedToMainScreen());
             PublishSubject<Boolean> subject = PublishSubject.create();
             Subscription confirmArchiveSubscription = model.moveBetweenRealms(selectedIds)
                     .zipWith(view.showConfirmArchiveActionPopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
@@ -132,10 +136,11 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                     .subscribe(cancelMemoPair -> {
                         if (cancelMemoPair.first != null && cancelMemoPair.second != null) {
                             for (Memo processed : cancelMemoPair.second) {
-                                if (!cancelMemoPair.first) {
-                                    removeAlarmNotification(processed.getId(), processed.isAlarmSet());
-                                } else {
+                                if (cancelMemoPair.first) {
                                     model.revertArchived(processed);
+                                    if (processed.isAlarmSet()) {
+                                        updateAlarm(processed, isReturnedToMainScreen());
+                                    }
                                     view.getAdapter().notifyDataSetChanged();
                                 }
                             }
@@ -233,11 +238,36 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         });
     }
 
-    private void removeAlarmNotification(int memoId, boolean isAlarmSet) {
+    private void updateAlarmNotification(Collection<Integer> selectedIds, boolean isRemove, boolean isMovedToMainScreen) {
         ifViewAttached(view -> {
-            if (isAlarmSet) {
-                view.removeAlarm(memoId);
+            for (Integer id : selectedIds) {
+                Memo alarmUpdated = model.getMemoById(id);
+                if (alarmUpdated.isAlarmSet()) {
+                    if (isRemove) {
+                        view.removeAlarm(alarmUpdated.getId());
+                    } else {
+                        updateAlarm(alarmUpdated, isMovedToMainScreen);
+                    }
+                }
             }
         });
+    }
+
+    private void updateAlarm(Memo alarmUpdated, boolean isMovedToMainScreen) {
+        ifViewAttached(view -> {
+            String notificationTextLocal = alarmUpdated.getMemoText();
+            if (notificationTextLocal != null && notificationTextLocal.length() > 10) {
+                notificationTextLocal = notificationTextLocal.substring(0, 10).concat("...");
+            }
+            view.setAlarm(alarmUpdated.getId(), alarmUpdated.getAlarmDate(), notificationTextLocal, true, isMovedToMainScreen);
+        });
+    }
+
+    private boolean isMovedToMainScreen() {
+        return this instanceof ArchiveFragmentPresenter;
+    }
+
+    boolean isReturnedToMainScreen() {
+        return true;
     }
 }

@@ -41,6 +41,7 @@ import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 import com.gnest.remember.presenter.ListFragmentPresenter;
+import com.gnest.remember.services.AlarmReceiver;
 import com.gnest.remember.view.IListFragmentView;
 import com.gnest.remember.view.activity.MainActivity;
 import com.gnest.remember.view.helper.ItemTouchHelperCallback;
@@ -350,7 +351,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
                 subject.onNext(true);
             }
             subject.onCompleted();
-            mPopupWindow.dismiss();
         });
         mPopupWindow.showAtLocation(mPopupLayout, Gravity.BOTTOM, 0, mYOffset);
         return mPopupWindow;
@@ -431,11 +431,17 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
+    public void setAlarm(int memoId, long alarmDate, String notificationText, boolean isAlarmSet, boolean isAlarmMovedToMainScreen) {
+        Intent intent = AlarmReceiver.getReceiverIntent(getContext(), memoId, notificationText, alarmDate, isAlarmSet, isAlarmMovedToMainScreen);
+        mListener.sendBroadcast(intent);
+    }
+
+    @Override
     public void removeAlarm(int memoId) {
         FragmentActivity activity = getActivity();
         if (activity != null) {
             AlarmManager manager = (AlarmManager) activity.getSystemService(Context.ALARM_SERVICE);
-            Intent intent = AlarmService.getServiceIntent(activity, null, memoId);
+            Intent intent = AlarmService.getServiceIntent(activity, null, memoId, true);
             PendingIntent pendingIntent = PendingIntent.getService(activity, memoId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             if (manager != null) {
                 manager.cancel(pendingIntent);
@@ -581,5 +587,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         void onEnterEditMode(int memoId);
 
         void syncDrawerToggleState();
+
+        void sendBroadcast(Intent intent);
     }
 }
