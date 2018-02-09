@@ -94,8 +94,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             ActionBar actionBar = activity.getSupportActionBar();
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setHomeButtonEnabled(true);
-                mListener.syncDrawerToggleState();
             }
             SHARED_PREFERENCES = PreferenceManager.getDefaultSharedPreferences(activity);
             SHARED_PREFERENCES.registerOnSharedPreferenceChangeListener(this);
@@ -177,7 +175,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                mListener.onBackButtonPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -214,6 +212,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     public interface OnSettingsFragmentInteractionListener {
-        void syncDrawerToggleState();
+        void onBackButtonPressed();
     }
 }
