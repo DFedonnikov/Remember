@@ -28,6 +28,7 @@
         <item name="colorPrimary">@color/toolbarColorPrimary</item>
         <item name="colorButtonNormal">@color/toolbarColorPrimary</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="colorControlNormal">@android:color/black</item>
     </style>
 
     <style name="DrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
