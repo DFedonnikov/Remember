@@ -197,7 +197,12 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        colorChoiceSpinner.setOnItemSelectedListener(null);
+        if (colorChoiceSpinner != null) {
+            colorChoiceSpinner.setOnItemSelectedListener(null);
+        }
+        if (timePickFragment != null) {
+            timePickFragment.setTimeSetListener(null);
+        }
         mUnbinder.unbind();
     }
 
@@ -343,12 +348,6 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         if (mColor != null) {
             colorChoiceSpinner.setSelection(ColorSpinnerAdapter.Colors.valueOf(mColor).ordinal());
         }
-    }
-
-    @Override
-    public void onDestroyOptionsMenu() {
-        super.onDestroyOptionsMenu();
-
     }
 
     @Override
