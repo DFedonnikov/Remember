@@ -2,6 +2,7 @@ package com.gnest.remember.view.activity;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -213,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements
         } else if (fragmentClass.equals(SettingsFragment.class)) {
             fragment = mSettingsFragment = SettingsFragment.newInstance();
             ft.addToBackStack(null);
+            checkSaveListLayoutState();
             backStackedFragmentTitle = getTitle().toString();
         } else {
             fragment = mItemFragment = ListItemFragment.newInstance(sColumns, sMemoSizePx, sMarginsPx);
@@ -226,6 +228,14 @@ public class MainActivity extends AppCompatActivity implements
 
         ft.replace(R.id.current_fragment, fragment, null);
         ft.commit();
+    }
+
+    private void checkSaveListLayoutState() {
+        if (mItemFragment != null) {
+            mItemFragment.saveListState();
+        } else if (mArchiveFragment != null) {
+            mArchiveFragment.saveListState();
+        }
     }
 
     @Override

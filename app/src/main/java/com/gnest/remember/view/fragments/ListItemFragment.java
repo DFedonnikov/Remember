@@ -290,12 +290,18 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Bundle state = new Bundle();
-        state.putParcelable(SAVED_LAYOUT_MANAGER, mMyGridLayoutManager.onSaveInstanceState());
-        state.putBoolean(EXPANDED_KEY, mAdapter.isItemsExpanded());
-        state.putInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
-        state.putInt(MyGridLayoutManager.POSITION_KEY, mMyGridLayoutManager.getLastPosition());
+        Bundle state = saveListState();
         outState.putBundle(SAVED_STATE_KEY, state);
+    }
+
+    @NonNull
+    public Bundle saveListState() {
+        mSavedState = new Bundle();
+        mSavedState.putParcelable(SAVED_LAYOUT_MANAGER, mMyGridLayoutManager.onSaveInstanceState());
+        mSavedState.putBoolean(EXPANDED_KEY, mAdapter.isItemsExpanded());
+        mSavedState.putInt(MyGridLayoutManager.LM_SCROLL_ORIENTATION_KEY, mMyGridLayoutManager.getOrientation());
+        mSavedState.putInt(MyGridLayoutManager.POSITION_KEY, mMyGridLayoutManager.getLastPosition());
+        return mSavedState;
     }
 
     @Override

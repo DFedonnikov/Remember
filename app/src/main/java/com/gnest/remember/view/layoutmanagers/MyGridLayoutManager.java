@@ -10,8 +10,6 @@ import android.view.View;
 
 import com.gnest.remember.App;
 
-import rx.subjects.BehaviorSubject;
-
 public class MyGridLayoutManager extends GridLayoutManager {
 
     public static final String LM_SCROLL_ORIENTATION_KEY = "LayoutManager orientation key";
@@ -43,7 +41,7 @@ public class MyGridLayoutManager extends GridLayoutManager {
             Rect viewRect = new Rect(left, top, right, bottom);
 
             int square = Math.abs(viewRect.height() * viewRect.width());
-            if (square >= maxSquare) {
+            if (square > maxSquare) {
                 maxSquare = square;
                 maxSquareView = view;
             }
