@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String ARCHIVE_FRAG_VISIBILITY_KEY = "Archive frag visibility key";
     private static final String SETTINGS_FRAGMENT_VISIBILITY_KEY = "Settings frag visibility key";
     public static final int ITEM_MARGINS_DP = 12;
-    public static final int MAX_MEMO_SIZE_DP = 180;
+    public static final int MEMO_SIZE_DP = 160;
 
     private ListItemFragment mItemFragment;
     private EditMemoFragment mEditMemoFragment;
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void calculateColumnsAndMemoSize() {
         int screenWidthDP = getResources().getConfiguration().screenWidthDp;
-        sColumns = screenWidthDP / MAX_MEMO_SIZE_DP;
+        sColumns = screenWidthDP / MEMO_SIZE_DP;
         float density = getResources().getDisplayMetrics().density;
         sMemoSizePx = (int) (((screenWidthDP - 2 * ITEM_MARGINS_DP * sColumns) / sColumns) * density + 0.5);
         sMarginsPx = (int) (ITEM_MARGINS_DP * density + 0.5);
