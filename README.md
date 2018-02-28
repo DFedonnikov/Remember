@@ -4,6 +4,11 @@
 ## About Remember
 Do not forget - __Remember__. Easy manage your notes with minimum efforts. Intuitive created memos notifications will never let you miss an important reminder.
 
+### Used technologies:
+* __Architecture:__ Mosby, rxJava
+* __Database:__ Realm
+* __Other frameworks:__ Butterknife, Glide
+
 ### What's new (14.02.2018):
 * Reduced APK file size
 
