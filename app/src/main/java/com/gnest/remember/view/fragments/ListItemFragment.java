@@ -169,12 +169,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             mMargins = getArguments().getInt(ARG_MEMO_MARGINS);
         }
         Context context = mView.getContext();
-        if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
-            recyclerView.setLayoutManager(mMyGridLayoutManager);
-        }
+        mMyGridLayoutManager = new MyGridLayoutManager(context, mColumnCount);
+        recyclerView.setLayoutManager(mMyGridLayoutManager);
         mAdapter = new MySelectableAdapter(mMemoSize, mMargins);
         mAdapter.setActionListener(this);
         mMyGridLayoutManager.setExpandListener(mAdapter);
