@@ -9,7 +9,10 @@ Do not forget - __Remember__. Easy manage your notes with minimum efforts. Intui
 * __Database:__ Realm
 * __Other frameworks:__ Butterknife, Glide
 
-### What's new (14.02.2018):
+### What's new
+#### 06.03.2018
+* Fixed erros on devices with dpi less than 360
+#### 14.02.2018
 * Reduced APK file size
 
 [<img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width="227" height="88"/>](http://play.google.com/store/apps/details?id=com.gnest.remember)
