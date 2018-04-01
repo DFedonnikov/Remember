@@ -497,7 +497,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
-    public void openFromNotification(long id) {
+    public void openFromNotification(int id) {
         presenter.processOpenFromNotification(id);
     }
 

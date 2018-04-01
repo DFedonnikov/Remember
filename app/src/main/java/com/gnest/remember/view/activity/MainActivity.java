@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements
     private void checkRunFromNotification() {
         Intent intent = getIntent();
         if (intent != null) {
-            long id = intent.getLongExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
+            int id = intent.getIntExtra(AlarmService.NOTIFICATION_MEMO_ID, -1);
             boolean isOnMainScreen = intent.getBooleanExtra(AlarmService.IS_ON_MAIN_SCREEN, true);
             intent.removeExtra(AlarmService.NOTIFICATION_MEMO_ID);
             intent.removeExtra(AlarmService.IS_ON_MAIN_SCREEN);

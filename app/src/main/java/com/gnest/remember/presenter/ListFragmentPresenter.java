@@ -148,23 +148,23 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void processOpenFromNotification(long id) {
+    public void processOpenFromNotification(int id) {
         ifViewAttached(view ->
                 view.getDataLoadedSubject()
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .distinctUntilChanged(dataLoaded -> dataLoaded)
                         .zipWith(getComputingLayoutOrScrollingSubject(view).distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
-                        .map(subjectsCompletedPair -> model.getMemoById((int) id))
+                        .map(subjectsCompletedPair -> model.getMemoById(id))
                         .subscribe(memo -> {
-                            MyGridLayoutManager manager = view.getLayoutManager();
-                            MySelectableAdapter adapter = view.getAdapter();
-                            manager.setSpanCount(1);
-                            adapter.expandItems();
-                            manager.setOrientation(HORIZONTAL);
-                            manager.scrollToPositionWithOffset(memo.getPosition(), 0);
-                            model.setMemoAlarmFalse(memo.getId());
-                            view.closeNotification(memo.getId());
+                                MyGridLayoutManager manager = view.getLayoutManager();
+                                MySelectableAdapter adapter = view.getAdapter();
+                                manager.setSpanCount(1);
+                                adapter.expandItems();
+                                manager.setOrientation(HORIZONTAL);
+                                manager.scrollToPositionWithOffset(memo.getPosition(), 0);
+                                model.setMemoAlarmFalse(memo.getId());
+                                view.closeNotification(memo.getId());
                         }));
     }
 

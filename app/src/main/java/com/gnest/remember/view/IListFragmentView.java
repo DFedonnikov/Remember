@@ -21,7 +21,7 @@ public interface IListFragmentView extends MvpView {
 
     void shareMemoText(String memoText);
 
-    void openFromNotification(long id);
+    void openFromNotification(int id);
 
     void closeNotification(int id);
 

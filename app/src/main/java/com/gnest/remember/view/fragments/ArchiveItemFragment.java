@@ -56,7 +56,7 @@ public class ArchiveItemFragment extends ListItemFragment {
         }
     }
 
-    public void waitForLoadAndOpenFromNotification(long id) {
+    public void waitForLoadAndOpenFromNotification(int id) {
         getDataLoadedSubject()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
