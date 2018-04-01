@@ -229,9 +229,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                 Memo alarmUpdated = model.getMemoById(id);
                 if (alarmUpdated.isAlarmSet()) {
                     if (isRemove) {
-                        view.removeAlarm(alarmUpdated.getId());
+                        view.removeAlarm(id);
                     } else {
                         updateAlarm(alarmUpdated, isMovedToMainScreen);
+                    }
+                    if (view.isNotificationVisible(id)) {
+                        model.setMemoAlarmFalse(id);
+                        view.closeNotification(id);
                     }
                 }
             }
