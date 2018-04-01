@@ -37,6 +37,8 @@
     <string name="notification_default_value">content://settings/system/notification_sound</string>
     <string name="sound_preference_title">Notification sound</string>
     <string name="font_size_preference_title">Font size</string>
+    <string name="channel_name">Remember</string>
+    <string name="channel_description">Remember channel</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>
