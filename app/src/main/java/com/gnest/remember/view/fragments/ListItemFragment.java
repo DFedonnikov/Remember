@@ -6,8 +6,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -448,6 +450,29 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
             if (manager != null) {
                 manager.cancel(pendingIntent);
             }
+        }
+    }
+
+    @Override
+    public boolean isNotificationVisible(int id) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            FragmentActivity activity = getActivity();
+            NotificationManager manager = null;
+            if (activity != null) {
+                manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+            }
+            if (manager != null) {
+                for (StatusBarNotification notification : manager.getActiveNotifications()) {
+                    if (notification.getId() == id) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } else {
+            Intent notificationIntent = new Intent(getContext(), MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), id, notificationIntent, PendingIntent.FLAG_NO_CREATE);
+            return pendingIntent != null;
         }
     }
 
