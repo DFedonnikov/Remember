@@ -1,7 +1,6 @@
 package com.gnest.remember.services;
 
 import android.app.IntentService;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -10,7 +9,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -22,9 +20,7 @@ public class AlarmService extends IntentService {
 
     public static final String NOTIFICATION_TEXT = "NotificationText";
     public static final String NOTIFICATION_MEMO_ID = "NotificationMemoPosition";
-    public static final String NOTIFICATION_CHANNEL_ID = "com.gnest.remember.NOTIFICATION";
     public static final String IS_ON_MAIN_SCREEN = "isOnMainScreen";
-    public static final long[] VIBRATE_PATTERN = {300, 300, 300, 300};
 
     public static Intent getServiceIntent(Context context, String notificationText, int savedId, boolean isOnMainScreen) {
         Intent intent = new Intent(context, AlarmService.class);
@@ -42,17 +38,18 @@ public class AlarmService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null) {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_note)
                     .setContentTitle(getString(R.string.notification_title))
-                    .setContentText(intent.getStringExtra(NOTIFICATION_TEXT))
-                    .setVibrate(VIBRATE_PATTERN)
-                    .setSound(App.NOTIFICATION_SOUND);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel(notificationManager);
-                builder.setChannelId(NOTIFICATION_CHANNEL_ID);
+                    .setContentText(intent.getStringExtra(NOTIFICATION_TEXT));
+            /*If user uses Android Oreo or higher,
+            notification channel will take care of sound and vibration.
+            Otherwise, configure them in builder.
+             */
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                builder.setVibrate(App.VIBRATE_PATTERN)
+                        .setSound(App.NOTIFICATION_SOUND);
             }
-
             Intent resultIntent = new Intent(this, MainActivity.class);
             int memoId = intent.getIntExtra(NOTIFICATION_MEMO_ID, -1);
             boolean isOnMainScreen = intent.getBooleanExtra(IS_ON_MAIN_SCREEN, true);
@@ -66,20 +63,6 @@ public class AlarmService extends IntentService {
             if (notificationManager != null) {
                 notificationManager.notify(memoId, builder.build());
             }
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void createNotificationChannel(@Nullable NotificationManager notificationManager) {
-        if (notificationManager != null) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            channel.enableVibration(true);
-            channel.setVibrationPattern(VIBRATE_PATTERN);
-            notificationManager.createNotificationChannel(channel);
         }
     }
 
