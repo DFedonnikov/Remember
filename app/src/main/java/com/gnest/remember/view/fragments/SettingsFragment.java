@@ -1,15 +1,19 @@
 package com.gnest.remember.view.fragments;
 
+import android.annotation.TargetApi;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
@@ -33,6 +37,7 @@ import butterknife.Unbinder;
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int REQUEST_CODE_NOTIFICATION_SOUND = 1;
+    private static final int REQUEST_CODE_CHANNEL_SETUP = 2;
 
     @BindView(R.id.settings_fragment_toolbar)
     Toolbar toolbar;
@@ -40,7 +45,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     private static SharedPreferences SHARED_PREFERENCES;
 
     private OnSettingsFragmentInteractionListener mListener;
-    private DrawerLayout mDrawerLayout;
     private Unbinder mUnbinder;
 
     public static SettingsFragment newInstance() {
@@ -66,9 +70,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         View view = super.onCreateView(inflater, container, savedInstanceState);
         if (view != null) {
             mUnbinder = ButterKnife.bind(this, view);
-        }
-        if (getActivity() != null) {
-            mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
         }
         return view;
     }
@@ -118,10 +119,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
         if (App.NOTIFICATION_SOUND_KEY.equals(preference.getKey())) {
-            openRingtonePicker();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                openNotificationChanelSetup();
+            } else {
+                openRingtonePicker();
+            }
             return true;
         } else {
             return super.onPreferenceTreeClick(preference);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void openNotificationChanelSetup() {
+        Context context = getContext();
+        if (context != null) {
+            Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
+            intent.putExtra(Settings.EXTRA_CHANNEL_ID, App.NOTIFICATION_CHANNEL_ID);
+            startActivityForResult(intent, REQUEST_CODE_CHANNEL_SETUP);
         }
     }
 
@@ -160,6 +176,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 editor.putString(App.NOTIFICATION_SOUND_KEY, "");
             }
             editor.apply();
+        } else if (requestCode == REQUEST_CODE_CHANNEL_SETUP) {
+            setNotificationSoundPrefSummary(getRingtoneUri());
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -213,9 +231,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     private Uri getRingtoneUri() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                NotificationManager manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+                if (manager != null) {
+                    NotificationChannel channel = manager.getNotificationChannel(App.NOTIFICATION_CHANNEL_ID);
+                    if (channel != null) {
+                        return channel.getSound();
+                    }
+                }
+            }
+        }
         String uriPath = SHARED_PREFERENCES.getString(App.NOTIFICATION_SOUND_KEY, "");
         return uriPath.isEmpty() ? Settings.System.DEFAULT_NOTIFICATION_URI : Uri.parse(uriPath);
     }
+
 
     public interface OnSettingsFragmentInteractionListener {
         void onBackPressed();
