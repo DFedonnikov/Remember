@@ -98,7 +98,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             SHARED_PREFERENCES.registerOnSharedPreferenceChangeListener(this);
         }
         setFontPrefSummary();
-        setNotificationSoundPrefSummary();
+        setNotificationSoundPrefSummary(getRingtoneUri());
     }
 
     @Override
@@ -189,8 +189,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 App.setFontSize(Integer.parseInt(fontSize));
                 break;
             case App.NOTIFICATION_SOUND_KEY:
-                String uriPath = setNotificationSoundPrefSummary();
-                App.setNotificationSound(uriPath != null ? Uri.parse(uriPath) : Settings.System.DEFAULT_NOTIFICATION_URI);
+                Uri ringtoneUri = getRingtoneUri();
+                setNotificationSoundPrefSummary(ringtoneUri);
+                App.setNotificationSound(ringtoneUri);
         }
     }
 
@@ -202,12 +203,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         return fontSize;
     }
 
-    private String setNotificationSoundPrefSummary() {
+    private void setNotificationSoundPrefSummary(Uri ringtoneUri) {
         Preference notificationSoundPref = findPreference(App.NOTIFICATION_SOUND_KEY);
-        String uriPath = SHARED_PREFERENCES.getString(App.NOTIFICATION_SOUND_KEY, null);
-        String summary = uriPath == null || uriPath.isEmpty() ? "" : RingtoneManager.getRingtone(getContext(), Uri.parse(uriPath)).getTitle(getContext());
-        notificationSoundPref.setSummary(summary);
-        return uriPath;
+        Context context = getContext();
+        if (context != null) {
+            String summary = RingtoneManager.getRingtone(context, ringtoneUri).getTitle(context);
+            notificationSoundPref.setSummary(summary);
+        }
+    }
+
+    private Uri getRingtoneUri() {
+        String uriPath = SHARED_PREFERENCES.getString(App.NOTIFICATION_SOUND_KEY, "");
+        return uriPath.isEmpty() ? Settings.System.DEFAULT_NOTIFICATION_URI : Uri.parse(uriPath);
     }
 
     public interface OnSettingsFragmentInteractionListener {
