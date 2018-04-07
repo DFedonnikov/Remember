@@ -78,7 +78,8 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             }
             realm.executeTransactionAsync(realm1 -> {
                 RealmResults<Memo> results = realm1.where(Memo.class)
-                        .findAllSorted(MemoRealmFields.ID);
+                        .findAll()
+                        .sort(MemoRealmFields.ID);
                 for (Memo memo : results) {
                     if (memo.isAlarmSet()) {
                         setAlarm(context, memo.getId(), memo.getMemoText(), memo.getAlarmDate(), memo.isAlarmSet(), isOnMainScreen);
