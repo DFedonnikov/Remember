@@ -5,11 +5,12 @@ import com.gnest.remember.model.db.data.Memo;
 import java.util.Collection;
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.realm.RealmResults;
-import rx.Observable;
 
 public interface IListFragmentModel {
-    Observable<RealmResults<Memo>> getData();
+    Flowable<RealmResults<Memo>> getData();
 
     Memo getMemoById(int id);
 
