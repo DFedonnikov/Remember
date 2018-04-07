@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements
                 } else {
                     insertArchiveFragment();
                     if (mArchiveFragment != null) {
-                        mArchiveFragment.waitForLoadAndOpenFromNotification(id);
+                        mArchiveFragment.openFromNotification(id);
                     }
                 }
             }
