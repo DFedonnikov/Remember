@@ -345,7 +345,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
           /*Have to pass a dummy listener, so action button could be visible
         * Undo action is being processed by rxSnackbar in presenter*/
         Snackbar snackbar = Snackbar
-                .make(getView(), text, Snackbar.LENGTH_LONG)
+                .make(getView(), text, Snackbar.LENGTH_SHORT)
                 .setAction(android.R.string.cancel, v -> {
                 })
                 .setActionTextColor(getResources().getColor(R.color.colorPrimaryDark));
