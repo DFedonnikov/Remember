@@ -12,6 +12,7 @@ import android.os.Parcelable;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,8 +23,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,8 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -55,19 +52,15 @@ import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 
 import java.lang.ref.WeakReference;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import florent37.github.com.rxlifecycle.RxLifecycle;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.realm.RealmResults;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
-
 
 public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragmentPresenter>
         implements MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView {
@@ -80,7 +73,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private static final String SAVED_LAYOUT_MANAGER = "Saved layout manager";
     private static final String SAVED_STATE_KEY = "Saved state key";
 
-    private final BehaviorSubject<Boolean> mDataLoadedSubject = BehaviorSubject.create();
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @BindView(R.id.items_fragment)
     LinearLayout layout;
@@ -105,9 +98,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     String sendMemoIntentTitle;
 
     private View mView;
-    private View mPopupLayout;
     private Unbinder mUnbinder;
-    private int mYOffset;
     private int mColumnCount;
     private int mMemoSize;
     private int mMargins;
@@ -118,9 +109,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     private ActionMenu mActionMenu;
     private MyGridLayoutManager mMyGridLayoutManager;
     private DrawerLayout mDrawerLayout;
-    private TextView mCancel;
-    private TextView mCancelMessage;
-    private PopupWindow mPopupWindow;
     private Bundle mSavedState;
 
 
@@ -145,13 +133,10 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_item_list, container, false);
-        mPopupLayout = inflater.inflate(R.layout.layout_popup_confirmation_dismiss, mView.findViewById(R.id.container_popup_cancel_dismiss));
         mUnbinder = ButterKnife.bind(this, mView);
         if (getActivity() != null) {
             mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
         }
-        mCancel = mPopupLayout.findViewById(R.id.btn_cancel_dismiss);
-        mCancelMessage = mPopupLayout.findViewById(R.id.cancelText);
         WeakReference<LinearLayout> layoutWeakReference = new WeakReference<>(layout);
         Glide.with(this).load(R.drawable.itemfragment_background_pin_board).into(new SimpleTarget<Drawable>() {
             @Override
@@ -181,10 +166,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
-
-        mYOffset = getYOffset();
-
-        mPopupWindow = new PopupWindow(mPopupLayout, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, false);
 
         presenter.loadData();
     }
@@ -230,6 +211,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         if (mMyGridLayoutManager != null) {
             mMyGridLayoutManager.setExpandListener(null);
         }
+        compositeDisposable.dispose();
         shutDownActionMode();
     }
 
@@ -252,7 +234,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         mAdapter.setMemos(data);
         mAdapter.notifyDataSetChanged();
         checkStateRestore();
-        mDataLoadedSubject.onNext(true);
     }
 
     private void checkStateRestore() {
@@ -325,6 +306,16 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
+    public void onArchiveButtonPressed() {
+        presenter.processArchiveActionOnSelected(mAdapter.getSelectedIds());
+    }
+
+    @Override
+    public void onShareButtonPressed() {
+        presenter.processShare(mAdapter.getSelectedIds());
+    }
+
+    @Override
     public void onDeleteButtonPressed() {
         presenter.processDeleteSelectedMemos(mAdapter.getSelectedIds());
     }
@@ -335,58 +326,31 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
-    public Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject, int numOfNotes) {
-        PopupWindow popupWindow = setUpPopupWindow(subject, numOfNotes);
-        setUpCancelArchiveActionMessage(numOfNotes);
-        return getPopUpObservable(subject, popupWindow);
+    public Snackbar getArchiveSnackbar(int numOfNotes) {
+        return createAndShowSnackbar(getArchiveActionPluralForm(getPlural(numOfNotes)), numOfNotes);
     }
 
     @Override
-    public Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject, int numOfNotes) {
-        PopupWindow popupWindow = setUpPopupWindow(subject, numOfNotes);
-        setUpCancelRemoveMessage(numOfNotes);
-        return getPopUpObservable(subject, popupWindow);
+    public Snackbar getDeleteSnackbar(int numOfNotes) {
+        return createAndShowSnackbar(getRemoveActionPluralForm(getPlural(numOfNotes)), numOfNotes);
     }
 
     @NonNull
-    private PopupWindow setUpPopupWindow(PublishSubject<Boolean> subject, int numOfNotes) {
-        mCancel.setOnClickListener(v -> {
-            for (int x = 0; x < numOfNotes; x++) {
-                subject.onNext(true);
-            }
-            subject.onCompleted();
-        });
-        mPopupWindow.showAtLocation(mPopupLayout, Gravity.BOTTOM, 0, mYOffset);
-        return mPopupWindow;
-    }
-
-    private int getYOffset() {
-        //Checking if device has on screen buttons and calculating offset;
-        FragmentActivity activity = getActivity();
-        if (activity != null) {
-            DisplayMetrics metrics = new DisplayMetrics();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            int usableHeight = metrics.heightPixels;
-            getActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-            int realHeight = metrics.heightPixels;
-            if (realHeight > usableHeight)
-                return realHeight - usableHeight;
-            else
-                return 0;
+    private Snackbar createAndShowSnackbar(String pluralForm, int numOfNotes) {
+        String text = numOfNotes + " " + pluralForm;
+        View view = getView();
+        if (view == null) {
+            throw new NullPointerException("view == null");
         }
-        return 0;
-    }
-
-    void setUpCancelArchiveActionMessage(int numOfNotes) {
-        int plural = getPlural(numOfNotes);
-        String text = numOfNotes + " " + getArchiveActionPluralForm(plural);
-        mCancelMessage.setText(text);
-    }
-
-    void setUpCancelRemoveMessage(int numOfNotes) {
-        int plural = getPlural(numOfNotes);
-        String text = numOfNotes + " " + getRemovePluralForm(plural);
-        mCancelMessage.setText(text);
+          /*Have to pass a dummy listener, so action button could be visible
+        * Undo action is being processed by rxSnackbar in presenter*/
+        Snackbar snackbar = Snackbar
+                .make(getView(), text, Snackbar.LENGTH_LONG)
+                .setAction(android.R.string.cancel, v -> {
+                })
+                .setActionTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        snackbar.show();
+        return snackbar;
     }
 
     String getArchiveActionPluralForm(int plural) {
@@ -400,7 +364,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         }
     }
 
-    private String getRemovePluralForm(int plural) {
+    private String getRemoveActionPluralForm(int plural) {
         switch (plural) {
             case 2:
                 return noteRemovedMessage2;
@@ -424,14 +388,14 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         }
     }
 
-    @NonNull
-    private Observable<Boolean> getPopUpObservable(PublishSubject<Boolean> subject, PopupWindow popupWindow) {
-        return subject
-                .take(2000, TimeUnit.MILLISECONDS)
-                .onBackpressureDrop()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnUnsubscribe(popupWindow::dismiss);
+    @Override
+    public void shareMemoText(String memoText) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, memoText);
+        Intent chooserIntent = Intent.createChooser(intent, sendMemoIntentTitle);
+        mActionMode.finish();
+        startActivity(chooserIntent);
     }
 
     @Override
@@ -477,28 +441,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
-    public void onArchiveButtonPressed() {
-        presenter.processArchiveActionOnSelected(mAdapter.getSelectedIds());
-    }
-
-    @Override
-    public void onShareButtonPressed() {
-        presenter.processShare(mAdapter.getSelectedIds());
-    }
-
-    @Override
-    public void shareMemoText(String memoText) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, memoText);
-        Intent chooserIntent = Intent.createChooser(intent, sendMemoIntentTitle);
-        mActionMode.finish();
-        startActivity(chooserIntent);
-    }
-
-    @Override
     public void openFromNotification(int id) {
-        presenter.processOpenFromNotification(id);
+        Disposable disposable = RxLifecycle.with(getLifecycle())
+                .onResume()
+                .subscribe(event -> presenter.processOpenFromNotification(id));
+        compositeDisposable.add(disposable);
     }
 
     @Override
@@ -584,11 +531,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public RecyclerView getRecyclerView() {
         return recyclerView;
-    }
-
-    @Override
-    public BehaviorSubject<Boolean> getDataLoadedSubject() {
-        return mDataLoadedSubject;
     }
 
     @Override
