@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import rx.Observable;
 
 public class ListFragmentModelImpl implements IListFragmentModel {
 
@@ -36,10 +37,11 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     }
 
     @Override
-    public Observable<RealmResults<Memo>> getData() {
+    public Flowable<RealmResults<Memo>> getData() {
         return primaryRealm.where(Memo.class)
-                .findAllSortedAsync(MemoRealmFields.POSITION)
-                .asObservable();
+                .findAllAsync()
+                .sort(MemoRealmFields.POSITION)
+                .asFlowable();
     }
 
     @Override
@@ -163,11 +165,14 @@ public class ListFragmentModelImpl implements IListFragmentModel {
     private void validatePositions(Realm validatedRealm) {
         validatedRealm.executeTransaction(realm -> {
             RealmResults<Memo> memos = realm.where(Memo.class)
-                    .findAllSorted(MemoRealmFields.POSITION);
+                    .findAll()
+                    .sort(MemoRealmFields.POSITION);
             for (int i = 0; i < memos.size(); i++) {
                 Memo memoToUpdate = memos.get(i);
-                memoToUpdate.setPosition(i);
-                realm.insertOrUpdate(memoToUpdate);
+                if (memoToUpdate != null) {
+                    memoToUpdate.setPosition(i);
+                    realm.insertOrUpdate(memoToUpdate);
+                }
             }
         });
     }
