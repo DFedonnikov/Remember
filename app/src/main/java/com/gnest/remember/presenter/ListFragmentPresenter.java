@@ -1,8 +1,8 @@
 package com.gnest.remember.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
-import android.support.v7.widget.RecyclerView;
 
 import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
@@ -11,27 +11,24 @@ import com.gnest.remember.view.IListFragmentView;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
+import com.jakewharton.rxbinding2.support.design.widget.RxSnackbar;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.realm.RealmResults;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
-import rx.subscriptions.CompositeSubscription;
 
 import static android.widget.GridLayout.HORIZONTAL;
 
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
     IListFragmentModel model;
-    private CompositeSubscription compositeSubscription = new CompositeSubscription();
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public ListFragmentPresenter() {
         model = new ListFragmentModelImpl();
@@ -46,91 +43,109 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     @Override
     public void detachView() {
         model.closeDB();
-        compositeSubscription.clear();
+        compositeDisposable.clear();
         super.detachView();
     }
 
     @Override
     public void destroy() {
-        compositeSubscription.unsubscribe();
+        compositeDisposable.dispose();
         super.destroy();
     }
 
     @Override
     public void loadData() {
-        Subscription getDataSubscription = model.getData()
+        Disposable disposable = model.getData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(RealmResults::isLoaded)
-                .first()
+                .firstElement()
                 .subscribe(memos -> ifViewAttached(view -> view.setData(memos)));
-        compositeSubscription.add(getDataSubscription);
+        compositeDisposable.add(disposable);
     }
 
     @Override
     public void processDeleteSelectedMemos(Collection<Integer> selectedIds) {
-        ifViewAttached(view -> {
-            updateAlarmNotification(selectedIds, true, isMovedToMainScreen());
-            PublishSubject<Boolean> subject = PublishSubject.create();
-            Subscription removeSelectedSubscription = model.deleteSelected(selectedIds)
-                    .zipWith(view.showConfirmRemovePopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
-                    .doOnSubscribe(() -> {
-                        view.getAdapter().clearSelectedList();
-                        shutDownActionMode();
-                    })
-                    .subscribe(cancelMemoListPair -> revertChanges(view, cancelMemoListPair, true));
-            compositeSubscription.add(removeSelectedSubscription);
-        });
-    }
-
-    @Override
-    public void processSwipeDismiss(int memoId, int memoPosition) {
-        ifViewAttached(view -> {
-            updateAlarmNotification(Collections.singletonList(memoId), false, isMovedToMainScreen());
-            PublishSubject<Boolean> subject = PublishSubject.create();
-            Subscription confirmDismissSubscription = model.moveBetweenRealms(Collections.singletonList(memoId))
-                    .zipWith(view.showConfirmArchiveActionPopup(subject, 1), (memo, cancel) -> new Pair<>(cancel, memo))
-                    .doOnSubscribe(() -> {
-                        view.getAdapter().notifyItemRemoved(memoPosition);
-                        view.getAdapter().notifyItemRangeChanged(memoPosition, view.getAdapter().getItemCount() > 1 ? 1 : 0);
-                        shutDownActionMode();
-                    })
-                    .subscribe(cancelMemoListPair -> revertChanges(view, cancelMemoListPair, false));
-            compositeSubscription.add(confirmDismissSubscription);
-        });
+        performMemoTransaction(selectedIds, -1, TransactionStrategy.DELETE);
     }
 
     @Override
     public void processArchiveActionOnSelected(Collection<Integer> selectedIds) {
+        performMemoTransaction(selectedIds, -1, TransactionStrategy.ARCHIVE);
+    }
+
+    @Override
+    public void processSwipeDismiss(int memoId, int memoPosition) {
+        performMemoTransaction(Collections.singletonList(memoId), memoPosition, TransactionStrategy.ARCHIVE);
+    }
+
+    private void performMemoTransaction(Collection<Integer> ids, int memoPosition, TransactionStrategy strategy) {
         ifViewAttached(view -> {
-            updateAlarmNotification(selectedIds, false, isMovedToMainScreen());
-            PublishSubject<Boolean> subject = PublishSubject.create();
-            Subscription confirmArchiveSubscription = model.moveBetweenRealms(selectedIds)
-                    .zipWith(view.showConfirmArchiveActionPopup(subject, selectedIds.size()), (memo, cancel) -> new Pair<>(cancel, memo))
-                    .doOnSubscribe(() -> {
-                        view.getAdapter().clearSelectedList();
+            Observable<Integer> snackbarObservable = getRxSnackbar(ids, view, strategy);
+            Observable<List<Memo>> memoList = null;
+            switch (strategy) {
+                case ARCHIVE:
+                    updateAlarmNotification(ids, false, isMovedToMainScreen());
+                    memoList = model.moveBetweenRealms(ids);
+                    break;
+                case DELETE:
+                    updateAlarmNotification(ids, true, isMovedToMainScreen());
+                    memoList = model.deleteSelected(ids);
+                    break;
+            }
+            if (memoList == null) {
+                return;
+            }
+            Disposable disposable = memoList
+                    .zipWith(snackbarObservable, Pair::new)
+                    .doOnSubscribe(disp -> {
+                        MySelectableAdapter adapter = view.getAdapter();
+                        if (ids.size() == 1 && memoPosition != -1) {
+                            adapter.notifyItemRemoved(memoPosition);
+                            adapter.notifyItemRangeChanged(memoPosition, view.getAdapter().getItemCount() > 1 ? 1 : 0);
+                        } else {
+                            adapter.clearSelectedList();
+                        }
                         shutDownActionMode();
-                    })
-                    .subscribe(cancelMemoListPair -> revertChanges(view, cancelMemoListPair, false));
-            compositeSubscription.add(confirmArchiveSubscription);
+                    }).subscribe(listEventPair -> {
+                        if (listEventPair.first != null && listEventPair.second != null) {
+                            int event = listEventPair.second;
+                            if (event == Snackbar.Callback.DISMISS_EVENT_ACTION) {
+                                revertChanges(view, listEventPair.first, strategy);
+                            }
+                        }
+                    });
+            compositeDisposable.add(disposable);
         });
     }
 
-    private void revertChanges(IListFragmentView view, Pair<Boolean, List<Memo>> cancelMemoListPair, boolean isDeleted) {
-        if (cancelMemoListPair.first != null && cancelMemoListPair.second != null) {
-            boolean canceled = cancelMemoListPair.first;
-            List<Memo> memos = cancelMemoListPair.second;
+    @NonNull
+    private Observable<Integer> getRxSnackbar(Collection<Integer> ids, IListFragmentView view, TransactionStrategy strategy) {
+        Snackbar snackbar = null;
+        switch (strategy) {
+            case ARCHIVE:
+                snackbar = view.getArchiveSnackbar(ids.size());
+                break;
+            case DELETE:
+                snackbar = view.getDeleteSnackbar(ids.size());
+        }
+        return RxSnackbar.dismisses(snackbar);
+    }
+
+    private void revertChanges(IListFragmentView view, List<Memo> memos, TransactionStrategy strategy) {
+        if (memos != null) {
             for (Memo processed : memos) {
-                if (canceled) {
-                    if (isDeleted) {
-                        model.revertDeleteMemo(processed);
-                    } else {
+                switch (strategy) {
+                    case ARCHIVE:
                         model.revertArchived(processed);
-                    }
-                    if (processed.isAlarmSet()) {
-                        updateAlarm(processed, isReturnedToMainScreen());
-                    }
-                    view.getAdapter().notifyDataSetChanged();
+                        break;
+                    case DELETE:
+                        model.revertDeleteMemo(processed);
+                        break;
                 }
+                if (processed.isAlarmSet()) {
+                    updateAlarm(processed, isReturnedToMainScreen());
+                }
+                view.getAdapter().notifyDataSetChanged();
             }
         }
     }
@@ -150,39 +165,17 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     @Override
     public void processOpenFromNotification(int id) {
         ifViewAttached(view ->
-                view.getDataLoadedSubject()
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .distinctUntilChanged(dataLoaded -> dataLoaded)
-                        .zipWith(getComputingLayoutOrScrollingSubject(view).distinctUntilChanged(layoutCompleted -> layoutCompleted), Pair::new)
-                        .map(subjectsCompletedPair -> model.getMemoById(id))
-                        .subscribe(memo -> {
-                                MyGridLayoutManager manager = view.getLayoutManager();
-                                MySelectableAdapter adapter = view.getAdapter();
-                                manager.setSpanCount(1);
-                                adapter.expandItems();
-                                manager.setOrientation(HORIZONTAL);
-                                manager.scrollToPositionWithOffset(memo.getPosition(), 0);
-                                model.setMemoAlarmFalse(memo.getId());
-                                view.closeNotification(memo.getId());
-                        }));
-    }
-
-    private Observable<Boolean> getComputingLayoutOrScrollingSubject(IListFragmentView view) {
-        BehaviorSubject<Boolean> computingLayoutOrScrollingSubject = BehaviorSubject.create();
-        Subscription subscription = Observable.timer(50, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> {
-                    RecyclerView recyclerView = view.getRecyclerView();
-                    if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE
-                            && !recyclerView.isComputingLayout()) {
-                        computingLayoutOrScrollingSubject.onNext(true);
-                        computingLayoutOrScrollingSubject.onCompleted();
-                    }
-                });
-        compositeSubscription.add(subscription);
-        return computingLayoutOrScrollingSubject;
+        {
+            Memo memo = model.getMemoById(id);
+            MyGridLayoutManager manager = view.getLayoutManager();
+            MySelectableAdapter adapter = view.getAdapter();
+            manager.setSpanCount(1);
+            adapter.expandItems();
+            manager.setOrientation(HORIZONTAL);
+            manager.scrollToPositionWithOffset(memo.getPosition(), 0);
+            model.setMemoAlarmFalse(id);
+            view.closeNotification(id);
+        });
     }
 
     @Override
@@ -259,4 +252,11 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     boolean isReturnedToMainScreen() {
         return true;
     }
+
+    private enum TransactionStrategy {
+        ARCHIVE,
+        DELETE
+    }
+
+
 }
