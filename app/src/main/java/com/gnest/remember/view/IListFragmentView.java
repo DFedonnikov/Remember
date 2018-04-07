@@ -1,5 +1,6 @@
 package com.gnest.remember.view;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
 
@@ -10,9 +11,6 @@ import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 import io.realm.RealmResults;
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
 
 public interface IListFragmentView extends MvpView {
     void setData(RealmResults<Memo> data);
@@ -33,15 +31,13 @@ public interface IListFragmentView extends MvpView {
 
     RecyclerView getRecyclerView();
 
-    BehaviorSubject<Boolean> getDataLoadedSubject();
-
     ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
 
     MySelectableAdapter getAdapter();
 
     ActionMode getActionMode();
 
-    Observable<Boolean> showConfirmArchiveActionPopup(PublishSubject<Boolean> subject, int numOfNotes);
+    Snackbar getArchiveSnackbar(int numOfNotes);
 
-    Observable<Boolean> showConfirmRemovePopup(PublishSubject<Boolean> subject, int numOfNotes);
+    Snackbar getDeleteSnackbar(int numOfNotes);
 }
