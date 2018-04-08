@@ -31,4 +31,8 @@ public interface IEditMemoView extends MvpView {
     String getMemoColor();
 
     String getAlarmSetText();
+
+    void addToCalendar(int memoId, String description, long timeInMillis);
+
+    void removeFromCalendar(int id);
 }
