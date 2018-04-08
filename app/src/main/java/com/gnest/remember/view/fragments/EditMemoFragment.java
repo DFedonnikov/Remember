@@ -306,6 +306,16 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
     }
 
     @Override
+    public void addToCalendar(int memoId, String description, long timeInMillis) {
+        mListener.addToCalendar(memoId, description, timeInMillis);
+    }
+
+    @Override
+    public void removeFromCalendar(int memoId) {
+        mListener.removeFromCalendar(memoId);
+    }
+
+    @Override
     public void setAlarm(boolean isSet, long alarmDate, String notificationText, int id) {
         Intent intent = AlarmReceiver.getReceiverIntent(getContext(), id, notificationText, alarmDate, isSet, true);
         mListener.sendBroadcast(intent);
@@ -421,5 +431,9 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         void sendBroadcast(Intent intent);
 
         FragmentManager getSupportFragmentManager();
+
+        void addToCalendar(int memoId, String description, long timeInMillis);
+
+        void removeFromCalendar(int memoId);
     }
 }
