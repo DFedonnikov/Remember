@@ -40,4 +40,6 @@ public interface IListFragmentView extends MvpView {
     Snackbar getArchiveSnackbar(int numOfNotes);
 
     Snackbar getDeleteSnackbar(int numOfNotes);
+
+    void removeFromCalendar(int id);
 }
