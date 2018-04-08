@@ -119,7 +119,7 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     private void setNotification(IEditMemoView view, boolean isSet, String notificationText, int id) {
         String notificationTextLocal = notificationText;
         if (notificationTextLocal != null && notificationTextLocal.length() > 10) {
-            notificationTextLocal = notificationText.substring(0, 10).concat("...");
+            notificationTextLocal = notificationText.substring(0, 30).concat("...");
         }
         view.setAlarm(isSet, mModel.getSelectedDate().getTimeInMillis(), notificationTextLocal, id);
     }
