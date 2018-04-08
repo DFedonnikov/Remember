@@ -66,7 +66,7 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
             view.setCurrentDate(date.getTime());
         });
     }
-    
+
     @Override
     public void processPressBackButton() {
         ifViewAttached(view -> {
@@ -87,11 +87,11 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
             if (mModel.isAlarmSet() && !(mModel.isNew() && memoText.isEmpty())) {
                 String alarmSetText = view.getAlarmSetText();
                 setAlarm(view, memoText, mModel.getId(), alarmSetText);
+                view.addToCalendar(mModel.getId(), getTruncatedText(memoText), mModel.getSelectedDate().getTimeInMillis());
             }
             mModel.saveMemoToDB(memoText, memoColor);
         });
     }
-
 
     private void setAlarm(IEditMemoView view, String notificationText, int id, String alarmSetText) {
         if (id != -1) {
@@ -110,18 +110,28 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
             mModel.setIsAlarmPreviouslySet(false);
             Memo memo = mModel.getEditedMemo();
             if (memo != null) {
-                setNotification(view, false, null, memo.getId());
+                int id = memo.getId();
+                setNotification(view, false, null, id);
+                view.removeFromCalendar(id);
             }
             view.showAlarmToast(removeAlarmMessage);
         });
     }
 
     private void setNotification(IEditMemoView view, boolean isSet, String notificationText, int id) {
-        String notificationTextLocal = notificationText;
-        if (notificationTextLocal != null && notificationTextLocal.length() > 10) {
-            notificationTextLocal = notificationText.substring(0, 30).concat("...");
+        String notificationTextLocal = getTruncatedText(notificationText);
+        long timeInMillis = mModel.getSelectedDate().getTimeInMillis();
+        view.setAlarm(isSet, timeInMillis, notificationTextLocal, id);
+    }
+
+    private String getTruncatedText(String notificationText) {
+        if (notificationText == null) {
+            return "";
         }
-        view.setAlarm(isSet, mModel.getSelectedDate().getTimeInMillis(), notificationTextLocal, id);
+        if (notificationText.length() > 30) {
+            return notificationText.substring(0, 30).concat("...");
+        }
+        return notificationText;
     }
 
     @Override
@@ -159,7 +169,6 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
             if (selectedDate.after(now)) {
                 mModel.setIsAlarmSet(true);
                 view.setAlarmVisibility(true);
-
             }
         });
     }
