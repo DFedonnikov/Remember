@@ -25,6 +25,10 @@
     <string name="notification_title">Вы хотели, чтобы я вам напомнил о&#8230;</string>
     <string name="sound_preference_title">Звук уведомления</string>
     <string name="font_size_preference_title">Размер шрифта</string>
+    <string name="calendar_event_added_toast">Событие добавлено в ваш календарь</string>
+    <string name="calendar_event_updated_toast">Событие в вашем календаре обновлено</string>
+    <string name="calendar_perm_denied_toast">Для доступа к календарю необходимо ваше разрешение</string>
+    <string name="calendar_perm_denied_without_ask_again_toast">Доступ к календарю запрещен пользователем. Если вам необходима интеграция с календарем, пожауйста предоставьте разрешение в настройках вашего телефона</string>
     <string-array name="memo_colors">
         <item>Желтый</item>
         <item>Голубой</item>
