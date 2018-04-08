@@ -111,11 +111,19 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                             int event = listEventPair.second;
                             if (event == Snackbar.Callback.DISMISS_EVENT_ACTION) {
                                 revertChanges(view, listEventPair.first, strategy);
+                            } else if (strategy == TransactionStrategy.DELETE) {
+                                removeFromCalendar(view, listEventPair.first);
                             }
                         }
                     });
             compositeDisposable.add(disposable);
         });
+    }
+
+    private void removeFromCalendar(IListFragmentView view, List<Memo> memoList) {
+        for (Memo memo : memoList) {
+            view.removeFromCalendar(memo.getId());
+        }
     }
 
     @NonNull
