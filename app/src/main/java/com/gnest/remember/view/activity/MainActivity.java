@@ -1,8 +1,17 @@
 package com.gnest.remember.view.activity;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -14,6 +23,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.gnest.remember.R;
 import com.gnest.remember.view.fragments.ArchiveItemFragment;
@@ -21,10 +31,15 @@ import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.fragments.SettingsFragment;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends AppCompatActivity implements
         EditMemoFragment.OnEditMemoFragmentInteractionListener,
@@ -55,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements
     private Unbinder mUnbinder;
     private String backStackedFragmentTitle;
 
+    private RxPermissions rxPermissions;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
     private static int sColumns;
     private static int sMemoSizePx;
     private static int sMarginsPx;
@@ -65,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         mUnbinder = ButterKnife.bind(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        rxPermissions = new RxPermissions(this);
         calculateColumnsAndMemoSize();
         configureDrawer();
         if (savedInstanceState != null) {
@@ -154,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements
                         mArchiveFragment.openFromNotification(id);
                     }
                 }
+                removeFromCalendar(id);
             }
         }
     }
@@ -162,6 +182,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         mUnbinder.unbind();
+        compositeDisposable.dispose();
+        rxPermissions = null;
     }
 
     private void insertItemFragment(Bundle bundle) {
@@ -349,7 +371,144 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void addToCalendar(int memoId, String description, long timeInMillis) {
+        CalendarUpdateStrategy strategy = getEventId(memoId) == -1 ? CalendarUpdateStrategy.ADD : CalendarUpdateStrategy.UPDATE;
+        processCalendar(memoId, description, timeInMillis, strategy);
+    }
+
+    @Override
+    public void removeFromCalendar(int memoId) {
+        processCalendar(memoId, null, -1, CalendarUpdateStrategy.DELETE);
+    }
+
+    private void processCalendar(int memoId, String description, long timeInMillis, CalendarUpdateStrategy strategy) {
+        ContentResolver contentResolver = getContentResolver();
+        Disposable disposable = rxPermissions.requestEachCombined(Manifest.permission.READ_CALENDAR,
+                Manifest.permission.WRITE_CALENDAR)
+                .subscribe(permission -> {
+                    if (permission.granted) {
+                        switch (strategy) {
+                            case ADD:
+                                addToCalendarInternal(memoId, description, timeInMillis, contentResolver);
+                                break;
+                            case UPDATE:
+                                updateCalendarInternal(memoId, description, timeInMillis, contentResolver);
+                                break;
+                            case DELETE:
+                                removeFromCalendarInternal(memoId, contentResolver);
+                                break;
+                        }
+                    } else if (permission.shouldShowRequestPermissionRationale) {
+                        Toast.makeText(this, R.string.calendar_perm_denied_toast,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, R.string.calendar_perm_denied_without_ask_again_toast,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+        compositeDisposable.add(disposable);
+    }
+
+    private void addToCalendarInternal(int memoId, String description, long timeInMillis, ContentResolver contentResolver) {
+        long calendarId = getCalendarId(contentResolver);
+        ContentValues contentValues = getCalendarEventContentValues(description, timeInMillis, calendarId);
+        @SuppressLint("MissingPermission") Uri uri = contentResolver.insert(CalendarContract.Events.CONTENT_URI, contentValues);
+        if (uri != null) {
+            long eventId = Long.parseLong(uri.getLastPathSegment());
+            processCalendarEventIdInSharedPref(memoId, eventId, CalendarUpdateStrategy.ADD);
+        }
+        Toast.makeText(this, R.string.calendar_event_added_toast,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private void updateCalendarInternal(int memoId, String description, long timeInMillis, ContentResolver contentResolver) {
+        long calendarId = getCalendarId(contentResolver);
+        long eventId = getEventId(memoId);
+        ContentValues contentValues = getCalendarEventContentValues(description, timeInMillis, calendarId);
+        Uri updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId);
+        contentResolver.update(updateUri, contentValues, null, null);
+        Toast.makeText(this, R.string.calendar_event_updated_toast,
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @NonNull
+    private ContentValues getCalendarEventContentValues(String description, long timeInMillis, long calendarId) {
+        ContentValues contentValues = new ContentValues();
+        long endDate = timeInMillis + 1000 * 60 * 60;
+        contentValues.put(CalendarContract.Events.DTSTART, timeInMillis);
+        contentValues.put(CalendarContract.Events.DTEND, endDate);
+        contentValues.put(CalendarContract.Events.TITLE, getResources().getString(R.string.notification_title));
+        contentValues.put(CalendarContract.Events.DESCRIPTION, description);
+        contentValues.put(CalendarContract.Events.CALENDAR_ID, calendarId);
+        contentValues.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getDisplayName());
+        return contentValues;
+    }
+
+    @SuppressLint("MissingPermission")
+    private long getCalendarId(ContentResolver contentResolver) {
+        long calendarId = 0;
+        String selection = CalendarContract.Calendars.VISIBLE + " = 1 AND "
+                + CalendarContract.Calendars.IS_PRIMARY + " = 1";
+        Uri calendarUri = CalendarContract.Calendars.CONTENT_URI;
+        Cursor cur = contentResolver.query(calendarUri, null, selection, null, null);
+        if (cur != null && cur.getCount() <= 0) {
+            cur = contentResolver.query(calendarUri, null, null, null, null);
+        }
+        if (cur != null && cur.moveToFirst()) {
+            calendarId = cur.getLong(cur.getColumnIndex(CalendarContract.Calendars._ID));
+        }
+
+        if (cur != null) {
+            cur.close();
+        }
+        return calendarId;
+    }
+
+    private void processCalendarEventIdInSharedPref(int memoId, long eventId, CalendarUpdateStrategy strategy) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        String key = getCalendarEventKey(memoId);
+        switch (strategy) {
+            case ADD:
+                editor.putLong(key, eventId);
+                break;
+            case DELETE:
+                editor.remove(key);
+                break;
+        }
+        editor.apply();
+    }
+
+    @NonNull
+    private String getCalendarEventKey(int memoId) {
+        return getResources().getString(R.string.calendar_event_base_key) + memoId;
+    }
+
+    private void removeFromCalendarInternal(int memoId, ContentResolver contentResolver) {
+        long eventId = getEventId(memoId);
+        if (eventId != -1) {
+            Uri deleteUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId);
+            contentResolver.delete(deleteUri, null, null);
+            processCalendarEventIdInSharedPref(memoId, eventId, CalendarUpdateStrategy.DELETE);
+        }
+    }
+
+    private long getEventId(int memoId) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String key = getCalendarEventKey(memoId);
+        return preferences.getLong(key, -1);
+    }
+
+
     public static int getColumns() {
         return sColumns;
     }
+
+    private enum CalendarUpdateStrategy {
+        ADD,
+        DELETE,
+        UPDATE
+    }
+
 }
