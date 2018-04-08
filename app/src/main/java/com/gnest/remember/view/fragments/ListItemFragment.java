@@ -418,6 +418,11 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     }
 
     @Override
+    public void removeFromCalendar(int id) {
+        mListener.removeFromCalendar(id);
+    }
+
+    @Override
     public boolean isNotificationVisible(int id) {
         if (Build.VERSION.SDK_INT >= 23) {
             FragmentActivity activity = getActivity();
@@ -558,5 +563,7 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         void syncDrawerToggleState();
 
         void sendBroadcast(Intent intent);
+
+        void removeFromCalendar(int id);
     }
 }
