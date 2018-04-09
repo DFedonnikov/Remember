@@ -82,13 +82,13 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         ifViewAttached(view -> {
             Observable<Integer> snackbarObservable = getRxSnackbar(ids, view, strategy);
             Observable<List<Memo>> memoList = null;
+            updateAlarmNotification(view, ids, strategy, isMovedToMainScreen());
+            closeNotificationIfVisible(view, ids);
             switch (strategy) {
                 case ARCHIVE:
-                    updateAlarmNotification(ids, false, isMovedToMainScreen());
                     memoList = model.moveBetweenRealms(ids);
                     break;
                 case DELETE:
-                    updateAlarmNotification(ids, true, isMovedToMainScreen());
                     memoList = model.deleteSelected(ids);
                     break;
             }
@@ -111,13 +111,22 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
                             int event = listEventPair.second;
                             if (event == Snackbar.Callback.DISMISS_EVENT_ACTION) {
                                 revertChanges(view, listEventPair.first, strategy);
-                            } else if (strategy == TransactionStrategy.DELETE) {
+                            }
+                            if (strategy == TransactionStrategy.DELETE) {
                                 removeFromCalendar(view, listEventPair.first);
                             }
                         }
                     });
             compositeDisposable.add(disposable);
         });
+    }
+
+    private void closeNotificationIfVisible(IListFragmentView view, Collection<Integer> ids) {
+        for (Integer id : ids) {
+            if (view.isNotificationVisible(id)) {
+                view.closeNotification(id);
+            }
+        }
     }
 
     private void removeFromCalendar(IListFragmentView view, List<Memo> memoList) {
@@ -224,23 +233,20 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         });
     }
 
-    private void updateAlarmNotification(Collection<Integer> selectedIds, boolean isRemove, boolean isMovedToMainScreen) {
-        ifViewAttached(view -> {
-            for (Integer id : selectedIds) {
-                Memo alarmUpdated = model.getMemoById(id);
-                if (alarmUpdated.isAlarmSet()) {
-                    if (isRemove) {
-                        view.removeAlarm(id);
-                    } else {
-                        updateAlarm(alarmUpdated, isMovedToMainScreen);
-                    }
-                    if (view.isNotificationVisible(id)) {
-                        model.setMemoAlarmFalse(id);
-                        view.closeNotification(id);
-                    }
+    private void updateAlarmNotification(IListFragmentView view, Collection<Integer> ids, TransactionStrategy strategy, boolean isMovedToMainScreen) {
+        for (Integer id : ids) {
+            Memo memo = model.getMemoById(id);
+            if (memo.isAlarmSet()) {
+                switch (strategy) {
+                    case ARCHIVE:
+                        updateAlarm(memo, isMovedToMainScreen);
+                        break;
+                    case DELETE:
+                        view.removeAlarm(memo.getId());
+                        break;
                 }
             }
-        });
+        }
     }
 
     private void updateAlarm(Memo alarmUpdated, boolean isMovedToMainScreen) {
