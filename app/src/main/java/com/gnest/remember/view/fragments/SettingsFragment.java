@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 
 import com.gnest.remember.App;
 import com.gnest.remember.R;
+import com.squareup.leakcanary.RefWatcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +64,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        RefWatcher refWatcher = App.getRefWatcher();
+        refWatcher.watch(this);
     }
 
     @Override

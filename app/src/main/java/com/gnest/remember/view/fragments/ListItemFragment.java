@@ -49,6 +49,7 @@ import com.gnest.remember.view.menu.ActionMenu;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.lang.ref.WeakReference;
 import java.util.Locale;
@@ -127,6 +128,8 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mActionMenu = new ActionMenu(this);
+        RefWatcher refWatcher = App.getRefWatcher();
+        refWatcher.watch(this);
     }
 
     @Override

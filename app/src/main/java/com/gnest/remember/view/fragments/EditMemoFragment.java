@@ -44,6 +44,7 @@ import com.gnest.remember.view.adapters.ColorSpinnerAdapter;
 import com.gnest.remember.view.IEditMemoView;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
+import com.squareup.leakcanary.RefWatcher;
 
 import java.util.Date;
 import java.util.Locale;
@@ -113,6 +114,8 @@ public class EditMemoFragment extends MvpFragment<IEditMemoView, IEditMemoPresen
         }
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        RefWatcher refWatcher = App.getRefWatcher();
+        refWatcher.watch(this);
     }
 
     @Override

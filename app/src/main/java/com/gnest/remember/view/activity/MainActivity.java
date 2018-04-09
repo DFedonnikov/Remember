@@ -25,12 +25,15 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.gnest.remember.App;
 import com.gnest.remember.R;
 import com.gnest.remember.view.fragments.ArchiveItemFragment;
 import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.fragments.SettingsFragment;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.TimeZone;
@@ -81,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        RefWatcher refWatcher = App.getRefWatcher();
+        refWatcher.watch(this);
         mUnbinder = ButterKnife.bind(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         rxPermissions = new RxPermissions(this);
