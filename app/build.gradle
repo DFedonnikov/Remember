@@ -131,6 +131,10 @@ dependencies {
         transitive = true
     }
 
+    //Leakcanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    testImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 
     //JUnit
     testImplementation 'junit:junit:4.12'
