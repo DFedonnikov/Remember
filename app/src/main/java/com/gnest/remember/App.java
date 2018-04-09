@@ -13,12 +13,14 @@ import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v7.preference.PreferenceManager;
 
+import com.crashlytics.android.Crashlytics;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.model.db.migration.RealmMigration;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -52,6 +54,7 @@ public class App extends Application {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
         }
+        Fabric.with(this, new Crashlytics());
     }
 
     private void configRealm() {
