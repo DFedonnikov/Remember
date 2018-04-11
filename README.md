@@ -8,8 +8,15 @@ Do not forget - __Remember__. Easy manage your notes with minimum efforts. Intui
 * __Architecture:__ Mosby, rxJava
 * __Database:__ Realm
 * __Other frameworks:__ Butterknife, Glide
+* __Tools:__ Crashlytics, LeakCanary
 
 ### What's new
+#### 09.04.2018
+* Integrated Google Calendar. Now, if notification is set, it will be added to calendar as event
+* Added Crashlytics reporting
+* Added LeakCanary leak detection library
+* Added elevation to RecyclerView items
+* Fixed minor bugs
 #### 06.03.2018
 * Fixed erros on devices with dpi less than 360
 #### 14.02.2018
