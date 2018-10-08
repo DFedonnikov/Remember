@@ -29,6 +29,7 @@
     <string name="calendar_event_updated_toast">Событие в вашем календаре обновлено</string>
     <string name="calendar_perm_denied_toast">Для доступа к календарю необходимо ваше разрешение</string>
     <string name="calendar_perm_denied_without_ask_again_toast">Доступ к календарю запрещен пользователем. Если вам необходима интеграция с календарем, пожауйста предоставьте разрешение в настройках вашего телефона</string>
+    <string name="privacy_policy">Политика конфиденциальности</string>
     <string-array name="memo_colors">
         <item>Желтый</item>
         <item>Голубой</item>

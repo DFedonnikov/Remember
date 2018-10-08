@@ -23,6 +23,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gnest.remember.App;
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements
     DrawerLayout drawerLayout;
     @BindView(R.id.navigation_view)
     NavigationView navigationView;
+    @BindView(R.id.tvPrivacyPolicy)
+    TextView tvPrivacyPolicy;
 
     private static final String EDIT_FRAGMENT_NAME = "Edit";
     private static final String ARCHIVE_FRAGMENT_NAME = "Archive";
@@ -114,6 +118,11 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             insertItemFragment(null);
         }
+        tvPrivacyPolicy.setOnClickListener((View view) -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse("https://github.com/DFedonnikov/Remember/blob/master/privacy_policy.md"));
+            startActivity(intent);
+        });
     }
 
     private void restoreBackStackedFragment(FragmentManager manager, Bundle savedInstanceState) {
