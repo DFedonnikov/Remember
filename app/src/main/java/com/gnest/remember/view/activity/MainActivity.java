@@ -12,15 +12,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,12 +30,16 @@ import com.gnest.remember.view.fragments.EditMemoFragment;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.fragments.SettingsFragment;
-import com.squareup.leakcanary.LeakCanary;
+import com.google.android.material.navigation.NavigationView;
 import com.squareup.leakcanary.RefWatcher;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.TimeZone;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;

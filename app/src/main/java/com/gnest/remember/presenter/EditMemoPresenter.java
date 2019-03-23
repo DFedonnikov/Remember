@@ -1,7 +1,5 @@
 package com.gnest.remember.presenter;
 
-import android.support.annotation.NonNull;
-
 import com.gnest.remember.model.EditMemoModelImpl;
 import com.gnest.remember.model.IEditMemoModel;
 import com.gnest.remember.model.db.data.Memo;
@@ -12,6 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import javax.annotation.Nonnull;
 
 public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implements IEditMemoPresenter {
 
@@ -27,7 +27,7 @@ public class EditMemoPresenter extends MvpBasePresenter<IEditMemoView> implement
     }
 
     @Override
-    public void attachView(@NonNull IEditMemoView view) {
+    public void attachView(@Nonnull IEditMemoView view) {
         super.attachView(view);
         mModel.openDB();
     }

@@ -1,7 +1,6 @@
 package com.gnest.remember.view.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuInflater;
 
@@ -9,6 +8,7 @@ import com.gnest.remember.R;
 import com.gnest.remember.presenter.ArchiveFragmentPresenter;
 import com.gnest.remember.presenter.IListFragmentPresenter;
 
+import androidx.annotation.NonNull;
 import butterknife.BindString;
 
 public class ArchiveItemFragment extends ListItemFragment {

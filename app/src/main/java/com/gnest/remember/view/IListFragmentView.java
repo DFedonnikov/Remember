@@ -1,15 +1,13 @@
 package com.gnest.remember.view;
 
-import android.support.design.widget.Snackbar;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.RecyclerView;
-
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.fragments.ListItemFragment;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
+import com.google.android.material.snackbar.Snackbar;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
+import androidx.appcompat.view.ActionMode;
 import io.realm.RealmResults;
 
 public interface IListFragmentView extends MvpView {
@@ -28,8 +26,6 @@ public interface IListFragmentView extends MvpView {
     void setAlarm(int memoId, long alarmDate, String notificationText, boolean isAlarmSet, boolean isAlarmMovedToMainScreen);
 
     MyGridLayoutManager getLayoutManager();
-
-    RecyclerView getRecyclerView();
 
     ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
 

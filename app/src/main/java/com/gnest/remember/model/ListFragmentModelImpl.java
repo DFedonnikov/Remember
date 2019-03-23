@@ -1,7 +1,5 @@
 package com.gnest.remember.model;
 
-import android.support.annotation.Nullable;
-
 import com.gnest.remember.App;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.model.db.data.MemoRealmFields;
@@ -9,6 +7,8 @@ import com.gnest.remember.model.db.data.MemoRealmFields;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;

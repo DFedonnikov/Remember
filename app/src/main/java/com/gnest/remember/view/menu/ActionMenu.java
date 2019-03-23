@@ -1,12 +1,12 @@
 package com.gnest.remember.view.menu;
 
-
-import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gnest.remember.R;
 import com.gnest.remember.view.fragments.ArchiveItemFragment;
+
+import androidx.appcompat.view.ActionMode;
 
 public class ActionMenu implements ActionMode.Callback {
 

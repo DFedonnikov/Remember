@@ -10,19 +10,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.service.notification.StatusBarNotification;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,12 +43,18 @@ import com.gnest.remember.services.AlarmService;
 import com.gnest.remember.view.menu.ActionMenu;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
+import com.google.android.material.snackbar.Snackbar;
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 import com.squareup.leakcanary.RefWatcher;
 
 import java.lang.ref.WeakReference;
 import java.util.Locale;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -534,11 +535,6 @@ public class ListItemFragment extends MvpFragment<IListFragmentView, IListFragme
     @Override
     public MyGridLayoutManager getLayoutManager() {
         return mMyGridLayoutManager;
-    }
-
-    @Override
-    public RecyclerView getRecyclerView() {
-        return recyclerView;
     }
 
     @Override

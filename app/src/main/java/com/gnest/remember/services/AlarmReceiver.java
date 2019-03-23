@@ -5,12 +5,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.content.WakefulBroadcastReceiver;
 
 import com.gnest.remember.App;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 
+import androidx.legacy.content.WakefulBroadcastReceiver;
 import io.realm.Realm;
 import io.realm.RealmResults;
 

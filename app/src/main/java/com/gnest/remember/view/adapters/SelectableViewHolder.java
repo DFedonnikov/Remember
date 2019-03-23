@@ -1,10 +1,9 @@
 package com.gnest.remember.view.adapters;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.util.Linkify;
 import android.util.Patterns;
 import android.view.View;
@@ -23,6 +22,8 @@ import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
 
 import java.lang.ref.WeakReference;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.saket.bettermovementmethod.BetterLinkMovementMethod;

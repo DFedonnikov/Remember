@@ -1,8 +1,8 @@
 package com.gnest.remember.model.db.migration;
 
-import android.support.annotation.NonNull;
-
 import com.gnest.remember.model.db.data.MemoRealmFields;
+
+import javax.annotation.Nonnull;
 
 import io.realm.DynamicRealm;
 import io.realm.FieldAttribute;
@@ -11,7 +11,7 @@ import io.realm.RealmSchema;
 public class RealmMigration implements io.realm.RealmMigration {
 
     @Override
-    public void migrate(@NonNull DynamicRealm realm, long oldVersion, long newVersion) {
+    public void migrate(@Nonnull DynamicRealm realm, long oldVersion, long newVersion) {
         RealmSchema schema = realm.getSchema();
 
         if (oldVersion == 0) {

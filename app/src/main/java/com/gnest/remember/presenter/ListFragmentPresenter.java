@@ -1,8 +1,6 @@
 package com.gnest.remember.presenter;
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
@@ -10,12 +8,15 @@ import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.view.IListFragmentView;
 import com.gnest.remember.view.adapters.MySelectableAdapter;
 import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
+import com.google.android.material.snackbar.Snackbar;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
-import com.jakewharton.rxbinding2.support.design.widget.RxSnackbar;
+import com.jakewharton.rxbinding3.material.RxSnackbar;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -35,7 +36,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     }
 
     @Override
-    public void attachView(@NonNull IListFragmentView view) {
+    public void attachView(@Nonnull IListFragmentView view) {
         model.openDB();
         super.attachView(view);
     }
@@ -135,7 +136,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         }
     }
 
-    @NonNull
+    @Nonnull
     private Observable<Integer> getRxSnackbar(Collection<Integer> ids, IListFragmentView view, TransactionStrategy strategy) {
         Snackbar snackbar = null;
         switch (strategy) {
