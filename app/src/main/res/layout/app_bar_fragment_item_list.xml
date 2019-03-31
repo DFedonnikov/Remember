@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragments.ListItemFragment">
+    tools:context=".ui.fragments.ListItemFragment">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/ItemFragmentToolbar"
+        android:id="@+id/itemFragmentToolbar"
         style="@style/ToolbarStyle"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -28,6 +28,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ItemFragmentToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/itemFragmentToolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

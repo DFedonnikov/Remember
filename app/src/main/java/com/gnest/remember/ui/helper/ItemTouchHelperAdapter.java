@@ -1,4 +1,4 @@
-package com.gnest.remember.view.helper;
+package com.gnest.remember.ui.helper;
 
 
 import androidx.recyclerview.widget.RecyclerView;

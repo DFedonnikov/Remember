@@ -1,4 +1,4 @@
-package com.gnest.remember.view.adapters;
+package com.gnest.remember.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
-import com.gnest.remember.view.helper.ItemTouchHelperAdapter;
+import com.gnest.remember.ui.layoutmanagers.MyGridLayoutManager;
+import com.gnest.remember.ui.helper.ItemTouchHelperAdapter;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
