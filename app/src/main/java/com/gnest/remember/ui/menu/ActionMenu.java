@@ -1,10 +1,10 @@
-package com.gnest.remember.view.menu;
+package com.gnest.remember.ui.menu;
 
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gnest.remember.R;
-import com.gnest.remember.view.fragments.ArchiveItemFragment;
+import com.gnest.remember.ui.fragments.ArchiveItemFragment;
 
 import androidx.appcompat.view.ActionMode;
 

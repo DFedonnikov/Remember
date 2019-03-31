@@ -3,7 +3,7 @@ package com.gnest.remember.presenter;
 import com.gnest.remember.model.EditMemoModelImpl;
 import com.gnest.remember.model.IEditMemoModel;
 import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.view.IEditMemoView;
+import com.gnest.remember.ui.view.IEditMemoView;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package com.gnest.remember.view.adapters;
+package com.gnest.remember.ui.adapters;
 
 import android.graphics.drawable.Drawable;
 
@@ -18,7 +18,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.gnest.remember.App;
 import com.gnest.remember.R;
 import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.view.helper.ItemTouchHelperViewHolder;
+import com.gnest.remember.ui.helper.ItemTouchHelperViewHolder;
 
 import java.lang.ref.WeakReference;
 

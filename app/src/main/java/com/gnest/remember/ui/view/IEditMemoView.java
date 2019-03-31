@@ -1,4 +1,4 @@
-package com.gnest.remember.view;
+package com.gnest.remember.ui.view;
 
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 

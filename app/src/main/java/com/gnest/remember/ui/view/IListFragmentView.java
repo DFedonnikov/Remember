@@ -1,9 +1,8 @@
-package com.gnest.remember.view;
+package com.gnest.remember.ui.view;
 
 import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.view.adapters.MySelectableAdapter;
-import com.gnest.remember.view.fragments.ListItemFragment;
-import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
+import com.gnest.remember.ui.adapters.MySelectableAdapter;
+import com.gnest.remember.ui.layoutmanagers.MyGridLayoutManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
@@ -26,8 +25,6 @@ public interface IListFragmentView extends MvpView {
     void setAlarm(int memoId, long alarmDate, String notificationText, boolean isAlarmSet, boolean isAlarmMovedToMainScreen);
 
     MyGridLayoutManager getLayoutManager();
-
-    ListItemFragment.OnListItemFragmentInteractionListener getInteractionListener();
 
     MySelectableAdapter getAdapter();
 

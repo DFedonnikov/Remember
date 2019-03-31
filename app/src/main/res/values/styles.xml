@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -15,11 +15,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
 
-    <style name="Toolbar" parent="Theme.AppCompat">
+    <style name="Toolbar" parent="Theme.MaterialComponents">
         <!-- android:actionMenuTextColor is the color of the text of action (menu) items in the Toolbar, at least in the
         Theme.AppCompat theme. For some reason, they already get the textColorPrimary when running on API 21, but not on older versions of
         Android, so this is only necessary to support older Android versions. -->
@@ -40,7 +40,7 @@
         <item name="android:minHeight">?attr/actionBarSize</item>
         <!--<item name="android:background">@color/colorPrimary</item>-->
         <item name="theme">@style/Toolbar</item>
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Light</item>
         <item name="colorControlNormal">@android:color/black</item>
         <item name="colorControlHighlight">#3fff</item>
         <item name="titleTextAppearance">@style/ToolbarTitleTextAppearance</item>
@@ -56,16 +56,18 @@
     </style>
 
     <!-- Custom Preference Theme -->
-    <style name="AppPreferenceTheme"
-        parent="@style/PreferenceThemeOverlay.v14.Material">
+    <style name="AppPreferenceTheme" parent="@style/PreferenceThemeOverlay.v14.Material">
         <item name="preferenceFragmentCompatStyle">
             @style/AppPreferenceFragmentCompatStyle
         </item>
     </style>
     <!-- Custom Style for PreferenceFragmentCompat -->
-    <style name="AppPreferenceFragmentCompatStyle"
-        parent="@style/PreferenceFragment.Material">
+    <style name="AppPreferenceFragmentCompatStyle" parent="@style/PreferenceFragment.Material">
         <item name="android:layout">@layout/fragment_settings</item>
+    </style>
+
+    <style name="NavigationDrawer" parent="@style/Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/colorPrimaryDark</item>
     </style>
 
 </resources>

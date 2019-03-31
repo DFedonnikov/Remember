@@ -5,9 +5,9 @@ import androidx.core.util.Pair;
 import com.gnest.remember.model.IListFragmentModel;
 import com.gnest.remember.model.ListFragmentModelImpl;
 import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.view.IListFragmentView;
-import com.gnest.remember.view.adapters.MySelectableAdapter;
-import com.gnest.remember.view.layoutmanagers.MyGridLayoutManager;
+import com.gnest.remember.ui.view.IListFragmentView;
+import com.gnest.remember.ui.adapters.MySelectableAdapter;
+import com.gnest.remember.ui.layoutmanagers.MyGridLayoutManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
 import com.jakewharton.rxbinding3.material.RxSnackbar;
@@ -201,32 +201,6 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         model.swapMemos(fromId, fromPosition, toId, toPosition);
     }
 
-    @Override
-    public void processSingleChoiceClick(Memo memo, int verticalOrientationCode) {
-        ifViewAttached(view -> {
-            if (view.getLayoutManager().getOrientation() == verticalOrientationCode) {
-                view.getLayoutManager().openItem(memo.getPosition());
-            } else {
-                view.getInteractionListener().onEnterEditMode(memo.getId());
-            }
-        });
-    }
-
-    @Override
-    public void processPressBackButton(int verticalOrientationCode, int horizontalOrientationCode, int spanCount) {
-        ifViewAttached(view -> {
-            MyGridLayoutManager manager = view.getLayoutManager();
-            if (manager.getOrientation() == horizontalOrientationCode) {
-                manager.setOrientation(verticalOrientationCode);
-                manager.setSpanCount(spanCount);
-                manager.scrollToPosition(manager.getLastPosition());
-                view.getAdapter().setItemsExpanded(false);
-            } else {
-                view.getInteractionListener().onBackButtonPressed();
-            }
-        });
-    }
-
     private void shutDownActionMode() {
         ifViewAttached(view -> {
             if (view.getActionMode() != null)
@@ -272,6 +246,5 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
         ARCHIVE,
         DELETE
     }
-
 
 }

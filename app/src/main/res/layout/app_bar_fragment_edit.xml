@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragments.EditMemoFragment">
+    tools:context=".ui.fragments.EditMemoFragment">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar_layout"
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
@@ -33,7 +33,7 @@
                 app:layout_collapseParallaxMultiplier="1.0">
 
                 <com.github.sundeepk.compactcalendarview.CompactCalendarView
-                    android:id="@+id/compactcalendar_view"
+                    android:id="@+id/compactCalendarView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="12dp"
@@ -60,7 +60,7 @@
                     android:orientation="horizontal">
 
                     <RelativeLayout
-                        android:id="@+id/date_picker_button"
+                        android:id="@+id/datePickerButton"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         android:background="?android:selectableItemBackground"
@@ -68,7 +68,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/date_picker_text_view"
+                            android:id="@+id/datePickerTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
@@ -78,18 +78,18 @@
                             android:textColor="@android:color/black" />
 
                         <ImageView
-                            android:id="@+id/date_picker_arrow"
+                            android:id="@+id/datePickerArrow"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignBottom="@id/date_picker_text_view"
-                            android:layout_toRightOf="@id/date_picker_text_view"
+                            android:layout_alignBottom="@id/datePickerTextView"
+                            android:layout_toRightOf="@id/datePickerTextView"
                             app:srcCompat="@drawable/ic_arrow_drop_down_black"
                             tools:ignore="ContentDescription,RtlHardcoded" />
 
                     </RelativeLayout>
 
                     <ImageView
-                        android:id="@+id/bt_remove_alert"
+                        android:id="@+id/removeAlert"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"

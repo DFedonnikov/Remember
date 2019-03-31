@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main"
+    app:startDestination="@id/mainList">
+
+    <action
+        android:id="@+id/open_edit"
+        app:destination="@id/editMemo" />
+
+    <action
+        android:id="@+id/open_main"
+        app:destination="@+id/mainList" />
+
+    <fragment
+        android:id="@+id/mainList"
+        android:label="@string/notes"
+        android:name="com.gnest.remember.ui.fragments.ListItemFragment"
+        tools:layout="@layout/fragment_item_list">
+
+        <argument
+            android:name="orientation"
+            android:defaultValue="1"
+            app:argType="integer" />
+
+        <argument
+            android:name="position"
+            android:defaultValue="0"
+            app:argType="integer" />
+
+        <argument
+            android:name="isExpanded"
+            android:defaultValue="false"
+            app:argType="boolean" />
+
+        <argument
+            android:name="shouldRestore"
+            android:defaultValue="false"
+            app:argType="boolean" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/archive"
+        android:label="@string/archive"
+        android:name="com.gnest.remember.ui.fragments.ArchiveItemFragment"
+        tools:layout="@layout/fragment_item_list" />
+
+    <fragment
+        android:id="@+id/editMemo"
+        android:name="com.gnest.remember.ui.fragments.EditMemoFragment"
+        tools:layout="@layout/fragment_edit_memo">
+
+        <argument
+            android:name="memo_id"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settings"
+        android:label="@string/settings"
+        android:name="com.gnest.remember.ui.fragments.SettingsFragment"
+        tools:layout="@layout/fragment_settings" />
+
+</navigation>

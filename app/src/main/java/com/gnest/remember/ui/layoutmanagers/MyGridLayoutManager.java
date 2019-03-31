@@ -1,4 +1,4 @@
-package com.gnest.remember.view.layoutmanagers;
+package com.gnest.remember.ui.layoutmanagers;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;

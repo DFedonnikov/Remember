@@ -13,8 +13,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
 
 import com.gnest.remember.App;
+import com.gnest.remember.ui.MainActivity;
 import com.gnest.remember.R;
-import com.gnest.remember.view.activity.MainActivity;
 
 public class AlarmService extends IntentService {
 
