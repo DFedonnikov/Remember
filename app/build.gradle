@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs"
 
@@ -122,12 +123,15 @@ dependencies {
     def nav_version = "2.1.0-alpha01"
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    // For Kotlin use navigation-fragment-ktx
     implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    // For Kotlin use navigation-ui-ktx
 
-    // Comapact Calenar View
+    //Dagger2
+    def dagger_version = "2.21"
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+
+    // Comapact Calendar View
     implementation 'com.github.sundeepk:compact-calendar-view:2.0.2.1'
 
     //Mosby

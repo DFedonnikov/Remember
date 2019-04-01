@@ -12,6 +12,7 @@ import android.os.Build;
 import android.provider.Settings;
 
 import com.crashlytics.android.Crashlytics;
+import com.gnest.remember.di.DaggerAppComponent;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.model.db.migration.RealmMigration;
 import com.squareup.leakcanary.LeakCanary;
@@ -54,6 +55,9 @@ public class App extends Application {
         }
         refWatcher = LeakCanary.install(this);
         sSelf = this;
+        DaggerAppComponent.builder()
+                .application(this)
+                .build();
         Realm.init(this);
         configRealm();
         FONT = Typeface.createFromAsset(getAssets(), FONT_PATH);
