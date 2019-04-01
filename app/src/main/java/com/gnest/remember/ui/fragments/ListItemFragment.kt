@@ -21,6 +21,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
@@ -48,11 +50,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.gnest.remember.extensions.*
 import com.gnest.remember.ui.MainActivity
-import com.gnest.remember.extensions.getRenderParams
-import com.gnest.remember.extensions.setSupportActionBar
-import com.gnest.remember.extensions.setupActionBarWithNavController
-import com.gnest.remember.extensions.supportActionBar
+import com.gnest.remember.presentation.view_model.MemoListViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.realm.RealmResults
 import kotlinx.android.synthetic.main.activity_main.*
@@ -65,6 +65,8 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
 
     private val compositeDisposable = CompositeDisposable()
     private val actionMenu by lazy { ActionMenu(this) }
+
+    private val viewModelsFactory by inject { viewModelsFactory }
 
     private var mColumnCount: Int = 2
     private var mMemoSize: Int = 0
@@ -117,9 +119,22 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
         itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper?.attachToRecyclerView(memoList)
 
-        if (!checkNotification()) {
-            presenter.loadData()
-        }
+
+        subscribeToListUpdate()
+
+
+//        if (!checkNotification()) {
+//            presenter.loadData()
+//        }
+    }
+
+    private fun subscribeToListUpdate() {
+        ViewModelProviders.of(this).get(MemoListViewModel::class.java).list
+                .observe(this, Observer<RealmResults<Memo>> {
+                    adapter?.memos = it
+                    adapter?.notifyDataSetChanged()
+                    checkStateRestore()
+                })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -445,7 +460,6 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
             savedState = this
         }
     }
-
 
 
     private fun openEdit(id: Int = -1) {

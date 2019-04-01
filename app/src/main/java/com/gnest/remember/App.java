@@ -12,6 +12,7 @@ import android.os.Build;
 import android.provider.Settings;
 
 import com.crashlytics.android.Crashlytics;
+import com.gnest.remember.di.AppComponent;
 import com.gnest.remember.di.DaggerAppComponent;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.model.db.migration.RealmMigration;
@@ -20,6 +21,8 @@ import com.squareup.leakcanary.RefWatcher;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import androidx.annotation.RequiresApi;
 import androidx.preference.PreferenceManager;
@@ -45,6 +48,8 @@ public class App extends Application {
 
     private RefWatcher refWatcher;
 
+    private static AppComponent appComponent;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -55,7 +60,7 @@ public class App extends Application {
         }
         refWatcher = LeakCanary.install(this);
         sSelf = this;
-        DaggerAppComponent.builder()
+        appComponent = DaggerAppComponent.builder()
                 .application(this)
                 .build();
         Realm.init(this);
@@ -93,6 +98,14 @@ public class App extends Application {
 
     public static Context self() {
         return sSelf;
+    }
+
+    @Nonnull
+    public static AppComponent getAppComponent() {
+        if (appComponent == null) {
+            throw new NullPointerException("Trying to get AppComponent before App initialization");
+        }
+        return appComponent;
     }
 
     public static void setFontSize(int fontSize) {
