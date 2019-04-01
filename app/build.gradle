@@ -50,6 +50,22 @@ android {
             proguardFiles fileTree('proguard').asList().toArray()
         }
     }
+
+    flavorDimensions "version"
+
+    productFlavors {
+
+        development {
+            dimension "version"
+            applicationIdSuffix ".development"
+        }
+
+        production {
+            dimension "version"
+        }
+
+    }
+
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
