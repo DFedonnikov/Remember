@@ -19,13 +19,13 @@ public class ActionMenu implements ActionMode.Callback {
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        if (listener instanceof ArchiveItemFragment) {
-            mode.getMenuInflater().inflate(R.menu.context_menu_bar_archive_frag, menu);
-        } else {
-            mode.getMenuInflater().inflate(R.menu.context_menu_bar_list_frag, menu);
-        }
-        listener.switchMultiSelect(true);
-        shareButton = menu.findItem(R.id.share);
+//        if (listener instanceof ArchiveItemFragment) {
+//            mode.getMenuInflater().inflate(R.menu.context_menu_bar_archive_frag, menu);
+//        } else {
+//            mode.getMenuInflater().inflate(R.menu.context_menu_bar_list_frag, menu);
+//        }
+//        listener.switchMultiSelect(true);
+//        shareButton = menu.findItem(R.id.share);
         return true;
     }
 

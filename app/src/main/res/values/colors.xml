@@ -10,4 +10,9 @@
     <color name="spinnerTint">#000000</color>
     <color name="toolbarColorPrimary">#FF80CBC4</color>
     <color name="urlLinkColor">#0000FF</color>
+    <color name="gray">#E5ECF1</color>
+    <color name="blue">#6AC6FF</color>
+    <color name="emerald">#E62FC046</color>
+    <color name="yellow">#E6E6E65D</color>
+    <color name="purple">#E6DE5FAE</color>
 </resources>

@@ -136,27 +136,27 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
     }
 
     private void setMaxLinesOnFontSize(int fontSize) {
-        int[] numOfLines = App.getNumOfLines();
-        int maxLines;
-        switch (fontSize) {
-            case 12:
-                maxLines = numOfLines[0];
-                break;
-            case 14:
-                maxLines = numOfLines[1];
-                break;
-            case 16:
-                maxLines = numOfLines[2];
-                break;
-            case 18:
-            case 20:
-                maxLines = numOfLines[3];
-                break;
-            default:
-                maxLines = numOfLines[4];
-                break;
-        }
-        textView.setMaxLines(maxLines);
+//        int[] numOfLines = App.getNumOfLines();
+//        int maxLines;
+//        switch (fontSize) {
+//            case 12:
+//                maxLines = numOfLines[0];
+//                break;
+//            case 14:
+//                maxLines = numOfLines[1];
+//                break;
+//            case 16:
+//                maxLines = numOfLines[2];
+//                break;
+//            case 18:
+//            case 20:
+//                maxLines = numOfLines[3];
+//                break;
+//            default:
+//                maxLines = numOfLines[4];
+//                break;
+//        }
+//        textView.setMaxLines(maxLines);
     }
 
     interface OnItemSelectedListener {

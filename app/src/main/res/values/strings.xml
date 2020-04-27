@@ -45,6 +45,8 @@
     <string name="calendar_perm_denied_toast">Need your permission to integrate notification to your calendar</string>
     <string name="calendar_perm_denied_without_ask_again_toast">Calendar permission denied. If you want calendar integration, please grant permission in the settings of your phone</string>
     <string name="privacy_policy">Privacy policy</string>
+    <string name="fab_transition">fab transition</string>
+    <string name="set_alarm">Set alarm</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>

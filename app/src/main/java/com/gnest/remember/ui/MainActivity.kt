@@ -18,6 +18,7 @@ import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupWithNavController
 import com.gnest.remember.R
 import com.gnest.remember.extensions.toast
 import com.google.android.material.navigation.NavigationView
@@ -34,32 +35,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var navController: NavController
 
-    val renderParams by lazy {
-        RenderParams.newInstance(resources.configuration.screenWidthDp,
-                resources.displayMetrics.density)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         navController = findNavController(this, R.id.navHostFragment)
-        NavigationUI.setupWithNavController(navigationView, navController)
-        navigationView.setNavigationItemSelectedListener(this)
-
+        bottomNavView.setupWithNavController(navController)
+        bottomNavView.setOnNavigationItemSelectedListener {
+            var isProcessed = true
+            when (it.itemId) {
+                R.id.mainList -> navController.navigate(R.id.mainList)
+                R.id.archive -> navController.navigate(R.id.archive)
+                R.id.editMemo -> navController.navigate(R.id.editMemo)
+                R.id.settings -> navController.navigate(R.id.settings)
+                else -> isProcessed = false
+            }
+            isProcessed
+        }
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
-        tvPrivacyPolicy.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://github.com/DFedonnikov/Remember/blob/master/privacy_policy.md")
-            startActivity(intent)
-        }
-    }
-
-    override fun onBackPressed() {
-        when {
-            drawerLayout.isDrawerOpen(GravityCompat.START) -> drawerLayout.closeDrawer(GravityCompat.START)
-            else -> super.onBackPressed()
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -67,7 +61,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        drawerLayout.closeDrawers()
         when (item.itemId) {
             R.id.mainList -> navController.navigate(R.id.mainList)
             R.id.archive -> navController.navigate(R.id.archive)
@@ -187,24 +180,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         val key = getCalendarEventKey(memoId)
         return preferences.getLong(key, -1)
-    }
-
-
-    class RenderParams private constructor(screenWidthDP: Int, density: Float) {
-        val columns = screenWidthDP / MEMO_SIZE_DP
-        val memoSizePx = (((screenWidthDP - 2 * ITEM_MARGINS_DP * columns) / columns) * density + 0.5).toInt()
-        val marginsPx = (ITEM_MARGINS_DP * density + 0.5).toInt()
-
-
-        companion object {
-
-            private const val ITEM_MARGINS_DP = 12
-            private const val MEMO_SIZE_DP = 160
-
-            fun newInstance(screenWidthDP: Int, density: Float): RenderParams {
-                return RenderParams(screenWidthDP, density)
-            }
-        }
     }
 
     private enum class CalendarUpdateStrategy {

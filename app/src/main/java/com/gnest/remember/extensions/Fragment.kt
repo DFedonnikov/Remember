@@ -20,6 +20,4 @@ fun Fragment.setupActionBarWithNavController(drawerLayout: DrawerLayout) {
     activity?.let { setupActionBarWithNavController(it, navController, drawerLayout) }
 }
 
-fun Fragment.getRenderParams() = (requireActivity() as? MainActivity)?.renderParams
-
 fun Fragment.sharedPreferences() = PreferenceManager.getDefaultSharedPreferences(requireActivity())

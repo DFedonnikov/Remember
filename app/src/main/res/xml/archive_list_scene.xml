@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <Transition
+        motion:constraintSetEnd="@+id/archiveFabEnd"
+        motion:constraintSetStart="@+id/archiveFabStart"
+        motion:duration="500"
+        motion:motionInterpolator="easeIn" />
+
+    <ConstraintSet android:id="@+id/archiveFabStart">
+
+        <!--        <Constraint-->
+        <!--            android:id="@+id/memoArchivedList"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:clipToPadding="false"-->
+        <!--            android:padding="@dimen/memo_item_offset"-->
+        <!--            motion:layout_constraintHorizontal_bias="0.0"-->
+        <!--            motion:layout_constraintLeft_toLeftOf="parent"-->
+        <!--            motion:layout_constraintRight_toRightOf="parent"-->
+        <!--            motion:layout_constraintTop_toTopOf="parent"-->
+        <!--            tools:context=".ui.fragments.ListItemFragment"-->
+        <!--            tools:itemCount="5"-->
+        <!--            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"-->
+        <!--            tools:listitem="@layout/memo_list_item" />-->
+
+        <Constraint android:id="@+id/fab">
+            <Transform android:translationY="300dp" />
+        </Constraint>
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/archiveFabEnd">
+
+        <Constraint android:id="@+id/fab">
+            <Transform android:translationY="0dp" />
+        </Constraint>
+
+
+    </ConstraintSet>
+
+</MotionScene>

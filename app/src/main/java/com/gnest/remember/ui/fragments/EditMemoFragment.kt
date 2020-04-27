@@ -41,25 +41,30 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.gnest.remember.ui.MainActivity
 import com.gnest.remember.extensions.setSupportActionBar
-import com.gnest.remember.extensions.setupActionBarWithNavController
 import com.gnest.remember.extensions.supportActionBar
 import com.gnest.remember.services.AlarmReceiver
 import com.gnest.remember.ui.layoutmanagers.MyGridLayoutManager
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_fragment_edit.*
 import kotlinx.android.synthetic.main.content_fragment_edit.*
 
-class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener, OnBackPressedCallback {
+class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener {
 
     private val timePickFragment by lazy { TimePickerFragment() }
 
     private var color: String? = null
 
+    private val backPressedCallback = object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+//            saveMemo()
+//            presenter.processPressBackButton()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         val refWatcher = App.getRefWatcher()
-        refWatcher.watch(this)
+        refWatcher?.watch(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -74,8 +79,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
         setSupportActionBar(toolbar)
         supportActionBar()?.setDisplayHomeAsUpEnabled(true)
         supportActionBar()?.setHomeButtonEnabled(true)
-        activity?.drawerLayout?.let { setupActionBarWithNavController(it) }
-        activity?.addOnBackPressedCallback(this)
+//        activity?.drawerLayout?.let { setupActionBarWithNavController(it) }
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         timePickFragment.setTimeSetListener(this)
         editTextMemo.setOnFocusChangeListener { v, hasFocus ->
@@ -109,7 +114,7 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     override fun onDestroyView() {
         super.onDestroyView()
         timePickFragment.setTimeSetListener(null)
-        requireActivity().removeOnBackPressedCallback(this)
+//        requireActivity().removeOnBackPressedCallback(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -133,12 +138,6 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
         editTextMemo.setText(memoText)
         this.color = color
         setAlarmVisibility(alarmSet)
-    }
-
-    override fun handleOnBackPressed(): Boolean {
-        saveMemo()
-        presenter.processPressBackButton()
-        return true
     }
 
     override fun getMemoText(): String {
@@ -212,12 +211,7 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                return handleOnBackPressed()
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+        return true
     }
 
     override fun onItemSelected(adapterView: AdapterView<*>, view: View, i: Int, l: Long) {
@@ -251,7 +245,7 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
 
 
     private fun hideKeyboard(v: View) {
-        val inputMethodManager = App.self().getSystemService(Activity.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val inputMethodManager = App.self()?.getSystemService(Activity.INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(v.windowToken, 0)
     }
 

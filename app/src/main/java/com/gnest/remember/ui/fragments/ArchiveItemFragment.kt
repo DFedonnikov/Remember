@@ -6,26 +6,30 @@ import android.view.MenuItem
 import androidx.navigation.fragment.findNavController
 
 import com.gnest.remember.R
-import com.gnest.remember.model.db.data.Memo
-import com.gnest.remember.presenter.ArchiveFragmentPresenter
 import com.gnest.remember.presenter.IListFragmentPresenter
 import androidx.recyclerview.widget.RecyclerView
+import com.gnest.remember.ARCHIVE_REALM
+import org.koin.android.ext.android.inject
+import org.koin.core.qualifier.named
 
 class ArchiveItemFragment : ListItemFragment() {
 
-    override fun createPresenter(): IListFragmentPresenter {
-        return ArchiveFragmentPresenter()
-    }
+    private val listPresenter: IListFragmentPresenter by inject(named(ARCHIVE_REALM))
+
+//    override fun createPresenter(): IListFragmentPresenter {
+//        return listPresenter
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         //Has to be empty, so it won't inflate its parents menu layout here
     }
 
-    override fun handleOnBackPressed(): Boolean = when {
-        myGridLayoutManager?.orientation == RecyclerView.HORIZONTAL -> super.handleOnBackPressed()
-        else -> {
-            findNavController().navigateUp()
-            true
+    override fun onBackPressed() {
+        when (myGridLayoutManager?.orientation) {
+            RecyclerView.HORIZONTAL -> super.onBackPressed()
+            else -> {
+                findNavController().navigateUp()
+            }
         }
     }
 
@@ -39,11 +43,11 @@ class ArchiveItemFragment : ListItemFragment() {
         }
     }
 
-    override fun onSingleChoiceMemoClicked(memo: Memo) {
-        myGridLayoutManager
-                ?.takeIf { it.orientation == RecyclerView.VERTICAL }
-                ?.let { it.openItem(memo.position) }
-    }
+//    override fun onSingleChoiceMemoClicked(memo: Memo) {
+//        myGridLayoutManager
+//                ?.takeIf { it.orientation == RecyclerView.VERTICAL }
+//                ?.let { it.openItem(memo.position) }
+//    }
 
     override fun getArchiveActionPluralForm(plural: Int): String = when (plural) {
         2 -> getString(R.string.note_unarchived_message_2)

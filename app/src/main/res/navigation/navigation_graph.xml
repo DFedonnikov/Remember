@@ -7,7 +7,7 @@
 
     <action
         android:id="@+id/open_edit"
-        app:destination="@id/editMemo" />
+        app:destination="@id/edit" />
 
     <action
         android:id="@+id/open_main"
@@ -15,9 +15,9 @@
 
     <fragment
         android:id="@+id/mainList"
+        android:name="com.gnest.remember.presentation.ui.ActiveItemsFragment"
         android:label="@string/notes"
-        android:name="com.gnest.remember.ui.fragments.ListItemFragment"
-        tools:layout="@layout/fragment_item_list">
+        tools:layout="@layout/fragment_active_list">
 
         <argument
             android:name="orientation"
@@ -38,14 +38,17 @@
             android:name="shouldRestore"
             android:defaultValue="false"
             app:argType="boolean" />
+        <action
+            android:id="@+id/action_mainList_to_edit"
+            app:destination="@id/edit" />
 
     </fragment>
 
     <fragment
         android:id="@+id/archive"
+        android:name="com.gnest.remember.presentation.ui.ArchivedItemsFragment"
         android:label="@string/archive"
-        android:name="com.gnest.remember.ui.fragments.ArchiveItemFragment"
-        tools:layout="@layout/fragment_item_list" />
+        tools:layout="@layout/fragment_archived_list" />
 
     <fragment
         android:id="@+id/editMemo"
@@ -59,9 +62,28 @@
     </fragment>
 
     <fragment
+        android:id="@+id/edit"
+        android:name="com.gnest.remember.presentation.ui.EditFragment"
+        tools:layout="@layout/fragment_edit">
+        <argument
+            android:name="memoId"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="position"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="isArchived"
+            android:defaultValue="false"
+            app:argType="boolean"
+            />
+    </fragment>
+
+    <fragment
         android:id="@+id/settings"
-        android:label="@string/settings"
         android:name="com.gnest.remember.ui.fragments.SettingsFragment"
+        android:label="@string/settings"
         tools:layout="@layout/fragment_settings" />
 
 </navigation>

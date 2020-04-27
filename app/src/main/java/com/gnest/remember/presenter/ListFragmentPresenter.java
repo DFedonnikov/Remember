@@ -2,8 +2,7 @@ package com.gnest.remember.presenter;
 
 import androidx.core.util.Pair;
 
-import com.gnest.remember.model.IListFragmentModel;
-import com.gnest.remember.model.ListFragmentModelImpl;
+import com.gnest.remember.data.datasources.MemoLocalDataSource;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.ui.view.IListFragmentView;
 import com.gnest.remember.ui.adapters.MySelectableAdapter;
@@ -28,22 +27,22 @@ import static android.widget.GridLayout.HORIZONTAL;
 
 public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> implements IListFragmentPresenter {
 
-    IListFragmentModel model;
+    private MemoLocalDataSource source;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public ListFragmentPresenter() {
-        model = new ListFragmentModelImpl();
+    public ListFragmentPresenter(MemoLocalDataSource source) {
+        this.source = source;
     }
 
-    @Override
-    public void attachView(@Nonnull IListFragmentView view) {
-        model.openDB();
-        super.attachView(view);
-    }
+//    @Override
+//    public void attachView(@Nonnull IListFragmentView view) {
+//        model.openDB();
+//        super.attachView(view);
+//    }
 
     @Override
     public void detachView() {
-        model.closeDB();
+        source.closeDB();
         compositeDisposable.clear();
         super.detachView();
     }
@@ -56,7 +55,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     @Override
     public void loadData() {
-        Disposable disposable = model.getData()
+        Disposable disposable = source.getData()
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(RealmResults::isLoaded)
                 .firstElement()
@@ -87,10 +86,10 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
             closeNotificationIfVisible(view, ids);
             switch (strategy) {
                 case ARCHIVE:
-                    memoList = model.moveBetweenRealms(ids);
+                    memoList = source.moveBetweenRealms(ids);
                     break;
                 case DELETE:
-                    memoList = model.deleteSelected(ids);
+                    memoList = source.deleteSelected(ids);
                     break;
             }
             if (memoList == null) {
@@ -154,10 +153,10 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
             for (Memo processed : memos) {
                 switch (strategy) {
                     case ARCHIVE:
-                        model.revertArchived(processed);
+                        source.revertArchived(processed);
                         break;
                     case DELETE:
-                        model.revertDeleteMemo(processed);
+                        source.revertDeleteMemo(processed);
                         break;
                 }
                 if (processed.isAlarmSet()) {
@@ -172,7 +171,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     public void processShare(Collection<Integer> selectedIds) {
         ifViewAttached(view -> {
             if (selectedIds.size() == 1) {
-                Memo memo = model.getMemoById(selectedIds.iterator().next());
+                Memo memo = source.getMemoById(selectedIds.iterator().next());
                 if (memo != null) {
                     view.shareMemoText(memo.getMemoText());
                 }
@@ -184,21 +183,21 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
     public void processOpenFromNotification(int id) {
         ifViewAttached(view ->
         {
-            Memo memo = model.getMemoById(id);
+            Memo memo = source.getMemoById(id);
             MyGridLayoutManager manager = view.getLayoutManager();
             MySelectableAdapter adapter = view.getAdapter();
             manager.setSpanCount(1);
             adapter.expandItems();
             manager.setOrientation(HORIZONTAL);
             manager.scrollToPositionWithOffset(memo.getPosition(), 0);
-            model.setMemoAlarmFalse(id);
+            source.setMemoAlarmFalse(id);
             view.closeNotification(id);
         });
     }
 
     @Override
     public void processMemoSwap(int fromId, int fromPosition, int toId, int toPosition) {
-        model.swapMemos(fromId, fromPosition, toId, toPosition);
+        source.swapMemos(fromId, fromPosition, toId, toPosition);
     }
 
     private void shutDownActionMode() {
@@ -210,7 +209,7 @@ public class ListFragmentPresenter extends MvpBasePresenter<IListFragmentView> i
 
     private void updateAlarmNotification(IListFragmentView view, Collection<Integer> ids, TransactionStrategy strategy, boolean isMovedToMainScreen) {
         for (Integer id : ids) {
-            Memo memo = model.getMemoById(id);
+            Memo memo = source.getMemoById(id);
             if (memo.isAlarmSet()) {
                 switch (strategy) {
                     case ARCHIVE:

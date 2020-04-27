@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/multiFabEnd"
+        motion:constraintSetStart="@+id/multFabStart"
+        motion:duration="500"
+        motion:motionInterpolator="easeIn" />
+
+    <ConstraintSet android:id="@+id/multFabStart">
+
+        <Constraint
+            android:id="@+id/archiveFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            motion:layout_constraintBottom_toBottomOf="@id/mainFab"
+            motion:layout_constraintEnd_toEndOf="@+id/mainFab"
+            motion:layout_constraintStart_toStartOf="@+id/mainFab" />
+
+        <Constraint
+            android:id="@+id/shareFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            motion:layout_constraintBottom_toBottomOf="@id/archiveFab"
+            motion:layout_constraintEnd_toEndOf="@+id/archiveFab"
+            motion:layout_constraintStart_toStartOf="@+id/archiveFab" />
+        <Constraint
+            android:id="@+id/mainFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintVertical_bias="1.0" />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/multiFabEnd">
+
+        <Constraint
+            android:id="@+id/shareFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            motion:layout_constraintBottom_toTopOf="@+id/archiveFab"
+            motion:layout_constraintEnd_toEndOf="@+id/archiveFab"
+            motion:layout_constraintStart_toStartOf="@+id/archiveFab" />
+
+        <Constraint
+            android:id="@+id/archiveFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            motion:layout_constraintBottom_toTopOf="@+id/mainFab"
+            motion:layout_constraintEnd_toEndOf="@+id/mainFab"
+            motion:layout_constraintStart_toStartOf="@+id/mainFab" />
+
+        <Constraint
+            android:id="@+id/mainFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintVertical_bias="1.0" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/shareHidden">
+
+        <Constraint
+            android:id="@+id/shareFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="0dp"
+            motion:layout_constraintBottom_toBottomOf="@+id/archiveFab"
+            motion:layout_constraintEnd_toEndOf="@+id/archiveFab"
+            motion:layout_constraintStart_toStartOf="@+id/archiveFab" />
+
+        <Constraint
+            android:id="@+id/archiveFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            motion:layout_constraintBottom_toTopOf="@+id/mainFab"
+            motion:layout_constraintEnd_toEndOf="@+id/mainFab"
+            motion:layout_constraintStart_toStartOf="@+id/mainFab" />
+
+        <Constraint
+            android:id="@+id/mainFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintVertical_bias="1.0" />
+    </ConstraintSet>
+
+</MotionScene>
