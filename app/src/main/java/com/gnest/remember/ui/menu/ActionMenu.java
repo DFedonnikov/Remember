@@ -4,7 +4,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gnest.remember.R;
-import com.gnest.remember.ui.fragments.ArchiveItemFragment;
 
 import androidx.appcompat.view.ActionMode;
 
@@ -38,7 +37,7 @@ public class ActionMenu implements ActionMode.Callback {
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.archive:
+            case R.id.archivedListScreen:
                 listener.onArchiveButtonPressed();
                 return true;
             case R.id.delete:

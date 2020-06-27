@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/mainList"
+        android:id="@+id/activeListScreen"
         android:icon="@drawable/ic_drawer_note_add_black"
         android:orderInCategory="100"
         android:title="@string/notes" />
     <item
-        android:id="@+id/archive"
+        android:id="@+id/archivedListScreen"
         android:icon="@drawable/ic_drawer_archive_black"
         android:orderInCategory="100"
         android:title="@string/archive" />

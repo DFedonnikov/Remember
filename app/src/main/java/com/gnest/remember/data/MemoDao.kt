@@ -14,10 +14,16 @@ interface MemoDao {
     fun getArchived(): Flow<List<MemoDTO>>
 
     @Insert
+    suspend fun createMemo(dto: MemoDTO): Long
+
+    @Insert
     fun insertAll(memos: List<MemoDTO>)
 
     @Update
     fun update(memos: List<MemoDTO>)
+
+    @Update
+    fun update(memo: MemoDTO)
 
     @Query("UPDATE MemoDTO SET position = :position WHERE id = :id")
     fun updatePosition(id: Int, position: Int)
@@ -48,4 +54,7 @@ interface MemoDao {
 
     @Query("DELETE FROM MemoDTO WHERE id IN (:ids)")
     fun remove(ids: List<Int>)
+
+    @Query("SELECT * FROM MemoDTO WHERE id = (:id)")
+    suspend fun getMemo(id: Int): MemoDTO
 }

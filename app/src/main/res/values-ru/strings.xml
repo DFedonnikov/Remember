@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="btn_delete">Удалить</string>
     <string name="btn_add">Добавить</string>
     <string name="memo_text_hint">Введите текст заметки</string>
@@ -25,16 +25,44 @@
     <string name="notification_title">Вы хотели, чтобы я вам напомнил о&#8230;</string>
     <string name="sound_preference_title">Звук уведомления</string>
     <string name="font_size_preference_title">Размер шрифта</string>
-    <string name="calendar_event_added_toast">Событие добавлено в ваш календарь</string>
     <string name="calendar_event_updated_toast">Событие в вашем календаре обновлено</string>
     <string name="calendar_perm_denied_toast">Для доступа к календарю необходимо ваше разрешение</string>
     <string name="calendar_perm_denied_without_ask_again_toast">Доступ к календарю запрещен пользователем. Если вам необходима интеграция с календарем, пожауйста предоставьте разрешение в настройках вашего телефона</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="set_alarm">Напоминание</string>
+    <string name="time_past_error">Пожалуйста установите время для напоминания в будущем</string>
+    <string name="calendar_event_save_success">Событие было добавлено в ваш календарь</string>
+    <string name="calendar_event_save_failure">Событие не было добавлено в ваш календарь</string>
+    <string name="calendar_event_remove_success">Событие было удалено из вашего календаря</string>
+    <string name="calendar_event_remove_failure">Событие не было удалено из вашего календаря</string>
     <string-array name="memo_colors">
         <item>Желтый</item>
         <item>Голубой</item>
         <item>Изумрудный</item>
         <item>Пурпур</item>
     </string-array>
+    <plurals name="memo_archived_message" tools:ignore="UnusedQuantity">
+        <item quantity="zero">%1$d заметок архивировано</item>
+        <item quantity="one">%1$d заметка архивирована</item>
+        <item quantity="two">%1$d заметки архивированы</item>
+        <item quantity="few">%1$d заметки архивированы</item>
+        <item quantity="many">%1$d заметок архивировано</item>
+        <item quantity="other">%1$d заметок архивировано</item>
+    </plurals>
+    <plurals name="memo_unarchived_message" tools:ignore="UnusedQuantity">
+        <item quantity="zero">%1$d заметок разархивировано</item>
+        <item quantity="one">%1$d заметка разархивирована</item>
+        <item quantity="two">%1$d заметки разархивированы</item>
+        <item quantity="few">%1$d заметки разархивированы</item>
+        <item quantity="many">%1$d заметок разархивировано</item>
+        <item quantity="other">%1$d заметок разархивировано</item>
+    </plurals>
+    <plurals name="memo_removed_message" tools:ignore="UnusedQuantity">
+        <item quantity="zero">%1$d заметок удалено</item>
+        <item quantity="one">%1$d заметка удалена</item>
+        <item quantity="two">%1$d заметки удалены</item>
+        <item quantity="few">%1$d заметки удалены</item>
+        <item quantity="many">%1$d заметок удалено</item>
+        <item quantity="other">%1$d заметок удалено</item>
+    </plurals>
 </resources>

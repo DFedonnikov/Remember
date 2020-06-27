@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
-import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -14,18 +12,23 @@ import android.provider.CalendarContract
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.content.edit
-import androidx.core.view.GravityCompat
 import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.gnest.remember.R
+import com.gnest.remember.extensions.dismissNotification
 import com.gnest.remember.extensions.toast
+import com.gnest.remember.presentation.ui.ActiveItemsFragmentDirections
+import com.gnest.remember.presentation.ui.ArchivedItemsFragmentDirections
+import com.gnest.remember.presentation.viewmodel.MainViewModel
+import com.gnest.remember.presentation.viewmodel.SingleEventObserver
+import com.gnest.remember.ui.fragments.SettingsFragmentDirections
 import com.google.android.material.navigation.NavigationView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var navController: NavController
 
+    private val viewModel: MainViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,16 +48,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         bottomNavView.setOnNavigationItemSelectedListener {
             var isProcessed = true
             when (it.itemId) {
-                R.id.mainList -> navController.navigate(R.id.mainList)
-                R.id.archive -> navController.navigate(R.id.archive)
-                R.id.editMemo -> navController.navigate(R.id.editMemo)
-                R.id.settings -> navController.navigate(R.id.settings)
+                R.id.activeListScreen -> navController.navigate(ActiveItemsFragmentDirections.openActive())
+                R.id.archivedListScreen -> navController.navigate(ArchivedItemsFragmentDirections.openArchived())
+                R.id.settings -> navController.navigate(SettingsFragmentDirections.openSettings())
                 else -> isProcessed = false
             }
             isProcessed
         }
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
+        intent?.getIntExtra(CONTENT_INTENT_MEMO_ID_KEY, -1)?.takeIf { it > -1 }?.let { id ->
+            observeNotificationClickProcess()
+            viewModel.onOpenFromNotification(id)
+            dismissNotification(id)
+        }
+    }
+
+    private fun observeNotificationClickProcess() {
+        viewModel.activeMemoNotification.observe(this, SingleEventObserver {
+            val action = ActiveItemsFragmentDirections.openEdit()
+            action.memoId = it.id
+            action.position = it.position
+            navController.navigate(action)
+        })
+        viewModel.archivedMemoNotification.observe(this, SingleEventObserver {
+            navController.navigate(R.id.archivedListScreen)
+            val action = ArchivedItemsFragmentDirections.openEdit()
+            action.memoId = it.id
+            action.position = it.position
+            action.isArchived = it.isArchived
+            navController.navigate(action)
+        })
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -62,8 +87,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.mainList -> navController.navigate(R.id.mainList)
-            R.id.archive -> navController.navigate(R.id.archive)
+            R.id.activeListScreen -> navController.navigate(R.id.activeListScreen)
+            R.id.archivedListScreen -> navController.navigate(R.id.archivedListScreen)
             R.id.editMemo -> navController.navigate(R.id.editMemo)
             R.id.settings -> navController.navigate(R.id.settings)
             else -> return false
@@ -108,7 +133,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val eventId = java.lang.Long.parseLong(it)
             processCalendarEventIdInSharedPref(memoId, eventId, CalendarUpdateStrategy.ADD)
         }
-        toast(R.string.calendar_event_added_toast)
+        toast(R.string.calendar_event_save_success)
     }
 
     private fun updateCalendarInternal(memoId: Int, description: String?, timeInMillis: Long, contentResolver: ContentResolver) {
@@ -186,5 +211,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         ADD,
         DELETE,
         UPDATE
+    }
+
+    companion object {
+
+        const val CONTENT_INTENT_MEMO_ID_KEY = "CONTENT_INTENT_MEMO_ID_KEY"
     }
 }

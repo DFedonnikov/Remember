@@ -58,4 +58,17 @@
         </Constraint>
     </ConstraintSet>
 
+    <ConstraintSet android:id="@+id/alarmShow">
+        <Constraint android:id="@+id/alarmChip">
+            <Transform android:translationY="0dp"/>
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/alarmHide">
+        <Constraint android:id="@+id/alarmChip">
+            <Transform android:translationY="100dp"/>
+        </Constraint>
+    </ConstraintSet>
+
+
 </MotionScene>

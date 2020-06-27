@@ -37,7 +37,7 @@ class App : Application() {
             return
         }
         refWatcher = LeakCanary.install(this)
-        sSelf = this
+        self = this
         Realm.init(this)
         configRealm()
         FONT = Typeface.createFromAsset(assets, FONT_PATH)
@@ -111,15 +111,10 @@ class App : Application() {
         @JvmField
         var NOTIFICATION_SOUND = Settings.System.DEFAULT_NOTIFICATION_URI
         val REALM_CONFIG_MAP: MutableMap<String, RealmConfiguration> = HashMap()
-        private var sSelf: App? = null
+        lateinit var self: App
         @JvmStatic
         fun getConfigurationByName(name: String?): RealmConfiguration? {
             return REALM_CONFIG_MAP[name]
-        }
-
-        @JvmStatic
-        fun self(): Context? {
-            return sSelf
         }
 
         fun setFontSize(fontSize: Int) {
@@ -128,10 +123,6 @@ class App : Application() {
 
         fun setNotificationSound(notificationSoundPath: Uri) {
             NOTIFICATION_SOUND = notificationSoundPath
-        }
-
-        fun getRefWatcher(): RefWatcher? {
-            return sSelf!!.refWatcher
         }
     }
 }

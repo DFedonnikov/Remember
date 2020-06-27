@@ -63,8 +63,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        val refWatcher = App.getRefWatcher()
-        refWatcher?.watch(this)
+//        val refWatcher = App.getRefWatcher()
+//        refWatcher?.watch(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -130,8 +130,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     }
 
     override fun createPresenter(): IEditMemoPresenter {
-        val memoId = arguments?.let { EditMemoFragmentArgs.fromBundle(it).memoId } ?: 0
-        return EditMemoPresenter(memoId)
+//        val memoId = arguments?.let { EditMemoFragmentArgs.fromBundle(it).memoId } ?: 0
+        return EditMemoPresenter(0)
     }
 
     override fun setData(memoText: String, color: String, alarmSet: Boolean) {
@@ -153,16 +153,16 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     }
 
     override fun returnFromEdit(memoPosition: Int) {
-        findNavController(this).apply {
-            val direction = EditMemoFragmentDirections.openMain()
-            if (memoPosition != -1) {
-                direction
-                        .setOrientation(MyGridLayoutManager.HORIZONTAL)
-                        .setPosition(memoPosition)
-                        .setIsExpanded(true).shouldRestore = true
-            }
-            navigate(direction)
-        }
+//        findNavController(this).apply {
+//            val direction = EditMemoFragmentDirections.openMain()
+//            if (memoPosition != -1) {
+//                direction
+//                        .setOrientation(MyGridLayoutManager.HORIZONTAL)
+//                        .setPosition(memoPosition)
+//                        .setIsExpanded(true).shouldRestore = true
+//            }
+//            navigate(direction)
+//        }
     }
 
     override fun addToCalendar(memoId: Int, description: String, timeInMillis: Long) {
@@ -245,8 +245,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
 
 
     private fun hideKeyboard(v: View) {
-        val inputMethodManager = App.self()?.getSystemService(Activity.INPUT_METHOD_SERVICE) as? InputMethodManager
-        inputMethodManager?.hideSoftInputFromWindow(v.windowToken, 0)
+//        val inputMethodManager = App.self()?.getSystemService(Activity.INPUT_METHOD_SERVICE) as? InputMethodManager
+//        inputMethodManager?.hideSoftInputFromWindow(v.windowToken, 0)
     }
 
     class TimePickerFragment : DialogFragment(), TimePickerDialog.OnTimeSetListener {

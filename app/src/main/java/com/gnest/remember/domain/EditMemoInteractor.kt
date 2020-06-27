@@ -6,8 +6,11 @@ import kotlinx.coroutines.flow.map
 interface EditMemoInteractor {
 
     fun getMemos(isArchived: Boolean): Flow<List<Memo>>
-    fun saveMemos(memos: List<Memo>)
+    suspend fun saveMemo(memo: Memo): Int
+    fun updateMemos(memos: List<Memo>)
     fun updatePositions(idsToPosition: Map<Int, Int>)
+    suspend fun saveToCalendar(data: CalendarData): Boolean
+    suspend fun removeCalendarEvent(id: Int): Boolean
 }
 
 class EditMemoInteractorImpl constructor(private val repository: MemoRepository) : EditMemoInteractor {
@@ -20,9 +23,11 @@ class EditMemoInteractorImpl constructor(private val repository: MemoRepository)
         return activeMemos.map { memos -> memos.sortedBy { it.position } }
     }
 
-    override fun saveMemos(memos: List<Memo>) {
-        memos.find { it.id == 0 && it.text.isNotEmpty() }?.let { repository.insertAll(listOf(it)) }
-        memos.filter { it.id != 0 }.takeIf { it.isNotEmpty() }?.let {
+    override suspend fun saveMemo(memo: Memo): Int = memo.takeIf { it.id == 0 && it.text.isNotEmpty() }?.let { repository.createMemo(memo) }
+            ?: 0
+
+    override fun updateMemos(memos: List<Memo>) {
+        memos.filter { it.id != 0 }.let {
             repository.updateAll(it)
         }
     }
@@ -30,4 +35,15 @@ class EditMemoInteractorImpl constructor(private val repository: MemoRepository)
     override fun updatePositions(idsToPosition: Map<Int, Int>) {
         repository.updatePositions(idsToPosition)
     }
+
+    override suspend fun saveToCalendar(data: CalendarData): Boolean {
+        val isEventExists = repository.isCalendarEventExists(data.id)
+        val eventId = when {
+            isEventExists -> repository.updateCalendarEvent(data)
+            else -> repository.createCalendarEvent(data)
+        }
+        return eventId != 0L
+    }
+
+    override suspend fun removeCalendarEvent(id: Int): Boolean = repository.removeCalendarEvent(id)
 }

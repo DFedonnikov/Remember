@@ -24,8 +24,8 @@ public class MyGridLayoutManager extends GridLayoutManager {
 
     public MyGridLayoutManager(Context context, int spanCount) {
         super(context, spanCount);
-        DisplayMetrics metrics = App.self().getResources().getDisplayMetrics();
-        mScreenWidth = metrics.widthPixels;
+//        DisplayMetrics metrics = App.self().getResources().getDisplayMetrics();
+//        mScreenWidth = metrics.widthPixels;
     }
 
     private int getLargestSquareViewPosition() {

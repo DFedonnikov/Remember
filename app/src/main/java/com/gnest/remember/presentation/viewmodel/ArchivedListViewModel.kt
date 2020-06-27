@@ -2,6 +2,7 @@ package com.gnest.remember.presentation.viewmodel
 
 import androidx.lifecycle.*
 import com.gnest.remember.domain.MemoListInteractor
+import com.gnest.remember.presentation.ResourceProvider
 import com.gnest.remember.presentation.mappers.MemoMapper
 import com.gnest.remember.presentation.ui.memolist.MemoItem
 import com.gnest.remember.presentation.ui.state.DismissRemovedState
@@ -9,19 +10,22 @@ import com.gnest.remember.presentation.ui.state.DismissUnarchivedState
 import kotlinx.coroutines.flow.map
 
 class ArchivedListViewModel(private val interactor: MemoListInteractor,
-                            private val mapper: MemoMapper) : ViewModel() {
+                            private val mapper: MemoMapper,
+                            private val resourceProvider: ResourceProvider) : ViewModel() {
 
     private val outerList: LiveData<List<MemoItem>> = interactor.getArchivedMemos().map { mapper.mapDomain(it) }.asLiveData(viewModelScope.coroutineContext)
     private val localList = MutableLiveData<List<MemoItem>>()
     private val _list = MediatorLiveData<List<MemoItem>>()
     private val dismissUnarchivedItems: MutableList<MemoItem> = mutableListOf()
     private val dismissRemovedItems: MutableList<MemoItem> = mutableListOf()
-    private val _dismissUnarchivedLiveData = MutableLiveData<DismissUnarchivedState>()
-    private val _dismissRemovedLiveData = MutableLiveData<DismissRemovedState>()
+    private val _dismissUnarchivedLiveData = MutableLiveData<Event<DismissUnarchivedState>>()
+    private val _dismissRemovedLiveData = MutableLiveData<Event<DismissRemovedState>>()
+    private val _removeNotificationsAlarmLiveData = MutableLiveData<Event<List<Int>>>()
 
     val list: LiveData<List<MemoItem>> = _list
-    val dismissUnarchivedLiveData: LiveData<DismissUnarchivedState> = _dismissUnarchivedLiveData
-    val dismissRemovedLiveData: LiveData<DismissRemovedState> = _dismissRemovedLiveData
+    val dismissUnarchivedLiveData: LiveData<Event<DismissUnarchivedState>> = _dismissUnarchivedLiveData
+    val dismissRemovedLiveData: LiveData<Event<DismissRemovedState>> = _dismissRemovedLiveData
+    val removeNotificationsAlarmLiveData = _removeNotificationsAlarmLiveData
 
     init {
         _list.addSource(outerList) { _list.value = it }
@@ -31,14 +35,14 @@ class ArchivedListViewModel(private val interactor: MemoListInteractor,
     fun onItemUnarchive(item: MemoItem?) {
         item?.let {
             dismissUnarchivedItems.add(it)
-            _dismissUnarchivedLiveData.value = DismissUnarchivedState("${dismissUnarchivedItems.size}")
+            _dismissUnarchivedLiveData.value = DismissUnarchivedState(resourceProvider.getMemosUnarchivedMessage(dismissUnarchivedItems.size)).asEvent()
         }
     }
 
     fun onItemsUnarchive(selectedItems: List<MemoItem>) {
         dismissUnarchivedItems.addAll(selectedItems)
         localList.value = _list.value?.minus(dismissUnarchivedItems)
-        _dismissUnarchivedLiveData.value = DismissUnarchivedState("${dismissUnarchivedItems.size}")
+        _dismissUnarchivedLiveData.value = DismissUnarchivedState(resourceProvider.getMemosUnarchivedMessage(dismissUnarchivedItems.size)).asEvent()
     }
 
     fun onItemDismissUnarchivedCancel() {
@@ -69,7 +73,7 @@ class ArchivedListViewModel(private val interactor: MemoListInteractor,
     fun onItemsRemove(selectedItems: List<MemoItem>) {
         dismissRemovedItems.addAll(selectedItems)
         localList.value = _list.value?.minus(dismissRemovedItems)
-        _dismissRemovedLiveData.value = DismissRemovedState(("${dismissRemovedItems.size}"))
+        _dismissRemovedLiveData.value = DismissRemovedState((resourceProvider.getMemosRemovedMessage(dismissRemovedItems.size))).asEvent()
     }
 
     fun onItemDismissRemovedCancel() {
@@ -78,7 +82,9 @@ class ArchivedListViewModel(private val interactor: MemoListInteractor,
     }
 
     fun onItemDismissRemovedTimeout() {
-        interactor.removeMemos(dismissRemovedItems.map { it.id })
+        val idsToRemove = dismissRemovedItems.map { it.id }
+        interactor.removeMemos(idsToRemove)
+        _removeNotificationsAlarmLiveData.value = Event(idsToRemove)
         dismissRemovedItems.clear()
     }
 }

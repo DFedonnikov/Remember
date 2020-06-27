@@ -11,5 +11,4 @@ data class MemoDTO(@PrimaryKey(autoGenerate = true) val id: Int = 0,
                    @ColumnInfo(name = "position") val position: Int,
                    @ColumnInfo(name = "color") val color: String,
                    @ColumnInfo(name = "alarmDate") val dateTime: DateTime?,
-                   @ColumnInfo(name = "isAlarmSet") val isAlarmSet: Boolean,
                    @ColumnInfo(name = "isArchived") val isArchived: Boolean)

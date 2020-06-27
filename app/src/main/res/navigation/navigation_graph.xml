@@ -3,18 +3,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_main"
-    app:startDestination="@id/mainList">
+    app:startDestination="@id/activeListScreen">
+
+    <action
+        android:id="@+id/open_active"
+        app:destination="@+id/activeListScreen"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/navigation_main"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/open_archived"
+        app:destination="@+id/archivedListScreen"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/navigation_main"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/open_settings"
+        app:destination="@+id/settings"
+        app:launchSingleTop="true"
+        app:popUpTo="@id/navigation_main"
+        app:popUpToInclusive="true" />
 
     <action
         android:id="@+id/open_edit"
-        app:destination="@id/edit" />
-
-    <action
-        android:id="@+id/open_main"
-        app:destination="@+id/mainList" />
+        app:destination="@id/editScreen" />
 
     <fragment
-        android:id="@+id/mainList"
+        android:id="@+id/activeListScreen"
         android:name="com.gnest.remember.presentation.ui.ActiveItemsFragment"
         android:label="@string/notes"
         tools:layout="@layout/fragment_active_list">
@@ -38,31 +55,19 @@
             android:name="shouldRestore"
             android:defaultValue="false"
             app:argType="boolean" />
-        <action
-            android:id="@+id/action_mainList_to_edit"
-            app:destination="@id/edit" />
 
     </fragment>
 
     <fragment
-        android:id="@+id/archive"
+        android:id="@+id/archivedListScreen"
         android:name="com.gnest.remember.presentation.ui.ArchivedItemsFragment"
         android:label="@string/archive"
-        tools:layout="@layout/fragment_archived_list" />
+        tools:layout="@layout/fragment_archived_list">
 
-    <fragment
-        android:id="@+id/editMemo"
-        android:name="com.gnest.remember.ui.fragments.EditMemoFragment"
-        tools:layout="@layout/fragment_edit_memo">
-
-        <argument
-            android:name="memo_id"
-            android:defaultValue="-1"
-            app:argType="integer" />
     </fragment>
 
     <fragment
-        android:id="@+id/edit"
+        android:id="@+id/editScreen"
         android:name="com.gnest.remember.presentation.ui.EditFragment"
         tools:layout="@layout/fragment_edit">
         <argument
@@ -76,8 +81,7 @@
         <argument
             android:name="isArchived"
             android:defaultValue="false"
-            app:argType="boolean"
-            />
+            app:argType="boolean" />
     </fragment>
 
     <fragment

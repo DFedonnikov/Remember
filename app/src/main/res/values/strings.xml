@@ -40,13 +40,17 @@
     <string name="channel_name">Remember</string>
     <string name="channel_description">Remember channel</string>
     <string name="calendar_event_base_key">CalendarEventMemo#</string>
-    <string name="calendar_event_added_toast">Event added to your calendar</string>
     <string name="calendar_event_updated_toast">Event updated in your calendar</string>
     <string name="calendar_perm_denied_toast">Need your permission to integrate notification to your calendar</string>
     <string name="calendar_perm_denied_without_ask_again_toast">Calendar permission denied. If you want calendar integration, please grant permission in the settings of your phone</string>
     <string name="privacy_policy">Privacy policy</string>
     <string name="fab_transition">fab transition</string>
     <string name="set_alarm">Set alarm</string>
+    <string name="time_past_error">Please set time for alarm in future</string>
+    <string name="calendar_event_save_success">Event has been added to your calendar</string>
+    <string name="calendar_event_save_failure">Event has not been added to calendar</string>
+    <string name="calendar_event_remove_success">Event has been removed from calendar</string>
+    <string name="calendar_event_remove_failure">Event has not been removed from calendar</string>
     <string-array name="memo_colors">
         <item>Yellow</item>
         <item>Blue</item>
@@ -70,4 +74,28 @@
         <item>5</item>
         <item>4</item>
     </integer-array>
+    <plurals name="memo_archived_message">
+        <item quantity="zero">%1$d notes has been archived</item>
+        <item quantity="one">%1$d note has been archived</item>
+        <item quantity="two">%1$d notes has been archived</item>
+        <item quantity="few">%1$d notes has been archived</item>
+        <item quantity="many">%1$d notes has been archived</item>
+        <item quantity="other">%1$d notes has been archived</item>
+    </plurals>
+    <plurals name="memo_unarchived_message">
+        <item quantity="zero">%1$d notes has been unarchived</item>
+        <item quantity="one">%1$d note has been unarchived</item>
+        <item quantity="two">%1$d notes has been unarchived</item>
+        <item quantity="few">%1$d notes has been unarchived</item>
+        <item quantity="many">%1$d notes has been unarchived</item>
+        <item quantity="other">%1$d notes has been unarchived</item>
+    </plurals>
+    <plurals name="memo_removed_message">
+        <item quantity="zero">%1$d notes has been removed</item>
+        <item quantity="one">%1$d note has been removed</item>
+        <item quantity="two">%1$d notes has been removed</item>
+        <item quantity="few">%1$d notes has been removed</item>
+        <item quantity="many">%1$d notes has been removed</item>
+        <item quantity="other">%1$d notes has been removed</item>
+    </plurals>
 </resources>

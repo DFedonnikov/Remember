@@ -11,13 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.gnest.remember.R
+import com.gnest.remember.extensions.dismissNotificationsAlarm
 import com.gnest.remember.presentation.ui.memolist.MemoBinder
 import com.gnest.remember.presentation.ui.memolist.MemoItem
 import com.gnest.remember.presentation.ui.memolist.MemoPayloadProvider
 import com.gnest.remember.presentation.ui.memolist.SpaceItemDecoration
-import com.gnest.remember.presentation.ui.state.DismissArchivedState
-import com.gnest.remember.presentation.ui.state.DismissRemovedState
 import com.gnest.remember.presentation.viewmodel.ActiveListViewModel
+import com.gnest.remember.presentation.viewmodel.SingleEventObserver
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_active_list.*
@@ -31,48 +31,6 @@ class ActiveItemsFragment : Fragment() {
     private val listViewModel: ActiveListViewModel by viewModel()
     private lateinit var sections: ListSection<MemoItem>
     private lateinit var itemBinder: MemoBinder
-    private val dismissArchivedItemsObserver = Observer<DismissArchivedState> {
-        val snackbar = Snackbar
-                .make(requireView(), it.message, Snackbar.LENGTH_SHORT)
-                .setAction(android.R.string.cancel) {
-                    listViewModel.onItemDismissArchivedCancel()
-                    unsubscribeFromSnackbarDismissArchived()
-                }
-                .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
-                .addCallback(object : Snackbar.Callback() {
-                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                        when (event) {
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE, BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT
-                            -> listViewModel.onItemDismissArchivedTimeout()
-                            else -> {
-                            }
-                        }
-                        unsubscribeFromSnackbarDismissArchived()
-                    }
-                })
-        snackbar.show()
-    }
-    private val dismissRemovedItemsObserver = Observer<DismissRemovedState> {
-        val snackbar = Snackbar
-                .make(requireView(), it.message, Snackbar.LENGTH_SHORT)
-                .setAction(android.R.string.cancel) {
-                    listViewModel.onItemDismissRemovedCancel()
-                    unsubscribeFromSnackbarDismissRemoved()
-                }
-                .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
-                .addCallback(object : Snackbar.Callback() {
-                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                        when (event) {
-                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE, BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT
-                            -> listViewModel.onItemDismissRemovedTimeout()
-                            else -> {
-                            }
-                        }
-                        unsubscribeFromSnackbarDismissRemoved()
-                    }
-                })
-        snackbar.show()
-    }
     private val onSelectedBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             sections.clearSelections()
@@ -113,14 +71,12 @@ class ActiveItemsFragment : Fragment() {
     }
 
     private fun initListeners() {
-        fab.addListener = { findNavController().navigate(EditFragmentDirections.openEdit()) }
+        fab.addListener = { findNavController().navigate(ActiveItemsFragmentDirections.openEdit()) }
         fab.removeListener = {
-            subscribeToSnackbarDismissRemoved()
             listViewModel.onItemsRemove(sections.selectedItems)
             fab.shrink()
         }
         fab.archiveListener = {
-            subscribeToSnackbarDismissArchived()
             listViewModel.onItemsArchive(sections.selectedItems)
             fab.shrink()
         }
@@ -140,15 +96,12 @@ class ActiveItemsFragment : Fragment() {
             fab.shrink()
         }
         sections.setOnItemClickListener { position, item ->
-            val action = EditFragmentDirections.openEdit()
+            val action = ActiveItemsFragmentDirections.openEdit()
             action.memoId = item.id
             action.position = position
             findNavController().navigate(action)
         }
-        sections.setSwipeToDismissListener { _, item ->
-            subscribeToSnackbarDismissArchived()
-            listViewModel.onItemArchive(item)
-        }
+        sections.setSwipeToDismissListener { _, item -> listViewModel.onItemArchive(item) }
         sections.setOnSelectionChangedListener { _, _, selectedItems ->
             itemBinder.isSelectionActivated = selectedItems.isNotEmpty()
             onSelectedBackCallback.isEnabled = selectedItems.isNotEmpty()
@@ -162,6 +115,9 @@ class ActiveItemsFragment : Fragment() {
 
     private fun initSubscriptions() {
         subscribeToListUpdate()
+        subscribeToSnackbarDismissArchived()
+        subscribeToSnackbarDismissRemoved()
+        subscribeToNotificationsAlarmDismiss()
     }
 
     private fun subscribeToListUpdate() {
@@ -171,19 +127,51 @@ class ActiveItemsFragment : Fragment() {
     }
 
     private fun subscribeToSnackbarDismissArchived() {
-        listViewModel.dismissArchivedLiveData.observe(viewLifecycleOwner, dismissArchivedItemsObserver)
-    }
-
-    private fun unsubscribeFromSnackbarDismissArchived() {
-        listViewModel.dismissArchivedLiveData.removeObserver(dismissArchivedItemsObserver)
+        listViewModel.dismissArchivedLiveData.observe(viewLifecycleOwner, SingleEventObserver {
+            val snackbar = Snackbar
+                    .make(requireView(), it.message, Snackbar.LENGTH_SHORT)
+                    .setAction(android.R.string.cancel) {
+                        listViewModel.onItemDismissArchivedCancel()
+                    }
+                    .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+                    .addCallback(object : Snackbar.Callback() {
+                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                            when (event) {
+                                BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE, BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT
+                                -> listViewModel.onItemDismissArchivedTimeout()
+                                else -> {
+                                }
+                            }
+                        }
+                    })
+            snackbar.show()
+        })
     }
 
     private fun subscribeToSnackbarDismissRemoved() {
-        listViewModel.dismissRemovedLiveData.observe(viewLifecycleOwner, dismissRemovedItemsObserver)
+        listViewModel.dismissRemovedLiveData.observe(viewLifecycleOwner, SingleEventObserver {
+            val snackbar = Snackbar
+                    .make(requireView(), it.message, Snackbar.LENGTH_SHORT)
+                    .setAction(android.R.string.cancel) { listViewModel.onItemDismissRemovedCancel() }
+                    .setActionTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+                    .addCallback(object : Snackbar.Callback() {
+                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                            when (event) {
+                                BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE, BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT
+                                -> listViewModel.onItemDismissRemovedTimeout()
+                                else -> {
+                                }
+                            }
+                        }
+                    })
+            snackbar.show()
+        })
     }
 
-    private fun unsubscribeFromSnackbarDismissRemoved() {
-        listViewModel.dismissRemovedLiveData.removeObserver(dismissRemovedItemsObserver)
+    private fun subscribeToNotificationsAlarmDismiss() {
+        listViewModel.removeNotificationsAlarmLiveData.observe(viewLifecycleOwner, SingleEventObserver {
+            context?.dismissNotificationsAlarm(it)
+        })
     }
 
     override fun onDestroyView() {

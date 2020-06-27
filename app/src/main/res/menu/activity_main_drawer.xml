@@ -4,11 +4,11 @@
         android:id="@+id/menu_lists"
         android:checkableBehavior="none">
         <item
-            android:id="@+id/mainList"
+            android:id="@+id/activeListScreen"
             android:icon="@drawable/ic_note"
             android:title="@string/notes" />
         <item
-            android:id="@+id/archive"
+            android:id="@+id/archivedListScreen"
             android:icon="@drawable/ic_drawer_archive_black"
             android:title="@string/archive" />
     </group>

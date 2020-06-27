@@ -52,15 +52,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        val refWatcher = App.getRefWatcher()
+//        val refWatcher = App.getRefWatcher()
 //        refWatcher.watch(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setSupportActionBar(settingsFragmentToolbar)
-        supportActionBar()?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar()?.setHomeButtonEnabled(true)
 //        activity?.drawerLayout?.let { setupActionBarWithNavController(it) }
         sharedPreferences().registerOnSharedPreferenceChangeListener(this)
 //        activity?.addOnBackPressedCallback(this)
@@ -159,16 +156,16 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     private fun setFontPrefSummary(): String {
-        val fontSizePref = findPreference(App.FONT_SIZE_KEY)
-        val fontSize = sharedPreferences().getString(App.FONT_SIZE_KEY, "") ?: ""
-        fontSizePref.summary = fontSize
-        return fontSize
+//        val fontSizePref = findPreference(App.FONT_SIZE_KEY)
+//        val fontSize = sharedPreferences().getString(App.FONT_SIZE_KEY, "") ?: ""
+//        fontSizePref.summary = fontSize
+        return ""
     }
 
     private fun setNotificationSoundPrefSummary(ringtoneUri: Uri) {
-        val notificationSoundPref = findPreference(App.NOTIFICATION_SOUND_KEY)
-        val summary = RingtoneManager.getRingtone(requireContext(), ringtoneUri).getTitle(context)
-        notificationSoundPref.summary = summary
+//        val notificationSoundPref = findPreference(App.NOTIFICATION_SOUND_KEY)
+//        val summary = RingtoneManager.getRingtone(requireContext(), ringtoneUri).getTitle(context)
+//        notificationSoundPref.summary = summary
     }
 
     companion object {

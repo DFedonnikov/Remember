@@ -52,7 +52,7 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
         mView = itemView;
         this.mListener = onItemSelectedListener;
         this.mBackgroundTarget = getTarget(new WeakReference<>(mView));
-        Glide.with(App.self()).load(R.drawable.imageview_pin).into(pin);
+//        Glide.with(App.self()).load(R.drawable.imageview_pin).into(pin);
         textView.setOnClickListener(view -> mListener.get().onItemClicked(mPosition, mMemo, new WeakReference<>(SelectableViewHolder.this).get()));
         textView.setOnLongClickListener(view -> mListener.get().onItemLongClicked(mPosition, mMemo, new WeakReference<>(SelectableViewHolder.this).get()));
         textView.setTypeface(App.FONT);
@@ -70,18 +70,18 @@ class SelectableViewHolder extends RecyclerView.ViewHolder implements ItemTouchH
 
     @Override
     public void setSelectedState() {
-        Glide.with(App.self()).load(mBackgroundSelectedId).into(mBackgroundTarget);
+//        Glide.with(App.self()).load(mBackgroundSelectedId).into(mBackgroundTarget);
         pin.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDeselectedState() {
-        Glide.with(App.self()).load(mBackgroundId).into(mBackgroundTarget);
+//        Glide.with(App.self()).load(mBackgroundId).into(mBackgroundTarget);
         pin.setVisibility(View.VISIBLE);
     }
 
     private void setDeselectedAndExpandedState() {
-        Glide.with(App.self()).load(mBackgroundExpandedId).into(mBackgroundTarget);
+//        Glide.with(App.self()).load(mBackgroundExpandedId).into(mBackgroundTarget);
         pin.setVisibility(View.INVISIBLE);
     }
 

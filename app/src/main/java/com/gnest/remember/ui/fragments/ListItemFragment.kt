@@ -81,8 +81,8 @@ open class ListItemFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        val refWatcher = App.getRefWatcher()
-        refWatcher?.watch(this)
+//        val refWatcher = App.getRefWatcher()
+//        refWatcher?.watch(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -155,14 +155,14 @@ open class ListItemFragment : Fragment() {
     }
 
     private fun subscribeToListUpdate() {
-        listViewModel.list
-                .observe(viewLifecycleOwner, Observer<List<MemoItem>> {
-                    listSections.addAll(it)
+//        listViewModel.list
+//                .observe(viewLifecycleOwner, Observer<List<MemoItem>> {
+//                    listSections.addAll(it)
 
                     //                    adapter?.memos = it
 //                    adapter?.notifyDataSetChanged()
 //                    checkStateRestore()
-                })
+//                })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -2,6 +2,7 @@ package com.gnest.remember.presentation.ui
 
 import android.content.Context
 import android.graphics.drawable.TransitionDrawable
+import android.os.Build
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -12,66 +13,39 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.gnest.remember.R
+import com.gnest.remember.extensions.setPaddingOnly
 import kotlinx.android.synthetic.main.memo_view.view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.*
+import org.joda.time.DateTime
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.atan2
 
 class MemoView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = 0) : MotionLayout(context, attributeSet, defStyleAttr),
         CoroutineScope {
 
-    init {
-        inflate(context, R.layout.memo_view, this)
-        setupListeners()
-    }
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
-
-    private val colorState = MemoColorState()
-
-    private val swipeDetector = SwipeDetector(context) {
-        colorState.switchColor()
-//        isReadOnly = false
-    }
-    private val inputChannel = BroadcastChannel<String>(1)
-    private var isFromSetText = false
-
-    private fun setupListeners() {
-        launch {
-            inputChannel.asFlow()
-                    .debounce(100)
-                    .flowOn(Dispatchers.IO)
-                    .catch { }
-                    .collect {
-                        when {
-                            isFromSetText -> isFromSetText = false
-                            else -> textChangeListener?.invoke(it)
-                        }
-                    }
-        }
-        memoEditText.doAfterTextChanged { launch { inputChannel.send(it.toString()) } }
-        alarmChip.setOnTouchListener { _, _ -> isReadOnly }
-    }
-
-    var textChangeListener: ((String) -> Unit)? = null
-    var colorChangeListener: ((MemoColor) -> Unit)? = null
-    var clickListener: (() -> Unit)? = null
-    var onLongClickListener: (() -> Boolean)? = null
-    var onMoveListener: (() -> Unit)? = null
+    private val datePicker by lazy { DateTimePicker(context) }
+    private val paddingBottomReadonly = context.resources.getDimensionPixelSize(R.dimen.memo_padding_bottom_readonly)
+    private val paddingBottomEdit = context.resources.getDimensionPixelSize(R.dimen.memo_padding_bottom_edit)
     var isReadOnly = false
         set(value) {
             field = value
             clickableArea.isVisible = value
             memoEditText.isFocusable = !value
+            memoEditText.setPaddingOnly(bottom = when {
+                value -> paddingBottomReadonly
+                else -> paddingBottomEdit
+            })
+            colorSwipeArea.setOnTouchListener { _, event ->
+                swipeDetector.onTouchEvent(event)
+                true
+            }
             when {
                 value -> {
                     clickableArea.setOnClickListener { clickListener?.invoke() }
                     clickableArea.setOnLongClickListener { onLongClickListener?.invoke() ?: false }
                     clickableArea.setOnTouchListener { _, event ->
-                        swipeDetector.onTouchEvent(event)
                         if (event.action == MotionEvent.ACTION_MOVE) {
                             onMoveListener?.invoke()
                         }
@@ -82,7 +56,6 @@ class MemoView @JvmOverloads constructor(context: Context, attributeSet: Attribu
                     memoEditText.setOnClickListener { clickListener?.invoke() }
                     memoEditText.setOnLongClickListener { onLongClickListener?.invoke() ?: false }
                     memoEditText.setOnTouchListener { _, event ->
-                        swipeDetector.onTouchEvent(event)
                         if (event.action == MotionEvent.ACTION_MOVE) {
                             onMoveListener?.invoke()
                         }
@@ -91,6 +64,84 @@ class MemoView @JvmOverloads constructor(context: Context, attributeSet: Attribu
                 }
             }
         }
+
+    init {
+        inflate(context, R.layout.memo_view, this)
+        setupListeners()
+        isReadOnly = false
+    }
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
+
+    private val colorState = MemoColorState()
+
+    private val swipeDetector = SwipeDetector(context) { colorState.switchColor() }
+    private val inputChannel = BroadcastChannel<String>(1)
+    private var isFromSetText = false
+    private var isAlarmSet = false
+
+    private fun setupListeners() {
+        launch {
+            inputChannel.asFlow()
+                    .debounce(100)
+                    .flowOn(Dispatchers.IO)
+                    .catch { }
+                    .collect {
+                        memoText = it
+                        when {
+                            isFromSetText -> isFromSetText = false
+                            else -> textChangeListener?.invoke(it)
+                        }
+                    }
+        }
+        memoEditText.doAfterTextChanged { launch { inputChannel.send(it.toString()) } }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            memoEditText.setOnScrollChangeListener { _, _, scrollY, _, _ ->
+                if (scrollY > 0) {
+                    memoRoot.transitionToState(R.id.alarmHide)
+                } else {
+                    memoRoot.transitionToState(R.id.alarmShow)
+                }
+            }
+        }
+
+        alarmChip.setOnClickListener { datePicker.show() }
+        alarmChip.setOnCloseIconClickListener {
+            resetAlarm()
+            alarmChip.isCloseIconVisible = false
+            onAlarmDismissListener?.invoke()
+        }
+        datePicker.onDateTimeSetListener = { onDateChosen(it) }
+    }
+
+    private fun resetAlarm() {
+        isAlarmSet = false
+        alarmChip.text = context.getString(R.string.set_alarm)
+        datePicker.reset()
+        colorState.updateAlarmChipIcon(false)
+    }
+
+    private fun onDateChosen(date: DateTime) {
+        isAlarmSet = true
+        setAlarmChipText(date)
+        alarmChip.isCloseIconVisible = true
+        colorState.updateAlarmChipIcon(true)
+        onAlarmSetListener?.invoke(date)
+    }
+
+    private fun setAlarmChipText(date: DateTime) {
+        val dateText = "${date.dayOfMonth}.${date.monthOfYear}.${date.year} ${date.hourOfDay}:${date.minuteOfHour}"
+        alarmChip.text = dateText
+    }
+
+    var textChangeListener: ((String) -> Unit)? = null
+    var colorChangeListener: ((MemoColor) -> Unit)? = null
+    var clickListener: (() -> Unit)? = null
+    var onLongClickListener: (() -> Boolean)? = null
+    var onMoveListener: (() -> Unit)? = null
+    var onAlarmSetListener: ((DateTime) -> Unit)? = null
+    var onAlarmDismissListener: (() -> Unit)? = null
 
     override fun setSelected(isSelected: Boolean) {
         super.setSelected(isSelected)
@@ -136,25 +187,24 @@ class MemoView @JvmOverloads constructor(context: Context, attributeSet: Attribu
                                 R.color.purple))
 
         private var currentColorIndex = 0
+        private val alarmDisabledDrawable = context.getDrawable(R.drawable.ic_alarm_disabled)
 
         init {
             with(colors[0]) {
                 memoEditText.background = background
-                alarmChip.checkedIcon = alarm
+                alarmChip.chipIcon = alarm
                 alarmChip.setRippleColorResource(chipRippleBackground)
             }
-            isReadOnly = false
         }
 
-
         internal fun switchColor() {
-            val currentColor = colors[currentColorIndex.rem(colors.size)]
+            val currentColor = colors[currentColorIndex]
             memoEditText.background = currentColor.background
-            alarmChip.checkedIcon = currentColor.alarm
+            updateAlarmChipIcon(isAlarmSet)
             currentColor.background.startTransition(500)
             currentColor.alarm.startTransition(500)
-            currentColorIndex++
-            val nextColor = colors[currentColorIndex.rem(colors.size)]
+            currentColorIndex = currentColorIndex.inc().rem(colors.size)
+            val nextColor = colors[currentColorIndex]
             alarmChip.setRippleColorResource(nextColor.chipRippleBackground)
             colorChangeListener?.invoke(nextColor.color)
         }
@@ -163,8 +213,18 @@ class MemoView @JvmOverloads constructor(context: Context, attributeSet: Attribu
             colors.find { it.color == color }?.let { renderData ->
                 currentColorIndex = colors.indexOf(renderData)
                 memoEditText.background = renderData.background
-                alarmChip.checkedIcon = renderData.alarm
+                updateAlarmChipIcon(isAlarmSet)
                 alarmChip.setRippleColorResource(renderData.chipRippleBackground)
+            }
+        }
+
+        fun updateAlarmChipIcon(isEnabled: Boolean) {
+            when {
+                isEnabled -> {
+                    val currentColor = colors[currentColorIndex]
+                    alarmChip.chipIcon = currentColor.alarm
+                }
+                else -> alarmChip.chipIcon = alarmDisabledDrawable
             }
         }
     }
@@ -196,6 +256,7 @@ class MemoView @JvmOverloads constructor(context: Context, attributeSet: Attribu
         isFromSetText = true
         this.memoText = text
         memoEditText.setText(text)
+        memoEditText.setSelection(text.length)
     }
 
     fun hideAlarm() {
@@ -204,6 +265,16 @@ class MemoView @JvmOverloads constructor(context: Context, attributeSet: Attribu
 
     fun setColor(color: MemoColor) {
         colorState.setColor(color)
+    }
+
+    fun setAlarm(date: DateTime?) {
+        date?.let {
+            isAlarmSet = true
+            setAlarmChipText(it)
+            alarmChip.isCloseIconVisible = true
+            colorState.updateAlarmChipIcon(true)
+            datePicker.updateDate(it)
+        } ?: resetAlarm()
     }
 
     enum class MemoColor {
@@ -232,7 +303,7 @@ private class SwipeDetector(context: Context?,
     private fun observeSwipe() {
         job = launch {
             channel.asFlow()
-                    .debounce(100)
+                    .debounce(200)
                     .flowOn(Dispatchers.IO)
                     .catch { }
                     .collect { onSwipeUp() }
@@ -247,7 +318,7 @@ private class SwipeDetector(context: Context?,
         e1 ?: return false
         e2 ?: return false
         val angle = Math.toDegrees(atan2((e1.y - e2.y).toDouble(), (e2.x - e1.x).toDouble())).toFloat()
-        if (angle > 70 && angle <= 110) {
+        if (angle in 70.0..110.0) {
             launch { channel.send(Unit) }
             return true
         }
