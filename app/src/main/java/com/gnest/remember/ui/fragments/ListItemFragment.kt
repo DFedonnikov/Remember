@@ -60,8 +60,7 @@ import kotlinx.android.synthetic.main.app_bar_fragment_item_list.*
 import kotlinx.android.synthetic.main.content_fragment_item_list.*
 import kotlinx.android.synthetic.main.fragment_item_list.*
 
-open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresenter>(), MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView,
-        OnBackPressedCallback {
+open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresenter>(), MySelectableAdapter.OnItemActionPerformed, ActionMenu.MenuInteractionHelper, IListFragmentView {
 
     private val compositeDisposable = CompositeDisposable()
     private val actionMenu by lazy { ActionMenu(this) }
@@ -79,8 +78,8 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        val refWatcher = App.getRefWatcher()
-        refWatcher.watch(this)
+//        val refWatcher = App.getRefWatcher()
+//        refWatcher.watch(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -110,7 +109,7 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
         adapter = MySelectableAdapter(mMemoSize, mMargins)
         adapter?.setActionListener(this)
         myGridLayoutManager?.setExpandListener(adapter)
-        activity?.addOnBackPressedCallback(this)
+//        activity?.addOnBackPressedCallback(this)
 
         memoList.adapter = adapter
         val callback = ItemTouchHelperCallback(adapter)
@@ -139,7 +138,7 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
     }
 
     override fun onDestroyView() {
-        activity?.removeOnBackPressedCallback(this)
+//        activity?.removeOnBackPressedCallback(this)
         super.onDestroyView()
     }
 
@@ -155,17 +154,17 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
         checkStateRestore()
     }
 
-    override fun handleOnBackPressed(): Boolean =
-            when {
-                myGridLayoutManager?.orientation == RecyclerView.HORIZONTAL -> {
-                    myGridLayoutManager?.orientation = RecyclerView.VERTICAL
-                    myGridLayoutManager?.spanCount = mColumnCount
-                    myGridLayoutManager?.scrollToPosition(myGridLayoutManager?.lastPosition ?: 0)
-                    adapter?.isItemsExpanded = false
-                    true
-                }
-                else -> false
-            }
+//    override fun handleOnBackPressed(): Boolean =
+//            when {
+//                myGridLayoutManager?.orientation == RecyclerView.HORIZONTAL -> {
+//                    myGridLayoutManager?.orientation = RecyclerView.VERTICAL
+//                    myGridLayoutManager?.spanCount = mColumnCount
+//                    myGridLayoutManager?.scrollToPosition(myGridLayoutManager?.lastPosition ?: 0)
+//                    adapter?.isItemsExpanded = false
+//                    true
+//                }
+//                else -> false
+//            }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -263,7 +262,7 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
             return false
         } else {
             val notificationIntent = Intent(context, MainActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(context, id, notificationIntent, PendingIntent.FLAG_NO_CREATE)
+            val pendingIntent = PendingIntent.getActivity(context, id, notificationIntent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
             return pendingIntent != null
         }
     }
@@ -374,12 +373,12 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
 
         //Restoring state after returning from edit mode
         arguments?.let {
-            ListItemFragmentArgs.fromBundle(it).apply {
-                if (shouldRestore) {
-                    restoreLayoutManagerState(orientation, isExpanded, anchorPosition = position)
-                    return
-                }
-            }
+//            ListItemFragmentArgs.fromBundle(it).apply {
+//                if (shouldRestore) {
+//                    restoreLayoutManagerState(orientation, isExpanded, anchorPosition = position)
+//                    return
+//                }
+//            }
         }
 
         requireActivity().intent?.apply {
@@ -449,8 +448,8 @@ open class ListItemFragment : MvpFragment<IListFragmentView, IListFragmentPresen
 
 
     private fun openEdit(id: Int = -1) {
-        val direction = ListItemFragmentDirections.openEdit().setMemoId(id)
-        findNavController().navigate(direction)
+//        val direction = ListItemFragmentDirections.openEdit().setMemoId(id)
+        findNavController().navigate(0)
     }
 
     companion object {

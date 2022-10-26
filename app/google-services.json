@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "688073336324",
+    "firebase_url": "https://remember-2716d.firebaseio.com",
+    "project_id": "remember-2716d",
+    "storage_bucket": "remember-2716d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688073336324:android:886e4b7e33a95df5073751",
+        "android_client_info": {
+          "package_name": "com.gnest.remember"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "688073336324-3g149sgt2vklcbm8vnsj7vrci87rk9dk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCR7UmKE78d06Hk8fIfe711koGQ4xtogHM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "688073336324-3g149sgt2vklcbm8vnsj7vrci87rk9dk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688073336324:android:67394bf68311f465073751",
+        "android_client_info": {
+          "package_name": "com.gnest.remember.development"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "688073336324-3g149sgt2vklcbm8vnsj7vrci87rk9dk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCR7UmKE78d06Hk8fIfe711koGQ4xtogHM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "688073336324-3g149sgt2vklcbm8vnsj7vrci87rk9dk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

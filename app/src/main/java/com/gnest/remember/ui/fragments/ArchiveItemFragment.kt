@@ -21,13 +21,13 @@ class ArchiveItemFragment : ListItemFragment() {
         //Has to be empty, so it won't inflate its parents menu layout here
     }
 
-    override fun handleOnBackPressed(): Boolean = when {
-        myGridLayoutManager?.orientation == RecyclerView.HORIZONTAL -> super.handleOnBackPressed()
-        else -> {
-            findNavController().navigateUp()
-            true
-        }
-    }
+//    override fun handleOnBackPressed(): Boolean = when {
+//        myGridLayoutManager?.orientation == RecyclerView.HORIZONTAL -> super.handleOnBackPressed()
+//        else -> {
+//            findNavController().navigateUp()
+//            true
+//        }
+//    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {

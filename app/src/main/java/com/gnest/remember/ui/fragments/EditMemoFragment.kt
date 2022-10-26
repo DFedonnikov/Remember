@@ -37,8 +37,9 @@ import java.util.Locale
 import java.util.TimeZone
 
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 
-import androidx.navigation.fragment.NavHostFragment.findNavController
+//import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.gnest.remember.ui.MainActivity
 import com.gnest.remember.extensions.setSupportActionBar
 import com.gnest.remember.extensions.setupActionBarWithNavController
@@ -49,7 +50,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_fragment_edit.*
 import kotlinx.android.synthetic.main.content_fragment_edit.*
 
-class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener, OnBackPressedCallback {
+class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), AdapterView.OnItemSelectedListener, IEditMemoView, TimeSetListener {
 
     private val timePickFragment by lazy { TimePickerFragment() }
 
@@ -58,8 +59,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        val refWatcher = App.getRefWatcher()
-        refWatcher.watch(this)
+//        val refWatcher = App.getRefWatcher()
+//        refWatcher.watch(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -75,7 +76,7 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
         supportActionBar()?.setDisplayHomeAsUpEnabled(true)
         supportActionBar()?.setHomeButtonEnabled(true)
         activity?.drawerLayout?.let { setupActionBarWithNavController(it) }
-        activity?.addOnBackPressedCallback(this)
+//        activity?.addOnBackPressedCallback(this)
 
         timePickFragment.setTimeSetListener(this)
         editTextMemo.setOnFocusChangeListener { v, hasFocus ->
@@ -109,7 +110,7 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     override fun onDestroyView() {
         super.onDestroyView()
         timePickFragment.setTimeSetListener(null)
-        requireActivity().removeOnBackPressedCallback(this)
+//        requireActivity().removeOnBackPressedCallback(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -125,8 +126,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     }
 
     override fun createPresenter(): IEditMemoPresenter {
-        val memoId = arguments?.let { EditMemoFragmentArgs.fromBundle(it).memoId } ?: 0
-        return EditMemoPresenter(memoId)
+//        val memoId = arguments?.let { EditMemoFragmentArgs.fromBundle(it).memoId } ?: 0
+        return EditMemoPresenter(0)
     }
 
     override fun setData(memoText: String, color: String, alarmSet: Boolean) {
@@ -135,11 +136,11 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
         setAlarmVisibility(alarmSet)
     }
 
-    override fun handleOnBackPressed(): Boolean {
-        saveMemo()
-        presenter.processPressBackButton()
-        return true
-    }
+//    override fun handleOnBackPressed(): Boolean {
+//        saveMemo()
+//        presenter.processPressBackButton()
+//        return true
+//    }
 
     override fun getMemoText(): String {
         return editTextMemo.text.toString()
@@ -154,16 +155,16 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     }
 
     override fun returnFromEdit(memoPosition: Int) {
-        findNavController(this).apply {
-            val direction = EditMemoFragmentDirections.openMain()
-            if (memoPosition != -1) {
-                direction
-                        .setOrientation(MyGridLayoutManager.HORIZONTAL)
-                        .setPosition(memoPosition)
-                        .setIsExpanded(true).shouldRestore = true
-            }
-            navigate(direction)
-        }
+//        findNavController(this).apply {
+//            val direction = EditMemoFragmentDirections.openMain()
+//            if (memoPosition != -1) {
+//                direction
+//                        .setOrientation(MyGridLayoutManager.HORIZONTAL)
+//                        .setPosition(memoPosition)
+//                        .setIsExpanded(true).shouldRestore = true
+//            }
+//            navigate(direction)
+//        }
     }
 
     override fun addToCalendar(memoId: Int, description: String, timeInMillis: Long) {
@@ -214,7 +215,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                return handleOnBackPressed()
+                return false
+//                return handleOnBackPressed()
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -262,8 +264,8 @@ class EditMemoFragment : MvpFragment<IEditMemoView, IEditMemoPresenter>(), Adapt
             var hour = 0
             var minute = 0
             if (arguments != null) {
-                hour = arguments!!.getInt(HOUR_KEY)
-                minute = arguments!!.getInt(MINUTE_KEY)
+                hour = requireArguments()!!.getInt(HOUR_KEY)
+                minute = requireArguments()!!.getInt(MINUTE_KEY)
             }
             return TimePickerDialog(activity, this, hour, minute,
                     DateFormat.is24HourFormat(activity))

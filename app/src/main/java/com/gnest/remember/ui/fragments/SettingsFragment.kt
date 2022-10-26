@@ -27,8 +27,7 @@ import com.gnest.remember.extensions.supportActionBar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_settings.*
 
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener,
-        OnBackPressedCallback {
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val ringtoneUri: Uri
         get() {
@@ -53,8 +52,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        val refWatcher = App.getRefWatcher()
-        refWatcher.watch(this)
+//        val refWatcher = App.getRefWatcher()
+//        refWatcher.watch(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,7 +63,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         supportActionBar()?.setHomeButtonEnabled(true)
         activity?.drawerLayout?.let { setupActionBarWithNavController(it) }
         sharedPreferences().registerOnSharedPreferenceChangeListener(this)
-        activity?.addOnBackPressedCallback(this)
+//        activity?.addOnBackPressedCallback(this)
         setFontPrefSummary()
         setNotificationSoundPrefSummary(ringtoneUri)
     }
@@ -72,13 +71,13 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     override fun onDestroyView() {
         super.onDestroyView()
         sharedPreferences().unregisterOnSharedPreferenceChangeListener(this)
-        activity?.removeOnBackPressedCallback(this)
+//        activity?.removeOnBackPressedCallback(this)
     }
 
-    override fun handleOnBackPressed(): Boolean {
-        findNavController().navigateUp()
-        return true
-    }
+//    override fun handleOnBackPressed(): Boolean {
+//        findNavController().navigateUp()
+//        return true
+//    }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         return if (App.NOTIFICATION_SOUND_KEY == preference.key) {

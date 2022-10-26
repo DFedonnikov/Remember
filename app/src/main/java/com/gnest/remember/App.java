@@ -11,20 +11,19 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 
-import com.crashlytics.android.Crashlytics;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 import com.gnest.remember.model.db.migration.RealmMigration;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.RequiresApi;
 import androidx.preference.PreferenceManager;
-import io.fabric.sdk.android.Fabric;
+
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+//import leakcanary.LeakCanary;
 
 public class App extends Application {
 
@@ -42,17 +41,17 @@ public class App extends Application {
 
     private static App sSelf;
 
-    private RefWatcher refWatcher;
+//    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
-        refWatcher = LeakCanary.install(this);
+//        if (LeakCanary.isInAnalyzerProcess(this)) {
+//            // This process is dedicated to LeakCanary for heap analysis.
+//            // You should not init your app in this process.
+//            return;
+//        }
+//        refWatcher = LeakCanary.install(this);
         sSelf = this;
         Realm.init(this);
         configRealm();
@@ -64,7 +63,7 @@ public class App extends Application {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();
         }
-        Fabric.with(this, new Crashlytics());
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
     }
 
     private void configRealm() {
@@ -127,7 +126,7 @@ public class App extends Application {
     }
 
 
-    public static RefWatcher getRefWatcher() {
-        return sSelf.refWatcher;
-    }
+//    public static RefWatcher getRefWatcher() {
+//        return sSelf.refWatcher;
+//    }
 }
