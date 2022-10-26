@@ -21,10 +21,12 @@ import java.util.Map;
 import androidx.annotation.RequiresApi;
 import androidx.preference.PreferenceManager;
 
+import dagger.hilt.android.HiltAndroidApp;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 //import leakcanary.LeakCanary;
 
+@HiltAndroidApp
 public class App extends Application {
 
     public static final String FONT_PATH = "fonts/CaviarDreams.ttf";
