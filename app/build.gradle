@@ -133,12 +133,15 @@ dependencies {
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
 
     //Compose
     implementation 'androidx.compose.material3:material3:1.0.0-rc01'
     implementation 'androidx.activity:activity-compose:1.6.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation 'androidx.compose.ui:ui-tooling-preview:1.2.1'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
     debugImplementation 'androidx.compose.ui:ui-tooling:1.2.1'
 
     //Support libraries
@@ -152,10 +155,8 @@ dependencies {
 
     //Navigation
     def nav_version = "2.5.2"
-    implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     // For Kotlin use navigation-fragment-ktx
-    implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     // For Kotlin use navigation-ui-ktx
 
@@ -206,7 +207,12 @@ dependencies {
 //    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
     //JUnit
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
+
+    androidTestImplementation 'androidx.test:core:1.4.0'
+
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
 }
 
 kapt {

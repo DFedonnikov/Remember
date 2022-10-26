@@ -124,4 +124,16 @@ public class Memo extends RealmObject {
         result = 31 * result + mPosition;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Memo{" +
+                "mId=" + mId +
+                ", mMemoText='" + mMemoText + '\'' +
+                ", mPosition=" + mPosition +
+                ", mColor='" + mColor + '\'' +
+                ", mAlarmDate=" + mAlarmDate +
+                ", mIsAlarmSet=" + mIsAlarmSet +
+                '}';
+    }
 }
