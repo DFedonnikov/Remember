@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#ffd673</color>
-    <color name="colorPrimaryDark">#006b53</color>
+    <color name="colorPrimaryDark">#1A833A</color>
     <color name="colorAccent">#ffd673</color>
     <color name="memo_yellow">#e6ffff00</color>
     <color name="memo_blue">#e635a2f0</color>

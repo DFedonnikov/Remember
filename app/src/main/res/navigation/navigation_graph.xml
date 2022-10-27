@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_main"
-    app:startDestination="@id/mainList">
+    app:startDestination="@id/DBMigrationFragment">
 
     <action
         android:id="@+id/open_edit"
@@ -12,6 +12,16 @@
     <action
         android:id="@+id/open_main"
         app:destination="@+id/mainList" />
+
+    <fragment
+        android:id="@+id/DBMigrationFragment"
+        android:name="com.gnest.remember.migration.RealmToRoomMigrationFragment"
+        android:label="DBMigrationFragment" >
+        <action
+            android:id="@+id/open_main_list"
+            app:destination="@id/mainList" />
+    </fragment>
+
 
     <fragment
         android:id="@+id/mainList"
