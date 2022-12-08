@@ -3,7 +3,7 @@ package com.gnest.remember.data.db
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.gnest.remember.data.db.entity.Memo
 import com.gnest.remember.utils.CoroutineTestRule
 import io.realm.Realm

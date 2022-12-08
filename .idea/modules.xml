@@ -6,7 +6,17 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Remember.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Remember.app.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Remember.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Remember.app.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Remember.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Remember.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/Remember.core.iml" filepath="$PROJECT_DIR$/.idea/modules/core/Remember.core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.iml" filepath="$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.main.iml" filepath="$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/core/designsystem/Remember.core.designsystem.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.iml" filepath="$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.main.iml" filepath="$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/StudioProjects.Remember.iml" filepath="$PROJECT_DIR$/.idea/modules/StudioProjects.Remember.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/build-logic/build-logic.iml" filepath="$PROJECT_DIR$/.idea/modules/build-logic/build-logic.iml" />
     </modules>
   </component>
 </project>
