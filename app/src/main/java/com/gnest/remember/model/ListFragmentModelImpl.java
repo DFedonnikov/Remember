@@ -4,14 +4,8 @@ import com.gnest.remember.App;
 import com.gnest.remember.model.db.data.Memo;
 import com.gnest.remember.model.db.data.MemoRealmFields;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import javax.annotation.Nullable;
 
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -36,13 +30,13 @@ public class ListFragmentModelImpl implements IListFragmentModel {
         secondaryRealm.close();
     }
 
-    @Override
-    public Flowable<RealmResults<Memo>> getData() {
-        return primaryRealm.where(Memo.class)
-                .findAllAsync()
-                .sort(MemoRealmFields.POSITION)
-                .asFlowable();
-    }
+//    @Override
+//    public Flowable<RealmResults<Memo>> getData() {
+//        return primaryRealm.where(Memo.class)
+//                .findAllAsync()
+//                .sort(MemoRealmFields.POSITION)
+//                .asFlowable();
+//    }
 
     @Override
     @Nullable
@@ -52,36 +46,36 @@ public class ListFragmentModelImpl implements IListFragmentModel {
                 .findFirst();
     }
 
-    @Override
-    public Observable<List<Memo>> deleteSelected(Collection<Integer> selectedIds) {
-        ArrayList<Memo> toReturnList = new ArrayList<>();
-        for (Integer id : selectedIds) {
-            Memo toRemove = primaryRealm.where(Memo.class)
-                    .equalTo(MemoRealmFields.ID, id)
-                    .findFirst();
-            if (toRemove == null) {
-                throw new IllegalStateException("Cannot find memo with id " + id);
-            }
-            // Creating new Memo object because after deletion toRemove will become invalid to operate on.
-            Memo toReturn = new Memo(toRemove);
-            toReturnList.add(toReturn);
-            //remove from primary and vice a versa if revert
-            removeFromRealm(primaryRealm, toRemove);
-        }
+//    @Override
+//    public Observable<List<Memo>> deleteSelected(Collection<Integer> selectedIds) {
+//        ArrayList<Memo> toReturnList = new ArrayList<>();
+//        for (Integer id : selectedIds) {
+//            Memo toRemove = primaryRealm.where(Memo.class)
+//                    .equalTo(MemoRealmFields.ID, id)
+//                    .findFirst();
+//            if (toRemove == null) {
+//                throw new IllegalStateException("Cannot find memo with id " + id);
+//            }
+//            // Creating new Memo object because after deletion toRemove will become invalid to operate on.
+//            Memo toReturn = new Memo(toRemove);
+//            toReturnList.add(toReturn);
+//            //remove from primary and vice a versa if revert
+//            removeFromRealm(primaryRealm, toRemove);
+//        }
+//
+//        validatePositions(primaryRealm);
+//        return Observable.just(toReturnList);
+//    }
 
-        validatePositions(primaryRealm);
-        return Observable.just(toReturnList);
-    }
-
-    @Override
-    public Observable<List<Memo>> moveBetweenRealms(Collection<Integer> ids) {
-        List<Memo> memos = new ArrayList<>();
-        for (Integer id : ids) {
-            memos.add(moveBetween(primaryRealm, secondaryRealm, id));
-        }
-        validatePositions(primaryRealm);
-        return Observable.just(memos);
-    }
+//    @Override
+//    public Observable<List<Memo>> moveBetweenRealms(Collection<Integer> ids) {
+//        List<Memo> memos = new ArrayList<>();
+//        for (Integer id : ids) {
+//            memos.add(moveBetween(primaryRealm, secondaryRealm, id));
+//        }
+//        validatePositions(primaryRealm);
+//        return Observable.just(memos);
+//    }
 
     @Override
     public void revertArchived(Memo toRevert) {

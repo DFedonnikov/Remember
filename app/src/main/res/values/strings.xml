@@ -1,5 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Remember</string>
+
+    
+    
+    
+
     <string name="memo_note_background">memo note background</string>
     <string name="btn_add">Add</string>
     <string name="btn_delete">Delete memo</string>
@@ -18,7 +23,7 @@
     <string name="send_memo_intent_title">Send Memo&#8230;,</string>
     <string name="notes">Notes</string>
     <string name="archive">Archive</string>
-    <string name="settings">Settings</string>
+<!--    <string name="settings">Settings</string>-->
     <string name="nav_open_drawer">open drawer</string>
     <string name="nav_close_drawer">close drawer</string>
     <string name="drawer_item_add">Add note</string>

@@ -16,3 +16,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "Remember"
 include ':app'
+include ':core:ui'
+include ':core:designsystem'
+include ':feature:home'
+include ':feature:finished'
+include ':feature:search'
+include ':feature:settings'

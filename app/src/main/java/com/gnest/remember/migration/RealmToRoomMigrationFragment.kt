@@ -33,9 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.fragment.findNavController
 import com.gnest.remember.R
-import com.gnest.remember.ui.uikit.AppColors
+import com.gnest.remember.core.designsystem.theme.AppColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -69,7 +68,7 @@ class RealmToRoomMigrationFragment : Fragment() {
                 onContentVisible = {
                     //For more smooth UX and animation cycle
                     delay(2000)
-                    findNavController().navigate(R.id.mainList)
+//                    findNavController().navigate(R.id.mainList)
                 },
                 content = { SuccessScreen() })
         MigrationSlide(isVisible = uiState is MigrationUiState.Error) {

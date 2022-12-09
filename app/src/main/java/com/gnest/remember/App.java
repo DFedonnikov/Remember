@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.RequiresApi;
-import androidx.preference.PreferenceManager;
 
 import dagger.hilt.android.HiltAndroidApp;
 import io.realm.Realm;
@@ -58,9 +57,9 @@ public class App extends Application {
         Realm.init(this);
         configRealm();
         FONT = Typeface.createFromAsset(getAssets(), FONT_PATH);
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        FONT_SIZE = Integer.parseInt(sharedPref.getString(FONT_SIZE_KEY, FONT_SIZE_DEFAULT));
-        NOTIFICATION_SOUND = Uri.parse(sharedPref.getString(NOTIFICATION_SOUND_KEY, Settings.System.DEFAULT_NOTIFICATION_URI.toString()));
+//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+//        FONT_SIZE = Integer.parseInt(sharedPref.getString(FONT_SIZE_KEY, FONT_SIZE_DEFAULT));
+//        NOTIFICATION_SOUND = Uri.parse(sharedPref.getString(NOTIFICATION_SOUND_KEY, Settings.System.DEFAULT_NOTIFICATION_URI.toString()));
         NUM_OF_LINES = getResources().getIntArray(R.array.numOfLines);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel();

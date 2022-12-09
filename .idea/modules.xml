@@ -15,6 +15,23 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.main.iml" filepath="$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/core/ui/Remember.core.ui.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/Remember.feature.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/Remember.feature.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/finished/Remember.feature.finished.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/settings/Remember.feature.settings.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/StudioProjects.Remember.iml" filepath="$PROJECT_DIR$/.idea/modules/StudioProjects.Remember.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/build-logic/build-logic.iml" filepath="$PROJECT_DIR$/.idea/modules/build-logic/build-logic.iml" />
     </modules>
