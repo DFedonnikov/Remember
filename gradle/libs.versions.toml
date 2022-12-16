@@ -1,12 +1,14 @@
 [versions]
+androidGradlePlugin = "7.3.1"
+androidMaterial = "1.7.0"
 androidxActivity = "1.6.0"
 androidxAppCompat = "1.5.1"
 androidxCore = "1.9.0"
 androidxEspresso = "3.5.0"
-androidGradlePlugin = "7.3.1"
 androidxHiltNavigationCompose = "1.0.0"
 androidxLifecycle = "2.5.1"
 androidxTestCore = "1.4.0"
+accompanist = "0.28.0"
 compose = "1.2.1"
 compose_material = "1.0.1"
 firebaseAnalytics = "21.2.0"
@@ -24,6 +26,7 @@ room = "2.4.3"
 
 [libraries]
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
+android-material = { module = "com.google.android.material:material", version.ref = "androidMaterial" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppCompat" }
 androidx-compose-activity = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 androidx-compose-material = { module = "androidx.compose.material3:material3", version.ref = "compose_material" }
@@ -34,6 +37,9 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-lifecycle-viewModelCompose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspresso" }
+
+accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanist" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
 firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebaseCrashlytics" }

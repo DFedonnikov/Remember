@@ -24,6 +24,10 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/home/Remember.feature.home.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/newnote/Remember.feature.newnote.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature/search/Remember.feature.search.main.iml" />

@@ -43,11 +43,4 @@ dependencies {
     implementation(libs.androidx.compose.material)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
-
-    testImplementation(libs.junit4)
-
-    androidTestImplementation(libs.androidx.test.core)
-
-    testImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
 }

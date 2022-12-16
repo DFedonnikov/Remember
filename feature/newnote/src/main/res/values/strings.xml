@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="new_note_title">New Notes</string>
+    <string name="new_note_header">What Do You Want to Note?</string>
+    <string name="interesting_idea_title">Interesting Idea</string>
+    <string name="interesting_idea_subtitle">Use free text area, feel free to write it all</string>
+    <string name="buying_something_title">Buying Something</string>
+    <string name="buying_something_subtitle">Use checklist, so you won’t miss anything</string>
+    <string name="goals_title">Goals</string>
+    <string name="goals_subtitle">"Near/future goals, notes and keep focus "</string>
+    <string name="guidance_title">Guidance</string>
+    <string name="guidance_subtitle">Create guidance for routine activities</string>
+    <string name="routine_tasks_title">Routine Tasks</string>
+    <string name="routine_subtasks_subtitle">Checklist with sub-checklist</string>
+</resources>

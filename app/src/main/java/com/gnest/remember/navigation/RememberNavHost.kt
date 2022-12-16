@@ -1,14 +1,16 @@
 package com.gnest.remember.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import com.gnest.remember.feature.finished.navigation.finishedScreen
 import com.gnest.remember.feature.home.navigation.homeRoute
 import com.gnest.remember.feature.home.navigation.homeScreen
+import com.gnest.remember.feature.newnote.navigation.newNoteScreen
 import com.gnest.remember.feature.settings.navigation.settingsScreen
 import com.gnest.remember.feature.search.navigation.searchScreen
+import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 /**
  * Top-level navigation graph. Navigation is organized as explained at
@@ -17,6 +19,7 @@ import com.gnest.remember.feature.search.navigation.searchScreen
  * The navigation graph defined in this file defines the different top level routes. Navigation
  * within each route is handled using state and Back Handlers.
  */
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun RememberNavHost(
         navController: NavHostController,
@@ -24,7 +27,7 @@ fun RememberNavHost(
         modifier: Modifier = Modifier,
         startDestination: String = homeRoute
 ) {
-    NavHost(
+    AnimatedNavHost(
             navController = navController,
             startDestination = startDestination,
             modifier = modifier,
@@ -33,5 +36,6 @@ fun RememberNavHost(
         finishedScreen()
         searchScreen()
         settingsScreen()
+        newNoteScreen(onBackClick)
     }
 }
