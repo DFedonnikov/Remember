@@ -4,15 +4,12 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 
-import com.gnest.remember.model.db.data.MemoRealmFields;
-import com.gnest.remember.model.db.migration.RealmMigration;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.util.HashMap;
@@ -55,7 +52,6 @@ public class App extends Application {
 //        refWatcher = LeakCanary.install(this);
         sSelf = this;
         Realm.init(this);
-        configRealm();
         FONT = Typeface.createFromAsset(getAssets(), FONT_PATH);
 //        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 //        FONT_SIZE = Integer.parseInt(sharedPref.getString(FONT_SIZE_KEY, FONT_SIZE_DEFAULT));
@@ -65,26 +61,6 @@ public class App extends Application {
             createNotificationChannel();
         }
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
-    }
-
-    private void configRealm() {
-        RealmConfiguration config = new RealmConfiguration.Builder()
-                .name(MemoRealmFields.DEFAULT_CONFIG_NAME)
-                .schemaVersion(1)
-                .migration(new RealmMigration())
-                .build();
-        Realm.setDefaultConfiguration(config);
-        RealmConfiguration archive = new RealmConfiguration.Builder()
-                .name(MemoRealmFields.ARCHIVE_CONFIG_NAME)
-                .schemaVersion(1)
-                .migration(new RealmMigration())
-                .build();
-        REALM_CONFIG_MAP.put(MemoRealmFields.DEFAULT_CONFIG_NAME, config);
-        REALM_CONFIG_MAP.put(MemoRealmFields.ARCHIVE_CONFIG_NAME, archive);
-    }
-
-    public static RealmConfiguration getConfigurationByName(String name) {
-        return REALM_CONFIG_MAP.get(name);
     }
 
     public static Context self() {

@@ -1,0 +1,71 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'realm-android'
+}
+
+android {
+    namespace 'com.gnest.remember.database'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+
+        testInstrumentationRunner "com.gnest.remember.testing.RememberTestRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+
+    implementation(project(":core:common"))
+    implementation(project(":core:testing"))
+
+
+    implementation(libs.kotlinx.coroutines)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.room.runtime)
+    kapt(libs.room.compiler)
+    implementation(libs.room.ktx)
+    testImplementation(libs.room.testing)
+//    testImplementation(libs.kotlinx.coroutines.test)
+//    androidTestImplementation(libs.junit4)
+//    androidTestImplementation(libs.junit.ktx)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+//    androidTestImplementation(libs.androidx.test.espresso.core, {
+//        exclude group: 'com.android.support', module: 'support-annotations'
+//    })
+//    androidTestImplementation(libs.hilt.android.testing)
+}
+
+kapt {
+    correctErrorTypes true
+}

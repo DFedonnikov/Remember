@@ -4,10 +4,9 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gnest.remember.data.db.RealmToRoomMigration
+import com.gnest.remember.database.migration.RealmToRoomMigration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,14 +17,15 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val SAVED_UI_STATE_KEY = "savedUiStateKey"
 
 @HiltViewModel
-class RealmToRoomMigrationViewModel @Inject constructor(savedStateHandle: SavedStateHandle,
-                                                        private val migration: RealmToRoomMigration) : ViewModel() {
+class RealmToRoomMigrationViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val migration: RealmToRoomMigration
+) : ViewModel() {
 
     val uiState = savedStateHandle.getStateFlow(SAVED_UI_STATE_KEY, MigrationUiState.Loading)
     private val intentFlow = MutableSharedFlow<MigrationIntent>()
@@ -33,12 +33,12 @@ class RealmToRoomMigrationViewModel @Inject constructor(savedStateHandle: SavedS
     init {
         viewModelScope.launch {
             intentFlow
-                    .flatMapMerge { mapIntents(it) }
-                    .catch {
-                        println("MIGRATION: intentFlow $it")
-                    }
-                    .onEach { savedStateHandle[SAVED_UI_STATE_KEY] = it }
-                    .launchIn(this)
+                .flatMapMerge { mapIntents(it) }
+                .catch {
+                    println("MIGRATION: intentFlow $it")
+                }
+                .onEach { savedStateHandle[SAVED_UI_STATE_KEY] = it }
+                .launchIn(this)
         }
         acceptIntent(MigrationIntent.StartMigration)
     }
@@ -61,10 +61,10 @@ class RealmToRoomMigrationViewModel @Inject constructor(savedStateHandle: SavedS
         }
         emit(MigrationUiState.Migrated)
     }
-            .catch {
-                println("MIGRATION: error: $it")
-                emit(MigrationUiState.Error)
-            }
+        .catch {
+            println("MIGRATION: error: $it")
+            emit(MigrationUiState.Error)
+        }
 
     fun acceptIntent(intent: MigrationIntent) {
         viewModelScope.launch { intentFlow.emit(intent) }
