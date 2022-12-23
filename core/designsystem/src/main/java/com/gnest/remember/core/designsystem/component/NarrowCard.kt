@@ -1,6 +1,7 @@
 package com.gnest.remember.core.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,13 +20,15 @@ fun NarrowCard(
     backgroundColor: Color,
     icon: @Composable () -> Unit,
     title: @Composable () -> Unit,
-    subtitle: @Composable () -> Unit
+    subtitle: @Composable () -> Unit,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
             .background(backgroundColor, RoundedCornerShape(8.dp))
             .wrapContentHeight()
-            .padding(start = 16.dp),
+            .padding(start = 16.dp)
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         icon()

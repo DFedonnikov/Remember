@@ -30,10 +30,11 @@ internal val RememberTypography = Typography(
         fontSize = 36.sp,
         lineHeight = 44.sp
     ),
+    //Verified
     headlineLarge = TextStyle(
-        fontWeight = FontWeight.W400,
+        fontWeight = FontWeight.W700,
         fontSize = 32.sp,
-        lineHeight = 40.sp
+        lineHeight = 38.sp
     ),
     headlineMedium = TextStyle(
         fontWeight = FontWeight.W400,
@@ -65,10 +66,11 @@ internal val RememberTypography = Typography(
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
+    //Verified
     bodyLarge = TextStyle(
         fontWeight = FontWeight.W400,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
+        lineHeight = 22.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(

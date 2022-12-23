@@ -25,13 +25,16 @@ import com.gnest.remember.core.ui.TopBar
 internal fun NewNoteRoute(
     modifier: Modifier = Modifier,
     viewModel: NewNoteViewModel = hiltViewModel(),
+    navigateToInterestingIdea: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    NewNoteScreen(modifier, onBackClick)
+    NewNoteScreen(modifier, navigateToInterestingIdea, onBackClick)
 }
 
 @Composable
-private fun NewNoteScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
+private fun NewNoteScreen(modifier: Modifier = Modifier,
+                          navigateToInterestingIdea: () -> Unit,
+                          onBackClick: () -> Unit) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         TopBar(title = TextSource.Resource(R.string.new_note_title), onBackClick = onBackClick)
         Column(
@@ -49,7 +52,8 @@ private fun NewNoteScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit
                 backgroundColor = AppColors.Jewel,
                 icon = Icon.DrawableResourceIcon(RememberIcons.Idea),
                 title = TextSource.Resource(R.string.interesting_idea_title),
-                subtitle = TextSource.Resource(R.string.interesting_idea_subtitle)
+                subtitle = TextSource.Resource(R.string.interesting_idea_subtitle),
+                onClick = navigateToInterestingIdea
             )
             NoteTypeCard(
                 modifier = Modifier.padding(top = 24.dp),
@@ -57,28 +61,28 @@ private fun NewNoteScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit
                 icon = Icon.DrawableResourceIcon(RememberIcons.Cart),
                 title = TextSource.Resource(R.string.buying_something_title),
                 subtitle = TextSource.Resource(R.string.buying_something_subtitle)
-            )
+            ) {}
             NoteTypeCard(
                 modifier = Modifier.padding(top = 24.dp),
                 backgroundColor = AppColors.LightningYellow,
                 icon = Icon.DrawableResourceIcon(RememberIcons.Goals),
                 title = TextSource.Resource(R.string.goals_title),
                 subtitle = TextSource.Resource(R.string.goals_subtitle)
-            )
+            ) {}
             NoteTypeCard(
                 modifier = Modifier.padding(top = 24.dp),
                 backgroundColor = AppColors.BrickRed,
                 icon = Icon.DrawableResourceIcon(RememberIcons.Guidance),
                 title = TextSource.Resource(R.string.guidance_title),
                 subtitle = TextSource.Resource(R.string.guidance_subtitle)
-            )
+            ) {}
             NoteTypeCard(
                 modifier = Modifier.padding(top = 24.dp),
                 backgroundColor = AppColors.RoyalPurple,
                 icon = Icon.DrawableResourceIcon(RememberIcons.RoutineTasks),
                 title = TextSource.Resource(R.string.routine_tasks_title),
                 subtitle = TextSource.Resource(R.string.routine_subtasks_subtitle)
-            )
+            ) {}
         }
     }
 }
@@ -88,6 +92,6 @@ private fun NewNoteScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit
 @DevicePreviews
 private fun NewNoteScreenPreview() {
     RememberTheme {
-        NewNoteScreen {}
+        NewNoteScreen(navigateToInterestingIdea = {}, onBackClick = {})
     }
 }

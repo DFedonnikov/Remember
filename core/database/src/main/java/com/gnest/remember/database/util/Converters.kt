@@ -1,7 +1,7 @@
 package com.gnest.remember.database.util
 
 import androidx.room.TypeConverter
-import com.gnest.remember.database.model.MemoColor
+import com.gnest.remember.database.model.NoteColor
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -19,9 +19,9 @@ class Converters {
             dateTime?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds()
 
     @TypeConverter
-    fun colorFromString(color: String?): MemoColor = runCatching { color?.let { MemoColor.valueOf(it) } }
-            .getOrNull() ?: MemoColor.YELLOW
+    fun colorFromString(color: String?): NoteColor = runCatching { color?.let { NoteColor.valueOf(it) } }
+            .getOrNull() ?: NoteColor.WHITE
 
     @TypeConverter
-    fun colorToString(color: MemoColor?): String? = color?.name
+    fun colorToString(color: NoteColor?): String? = color?.name
 }

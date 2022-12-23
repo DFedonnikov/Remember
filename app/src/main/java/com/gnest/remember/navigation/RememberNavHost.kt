@@ -10,6 +10,8 @@ import com.gnest.remember.feature.home.navigation.homeScreen
 import com.gnest.remember.feature.newnote.navigation.newNoteScreen
 import com.gnest.remember.feature.settings.navigation.settingsScreen
 import com.gnest.remember.feature.search.navigation.searchScreen
+import com.gnest.remember.interestingidea.navigation.interestingIdeaScreen
+import com.gnest.remember.interestingidea.navigation.navigateToInterestingIdea
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 /**
@@ -36,6 +38,9 @@ fun RememberNavHost(
         finishedScreen()
         searchScreen()
         settingsScreen()
-        newNoteScreen(onBackClick)
+        newNoteScreen(navigateToInterestingIdea = {
+            navController.navigateToInterestingIdea()
+        }, onBackClick)
+        interestingIdeaScreen(onBackClick)
     }
 }

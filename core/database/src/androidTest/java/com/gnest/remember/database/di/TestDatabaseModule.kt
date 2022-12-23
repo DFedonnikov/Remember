@@ -2,9 +2,7 @@ package com.gnest.remember.database.di
 
 import android.content.Context
 import androidx.room.Room
-import com.gnest.remember.database.MemoDatabase
-import com.gnest.remember.database.migration.RealmMigration
-import com.gnest.remember.database.model.old.MemoRealmFields
+import com.gnest.remember.database.NotesDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,8 +21,8 @@ object TestDatabaseModule {
 
     @Singleton
     @Provides
-    fun provideMemoDatabase(@ApplicationContext context: Context): MemoDatabase =
-        Room.inMemoryDatabaseBuilder(context, MemoDatabase::class.java).build()
+    fun provideNotesDatabase(@ApplicationContext context: Context): NotesDatabase =
+        Room.inMemoryDatabaseBuilder(context, NotesDatabase::class.java).build()
 
     @Singleton
     @MainRealm

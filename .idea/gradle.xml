@@ -25,11 +25,15 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/build-logic" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/common" />
+            <option value="$PROJECT_DIR$/core/database" />
             <option value="$PROJECT_DIR$/core/designsystem" />
+            <option value="$PROJECT_DIR$/core/testing" />
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/finished" />
             <option value="$PROJECT_DIR$/feature/home" />
+            <option value="$PROJECT_DIR$/feature/interestingidea" />
             <option value="$PROJECT_DIR$/feature/newnote" />
             <option value="$PROJECT_DIR$/feature/search" />
             <option value="$PROJECT_DIR$/feature/settings" />

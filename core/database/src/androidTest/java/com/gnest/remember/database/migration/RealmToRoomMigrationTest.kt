@@ -2,10 +2,11 @@ package com.gnest.remember.database.migration
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.gnest.remember.database.dao.MemoDao
+import com.gnest.remember.database.dao.InterestingIdeaDao
 import com.gnest.remember.database.di.ArchivedRealm
 import com.gnest.remember.database.di.MainRealm
-import com.gnest.remember.database.model.Memo
+import com.gnest.remember.database.model.InterestingIdeaEntity
+import com.gnest.remember.database.model.old.Memo
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.realm.Realm
@@ -19,8 +20,6 @@ import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
 
-typealias OldMemo = com.gnest.remember.database.model.old.Memo
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 class RealmToRoomMigrationTest {
@@ -29,7 +28,7 @@ class RealmToRoomMigrationTest {
     val hiltRule = HiltAndroidRule(this)
 
     @Inject
-    lateinit var dao: MemoDao
+    lateinit var dao: InterestingIdeaDao
     @Inject
     @MainRealm
     lateinit var mainRealm: Realm
@@ -56,11 +55,11 @@ class RealmToRoomMigrationTest {
     @Throws(Exception::class)
     fun testMigrateDb() {
         runTest {
-            val mainMemo1 = OldMemo(0, "Memo 1", 1, "BLUE", -1, false)
+            val mainMemo1 = Memo(0, "Memo 1", 1, "BLUE", -1, false)
             val alarmDate = System.currentTimeMillis()
-            val mainMemo2 = OldMemo(1, "Memo 2", 1, "EMERALD", alarmDate, true)
-            val archivedMemo3 = OldMemo(2, "Memo 3", 0, "PURPLE", -1, false)
-            val archivedMemo4 = OldMemo(3, "Memo 4", 1, "YELLOW", -1, false)
+            val mainMemo2 = Memo(1, "Memo 2", 1, "EMERALD", alarmDate, true)
+            val archivedMemo3 = Memo(2, "Memo 3", 0, "PURPLE", -1, false)
+            val archivedMemo4 = Memo(3, "Memo 4", 1, "YELLOW", -1, false)
 
             mainRealm.executeTransaction {
                 it.insert(mainMemo1)
@@ -84,8 +83,8 @@ class RealmToRoomMigrationTest {
         }
     }
 
-    private fun Memo.assertEquals(oldMemo: OldMemo, isArchived: Boolean) {
-        assert(id == oldMemo.id) { "new memo: $this; old memo: $oldMemo" }
+    private fun InterestingIdeaEntity.assertEquals(oldMemo: Memo, isArchived: Boolean) {
+        assert(id == oldMemo.id.toLong()) { "new memo: $this; old memo: $oldMemo" }
         assert(position == oldMemo.position)
         assert(color.name == oldMemo.color)
         if (oldMemo.alarmDate != -1L) {
@@ -97,15 +96,15 @@ class RealmToRoomMigrationTest {
             assert(alarmDate == null)
         }
         assert(isAlarmSet == oldMemo.isAlarmSet)
-        assert(this.isArchived == isArchived)
+        assert(this.isFinished == isArchived)
     }
 
     @Test
     @Throws(Exception::class)
     fun testBigMemoListMigration() {
         runTest {
-            val mainMemos = (0..9999).map { OldMemo(it, "Memo $it", it, "BLUE", -1, false)}
-            val archivedMemos = (10000..20000).map { OldMemo(it, "Memo $it", it, "EMERALD", -1, false)}
+            val mainMemos = (0..9999).map { Memo(it, "Memo $it", it, "BLUE", -1, false)}
+            val archivedMemos = (10000..20000).map { Memo(it, "Memo $it", it, "EMERALD", -1, false)}
 
             mainRealm.executeTransaction {
                 it.insert(mainMemos)
@@ -116,8 +115,8 @@ class RealmToRoomMigrationTest {
             migration.migrateFromRealmToRoom()
 
             val allMemos = dao.getAll()
-            val mainNewMemos = allMemos.filter { !it.isArchived }
-            val archiveNewMemos = allMemos.filter { it.isArchived }
+            val mainNewMemos = allMemos.filter { !it.isFinished }
+            val archiveNewMemos = allMemos.filter { it.isFinished }
             assert(mainMemos.size == mainNewMemos.size)
             assert(archivedMemos.size == archiveNewMemos.size)
             mainNewMemos.forEachIndexed { index, memo ->

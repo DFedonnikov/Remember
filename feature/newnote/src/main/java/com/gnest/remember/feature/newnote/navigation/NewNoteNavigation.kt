@@ -12,8 +12,11 @@ fun NavController.navigateToNewNote(navOptions: NavOptions? = null) {
     this.navigate(newNoteRoute, navOptions)
 }
 
-fun NavGraphBuilder.newNoteScreen(onBackClick: () -> Unit) {
+fun NavGraphBuilder.newNoteScreen(navigateToInterestingIdea: () -> Unit, onBackClick: () -> Unit) {
     modal(route = newNoteRoute) {
-        NewNoteRoute(onBackClick = onBackClick)
+        NewNoteRoute(
+            navigateToInterestingIdea = navigateToInterestingIdea,
+            onBackClick = onBackClick
+        )
     }
 }

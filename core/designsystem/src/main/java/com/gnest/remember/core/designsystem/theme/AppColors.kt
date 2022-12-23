@@ -13,4 +13,6 @@ object AppColors {
     val RoyalPurple = Color(0xFF6A3EA1)
     val HintOfGreen = Color(0xFFF9FFFB)
     val SwissCoffee = Color(0xFFE2DADA)
+    val FrenchGray = Color(0xFFC8C5CB)
+    val Topaz = Color(0xFF827D89)
 }

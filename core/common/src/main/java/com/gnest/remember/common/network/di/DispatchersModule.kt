@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.newSingleThreadContext
 
@@ -17,6 +18,7 @@ object DispatchersModule {
     @Dispatcher(RememberDispatchers.IO)
     fun providesIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Provides
     @Dispatcher(RememberDispatchers.SINGLE)
     fun providesSingleDispatcher(): CoroutineDispatcher = newSingleThreadContext("SingleThread")

@@ -24,7 +24,8 @@ fun NoteTypeCard(
     backgroundColor: Color,
     icon: Icon,
     title: TextSource,
-    subtitle: TextSource
+    subtitle: TextSource,
+    onClick: () -> Unit
 ) {
     NarrowCard(
         modifier = modifier,
@@ -53,7 +54,8 @@ fun NoteTypeCard(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall
             )
-        }
+        },
+        onClick = onClick
     )
 }
 
@@ -66,5 +68,5 @@ private fun NoteTypeCardPreview() {
         icon = Icon.DrawableResourceIcon(RememberIcons.Idea),
         title = TextSource.Simple("Interesting Idea"),
         subtitle = TextSource.Simple("Use free text area, feel free to write it all")
-    )
+    ) {}
 }

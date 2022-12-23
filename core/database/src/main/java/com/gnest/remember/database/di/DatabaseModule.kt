@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.gnest.remember.common.network.Dispatcher
 import com.gnest.remember.common.network.RememberDispatchers
-import com.gnest.remember.database.dao.MemoDao
+import com.gnest.remember.database.NotesDatabase
+import com.gnest.remember.database.dao.InterestingIdeaDao
 import com.gnest.remember.database.migration.RealmMigration
 import com.gnest.remember.database.migration.RealmToRoomMigration
 import com.gnest.remember.database.model.old.MemoRealmFields
@@ -18,7 +19,7 @@ import io.realm.RealmConfiguration
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
-private const val MEMO_DATABASE_NAME = "memo_database"
+private const val MEMO_DATABASE_NAME = "notes_database"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -26,10 +27,10 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideMemoDatabase(@ApplicationContext context: Context): com.gnest.remember.database.MemoDatabase =
+    fun provideNotesDatabase(@ApplicationContext context: Context): NotesDatabase =
         Room.databaseBuilder(
             context,
-            com.gnest.remember.database.MemoDatabase::class.java,
+            NotesDatabase::class.java,
             MEMO_DATABASE_NAME
         ).build()
 
@@ -60,14 +61,14 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideRealmToRoomMigration(
-        memoDao: MemoDao,
+        interestingIdeaDao: InterestingIdeaDao,
         @MainRealm mainRealmConfig: RealmConfiguration,
         @ArchivedRealm archivedRealmConfig: RealmConfiguration,
         @Dispatcher(RememberDispatchers.SINGLE)
         dispatcher: CoroutineDispatcher
     ): RealmToRoomMigration =
         RealmToRoomMigration(
-            memoDao,
+            interestingIdeaDao,
             mainRealmConfig,
             archivedRealmConfig,
             dispatcher

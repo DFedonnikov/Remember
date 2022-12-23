@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.gnest.remember.App;
-import com.gnest.remember.model.db.data.Memo;
-import com.gnest.remember.model.db.data.MemoRealmFields;
 
 import androidx.legacy.content.WakefulBroadcastReceiver;
 import io.realm.Realm;
@@ -69,28 +67,28 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
     }
 
     private void resetAlarm(Context context, boolean isOnMainScreen) {
-        Realm realm = null;
-        try {
-            if (isOnMainScreen) {
-                realm = Realm.getDefaultInstance();
-            } else {
-                realm = Realm.getInstance(App.getConfigurationByName(MemoRealmFields.ARCHIVE_CONFIG_NAME));
-            }
-            realm.executeTransactionAsync(realm1 -> {
-                RealmResults<Memo> results = realm1.where(Memo.class)
-                        .findAll()
-                        .sort(MemoRealmFields.ID);
-                for (Memo memo : results) {
-                    if (memo.isAlarmSet()) {
-                        setAlarm(context, memo.getId(), memo.getMemoText(), memo.getAlarmDate(), memo.isAlarmSet(), isOnMainScreen);
-                    }
-                }
-            });
-
-        } finally {
-            if (realm != null) {
-                realm.close();
-            }
-        }
+//        Realm realm = null;
+//        try {
+//            if (isOnMainScreen) {
+//                realm = Realm.getDefaultInstance();
+//            } else {
+//                realm = Realm.getInstance(App.getConfigurationByName(MemoRealmFields.ARCHIVE_CONFIG_NAME));
+//            }
+//            realm.executeTransactionAsync(realm1 -> {
+//                RealmResults<Memo> results = realm1.where(Memo.class)
+//                        .findAll()
+//                        .sort(MemoRealmFields.ID);
+//                for (Memo memo : results) {
+//                    if (memo.isAlarmSet()) {
+//                        setAlarm(context, memo.getId(), memo.getMemoText(), memo.getAlarmDate(), memo.isAlarmSet(), isOnMainScreen);
+//                    }
+//                }
+//            });
+//
+//        } finally {
+//            if (realm != null) {
+//                realm.close();
+//            }
+//        }
     }
 }
