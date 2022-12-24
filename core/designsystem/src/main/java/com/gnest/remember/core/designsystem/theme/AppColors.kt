@@ -15,4 +15,11 @@ object AppColors {
     val SwissCoffee = Color(0xFFE2DADA)
     val FrenchGray = Color(0xFFC8C5CB)
     val Topaz = Color(0xFF827D89)
+    val PictonBlue = Color(0xFF35a2f0)
+    val Rose = Color(0xFFF7DEE3)
+    val AeroBlue = Color(0xFFB9FFD1)
+    val CapeHoney = Color(0xFFFDEBAB)
+    val WhiteLilac = Color(0xFFEFE9F7)
+    val AthensGray = Color(0xFFEFEEF0)
+    val Ebony = Color(0xFF180E25)
 }

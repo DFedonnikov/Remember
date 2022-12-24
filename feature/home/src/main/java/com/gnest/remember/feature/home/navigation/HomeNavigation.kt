@@ -1,5 +1,6 @@
 package com.gnest.remember.feature.home.navigation
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -12,8 +13,10 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
     this.navigate(homeRoute, navOptions)
 }
 
-fun NavGraphBuilder.homeScreen() {
+fun NavGraphBuilder.homeScreen(
+    interestingIdeas: () -> (@Composable () -> Unit)
+) {
     push(route = homeRoute) {
-        HomeRoute()
+        HomeRoute(interestingNotes = interestingIdeas())
     }
 }

@@ -7,8 +7,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.gnest.remember.core.designsystem.component.FreeAreaTextField
-import com.gnest.remember.core.designsystem.component.TitleTextField
+import com.gnest.remember.core.designsystem.component.text.FreeAreaTextField
+import com.gnest.remember.core.designsystem.component.text.TitleTextField
 import com.gnest.remember.core.designsystem.theme.RememberTheme
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.ui.DevicePreviews
@@ -47,7 +47,7 @@ private fun InterestingIdeaScreen(
                 .padding(top = 24.dp)
                 .padding(horizontal = 13.dp),
             value = state.title,
-            placeholderText = TextSource.Resource(com.gnest.remember.interestingidea.R.string.title_placeholder),
+            placeholderText = TextSource.Resource(R.string.title_placeholder),
             onValueChange = onTitleChanged
         )
         FreeAreaTextField(

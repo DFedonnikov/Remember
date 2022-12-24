@@ -2,4 +2,5 @@
 <resources>
     <string name="title_placeholder">Title Here</string>
     <string name="text_placeholder">Write your notes here…</string>
+    <string name="interesting_idea">Interesting Idea</string>
 </resources>

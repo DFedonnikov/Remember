@@ -9,6 +9,9 @@ import com.gnest.remember.database.model.NoteColor
 import com.gnest.remember.interestingidea.domain.InterestingIdea
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,6 +22,7 @@ interface InterestingIdeaRepository {
     suspend fun createNewIdea(): InterestingIdea
     suspend fun updateIdea(idea: InterestingIdea)
     fun deleteById(id: Long)
+    fun observeInterestingIdeas(): Flow<List<InterestingIdea>>
 }
 
 class InterestingIdeaRepositoryImpl @Inject constructor(
@@ -38,7 +42,7 @@ class InterestingIdeaRepositoryImpl @Inject constructor(
             title = "",
             text = "",
             position = 0,
-            NoteColor.WHITE,
+            NoteColor.AERO_BLUE,
             alarmDate = null,
             isAlarmSet = false,
             isFinished = false
@@ -54,6 +58,10 @@ class InterestingIdeaRepositoryImpl @Inject constructor(
     override fun deleteById(id: Long) {
         launch { dao.deleteById(id) }
     }
+
+    override fun observeInterestingIdeas(): Flow<List<InterestingIdea>> = dao.observeAll()
+        .map { ideas -> ideas.map { it.asDomainModel() } }
+        .flowOn(coroutineContext)
 }
 
 private fun InterestingIdeaEntity.asDomainModel(id: Long = this.id): InterestingIdea =

@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -62,9 +65,13 @@ fun RememberApp(appState: RememberAppState = rememberAppState()) {
             navController = appState.navController,
             onBackClick = appState::onBackClick,
             modifier = Modifier
-                .padding(if (isBottomBarVisible) padding.calculateBottomPadding() else 0.dp)
+                .padding(
+                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
+                    top = padding.calculateTopPadding(),
+                    end = padding.calculateEndPadding(LayoutDirection.Ltr),
+                    bottom = if (isBottomBarVisible) padding.calculateBottomPadding() else 0.dp
+                )
         )
-
     }
 }
 

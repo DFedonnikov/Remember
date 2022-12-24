@@ -66,7 +66,13 @@ private fun Memo.toRoomModel(isArchived: Boolean): InterestingIdeaEntity = Inter
     title = "",
     text = memoText,
     position = position,
-    color = runCatching { NoteColor.valueOf(color) }.getOrNull() ?: NoteColor.WHITE,
+    color = when (color) {
+        "YELLOW" -> NoteColor.CAPE_HONEY
+        "BLUE" -> NoteColor.PICTON_BLUE
+        "EMERALD" -> NoteColor.AERO_BLUE
+        "PURPLE" -> NoteColor.WHITE_LILAC
+        else -> NoteColor.WHITE
+    },
     alarmDate = parseAlarmDate(),
     isAlarmSet = isAlarmSet,
     isFinished = isArchived

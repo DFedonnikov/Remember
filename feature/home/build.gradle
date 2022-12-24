@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -40,6 +41,8 @@ android {
 
 dependencies {
 
+    implementation(project(":core:common"))
+    implementation(project(":core:database"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
 
@@ -47,4 +50,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+
+    kapt(libs.hilt.compiler)
 }

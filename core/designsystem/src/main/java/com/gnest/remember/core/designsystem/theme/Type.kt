@@ -73,6 +73,7 @@ internal val RememberTypography = Typography(
         lineHeight = 22.sp,
         letterSpacing = 0.5.sp
     ),
+    //Verified
     bodyMedium = TextStyle(
         fontWeight = FontWeight.W400,
         fontSize = 14.sp,
@@ -86,16 +87,18 @@ internal val RememberTypography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp
     ),
+    //Verified
     labelLarge = TextStyle(
-        fontWeight = FontWeight.W400,
+        fontWeight = FontWeight.W700,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
+    //Verified
     labelMedium = TextStyle(
-        fontWeight = FontWeight.W400,
+        fontWeight = FontWeight.W500,
         fontSize = 12.sp,
-        lineHeight = 16.sp,
+        lineHeight = 15.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(

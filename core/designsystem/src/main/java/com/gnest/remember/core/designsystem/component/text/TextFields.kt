@@ -1,4 +1,4 @@
-package com.gnest.remember.core.designsystem.component
+package com.gnest.remember.core.designsystem.component.text
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme

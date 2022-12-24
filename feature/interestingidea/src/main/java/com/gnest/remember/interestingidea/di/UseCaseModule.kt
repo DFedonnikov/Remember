@@ -1,5 +1,7 @@
 package com.gnest.remember.interestingidea.di
 
+import com.gnest.remember.interestingidea.domain.ObserveInterestingIdeasUseCase
+import com.gnest.remember.interestingidea.domain.ObserveInterestingIdeasUseCaseImpl
 import com.gnest.remember.interestingidea.domain.CreateNewInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.domain.CreateNewInterestingIdeaUseCaseImpl
 import com.gnest.remember.interestingidea.domain.DeleteInterestingIdeaUseCase
@@ -28,4 +30,7 @@ interface UseCaseModule {
 
     @Binds
     fun bindDeleteInterestingIdeaUseCase(useCase: DeleteInterestingIdeaUseCaseImpl): DeleteInterestingIdeaUseCase
+
+    @Binds
+    fun bindObserveInterestingIdeasUseCase(useCase: ObserveInterestingIdeasUseCaseImpl): ObserveInterestingIdeasUseCase
 }

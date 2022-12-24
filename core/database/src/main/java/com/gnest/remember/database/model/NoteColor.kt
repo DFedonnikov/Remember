@@ -2,8 +2,10 @@ package com.gnest.remember.database.model
 
 enum class NoteColor {
     WHITE,
-    YELLOW,
-    BLUE,
-    EMERALD,
-    PURPLE
+    ROSE,
+    PICTON_BLUE,
+    AERO_BLUE,
+    CAPE_HONEY,
+    WHITE_LILAC,
+    ATHENS_GRAY
 }

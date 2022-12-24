@@ -6,7 +6,7 @@ androidxAppCompat = "1.5.1"
 androidxCore = "1.9.0"
 androidxEspresso = "3.5.0"
 androidxHiltNavigationCompose = "1.0.0"
-androidxLifecycle = "2.5.1"
+androidxLifecycle = "2.6.0-alpha03"
 androidxTestCore = "1.4.0"
 accompanist = "0.28.0"
 compose = "1.2.1"
@@ -35,6 +35,7 @@ androidx-compose-ui-tooling_preview = { module = "androidx.compose.ui:ui-tooling
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
 androidx-lifecycle-viewModelCompose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-runtimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspresso" }
 
