@@ -1,5 +1,6 @@
 package com.gnest.remember.interestingidea.data
 
+import com.gnest.remember.common.extensions.localDateTimeNow
 import com.gnest.remember.common.network.Dispatcher
 import com.gnest.remember.common.network.RememberDispatchers
 import com.gnest.remember.database.dao.InterestingIdeaDao
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 interface InterestingIdeaRepository {
@@ -42,7 +44,8 @@ class InterestingIdeaRepositoryImpl @Inject constructor(
             title = "",
             text = "",
             position = 0,
-            NoteColor.AERO_BLUE,
+            color = NoteColor.AERO_BLUE,
+            lastEdited = Clock.System.localDateTimeNow(),
             alarmDate = null,
             isAlarmSet = false,
             isFinished = false
@@ -70,9 +73,10 @@ private fun InterestingIdeaEntity.asDomainModel(id: Long = this.id): Interesting
         title = title,
         text = text,
         color = color,
+        lastEdited = lastEdited,
         alarmDate = alarmDate,
         isAlarmSet = isAlarmSet
     )
 
 private fun InterestingIdea.asActiveNoPositionUpdateEntity(): ActiveNoPositionUpdate =
-    ActiveNoPositionUpdate(id, title, text, color, alarmDate, isAlarmSet)
+    ActiveNoPositionUpdate(id, title, text, color, lastEdited, alarmDate, isAlarmSet)

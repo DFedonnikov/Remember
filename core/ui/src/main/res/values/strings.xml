@@ -2,4 +2,5 @@
 <resources>
     <string name="back">Back</string>
     <string name="view_all">View all</string>
+    <string name="last_edited">"Last edited on %s"</string>
 </resources>

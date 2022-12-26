@@ -8,5 +8,6 @@ data class InterestingIdea(
     val title: String,
     val text: String,
     val color: NoteColor,
+    val lastEdited: LocalDateTime,
     val alarmDate: LocalDateTime?,
     val isAlarmSet: Boolean)

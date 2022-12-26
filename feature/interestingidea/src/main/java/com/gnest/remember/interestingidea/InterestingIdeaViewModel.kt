@@ -3,6 +3,8 @@ package com.gnest.remember.interestingidea
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gnest.remember.common.extensions.formatForNewNote
+import com.gnest.remember.common.extensions.localDateTimeNow
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.database.model.NoteColor
 import com.gnest.remember.interestingidea.domain.CreateNewInterestingIdeaUseCase
@@ -18,10 +20,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -38,7 +39,11 @@ class InterestingIdeaViewModel @Inject constructor(
 
     private val localIdea = MutableStateFlow(emptyIdea())
     val state: Flow<InterestingIdeaState> = localIdea.map { idea ->
-        InterestingIdeaState(TextSource.Simple(idea.title), TextSource.Simple(idea.text))
+        InterestingIdeaState(
+            title = TextSource.Simple(idea.title),
+            text = TextSource.Simple(idea.text),
+            lastEdited = idea.lastEdited.formatForNewNote()
+        )
     }
 
     init {
@@ -56,11 +61,21 @@ class InterestingIdeaViewModel @Inject constructor(
 
 
     fun updateTitle(title: String) {
-        localIdea.tryEmit(localIdea.value.copy(title = title))
+        localIdea.tryEmit(
+            localIdea.value.copy(
+                title = title,
+                lastEdited = Clock.System.localDateTimeNow()
+            )
+        )
     }
 
     fun updateText(text: String) {
-        localIdea.tryEmit(localIdea.value.copy(text = text))
+        localIdea.tryEmit(
+            localIdea.value.copy(
+                text = text,
+                lastEdited = Clock.System.localDateTimeNow()
+            )
+        )
     }
 
     override fun onCleared() {
@@ -74,7 +89,16 @@ class InterestingIdeaViewModel @Inject constructor(
 
 data class InterestingIdeaState(
     val title: TextSource = TextSource.Simple(""),
-    val text: TextSource = TextSource.Simple("")
+    val text: TextSource = TextSource.Simple(""),
+    val lastEdited: String = ""
 )
 
-internal fun emptyIdea() = InterestingIdea(-1, "", "", NoteColor.WHITE, null, false)
+internal fun emptyIdea() = InterestingIdea(
+    id = -1,
+    title = "",
+    text = "",
+    color = NoteColor.WHITE,
+    lastEdited = Clock.System.localDateTimeNow(),
+    alarmDate = null,
+    isAlarmSet = false
+)

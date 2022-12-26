@@ -112,10 +112,16 @@ internal val RememberTypography = Typography(
 sealed interface TextSource {
     class Simple(val text: String) : TextSource
     class Resource(@StringRes val resId: Int) : TextSource
+
+    class Formatted(val source: TextSource, vararg args: Any) : TextSource {
+
+        val arguments = args
+    }
 }
 
 val TextSource.asString: String
     @Composable get() = when (this) {
         is TextSource.Simple -> text
         is TextSource.Resource -> stringResource(id = resId)
+        is TextSource.Formatted -> source.asString.format(args = arguments)
     }

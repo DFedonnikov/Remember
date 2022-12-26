@@ -34,5 +34,6 @@ android {
 dependencies {
 
     implementation(libs.hilt.android)
+    implementation(libs.kotlinx.datetime)
     kapt(libs.hilt.compiler)
 }

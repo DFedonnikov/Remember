@@ -1,5 +1,6 @@
 package com.gnest.remember.database.migration
 
+import com.gnest.remember.common.extensions.localDateTimeNow
 import com.gnest.remember.common.network.Dispatcher
 import com.gnest.remember.common.network.RememberDispatchers
 import com.gnest.remember.database.dao.InterestingIdeaDao
@@ -14,6 +15,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -73,6 +75,7 @@ private fun Memo.toRoomModel(isArchived: Boolean): InterestingIdeaEntity = Inter
         "PURPLE" -> NoteColor.WHITE_LILAC
         else -> NoteColor.WHITE
     },
+    lastEdited = Clock.System.localDateTimeNow(),
     alarmDate = parseAlarmDate(),
     isAlarmSet = isAlarmSet,
     isFinished = isArchived

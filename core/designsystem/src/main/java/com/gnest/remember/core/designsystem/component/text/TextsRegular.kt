@@ -49,3 +49,21 @@ fun TextXSRegular(
         textDecoration = textDecoration
     )
 }
+
+@Composable
+fun Text2XSRegular(
+    modifier: Modifier = Modifier,
+    text: TextSource,
+    color: Color = AppColors.Ebony,
+    textAlign: TextAlign? = null,
+    textDecoration: TextDecoration? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text.asString,
+        style = MaterialTheme.typography.bodySmall,
+        color = color,
+        textAlign = textAlign,
+        textDecoration = textDecoration
+    )
+}

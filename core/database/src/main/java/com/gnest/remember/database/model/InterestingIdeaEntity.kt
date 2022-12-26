@@ -12,6 +12,7 @@ data class InterestingIdeaEntity(
     @ColumnInfo(name = "text") val text: String,
     @ColumnInfo(name = "position") val position: Int,
     @ColumnInfo(name = "color") val color: NoteColor,
+    @ColumnInfo(name = "last_edited") val lastEdited: LocalDateTime,
     @ColumnInfo(name = "alarm_date") val alarmDate: LocalDateTime?,
     @ColumnInfo(name = "is_alarm_set") val isAlarmSet: Boolean,
     @ColumnInfo(name = "is_finished") val isFinished: Boolean
@@ -23,6 +24,7 @@ class ActiveNoPositionUpdate(
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "text") val text: String,
     @ColumnInfo(name = "color") val color: NoteColor,
+    @ColumnInfo(name = "last_edited") val lastEdited: LocalDateTime,
     @ColumnInfo(name = "alarm_date") val alarmDate: LocalDateTime?,
     @ColumnInfo(name = "is_alarm_set") val isAlarmSet: Boolean
 )

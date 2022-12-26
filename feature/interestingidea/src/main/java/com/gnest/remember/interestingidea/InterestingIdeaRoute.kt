@@ -1,6 +1,7 @@
 package com.gnest.remember.interestingidea
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,6 +13,7 @@ import com.gnest.remember.core.designsystem.component.text.TitleTextField
 import com.gnest.remember.core.designsystem.theme.RememberTheme
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.ui.DevicePreviews
+import com.gnest.remember.core.ui.NewNoteTaskBar
 import com.gnest.remember.core.ui.TopBar
 
 @Composable
@@ -40,7 +42,7 @@ private fun InterestingIdeaScreen(
     onTextChanged: (String) -> Unit,
     onBackClick: () -> Unit
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.navigationBarsPadding()) {
         TopBar(onBackClick = onBackClick)
         TitleTextField(
             modifier = Modifier
@@ -51,14 +53,20 @@ private fun InterestingIdeaScreen(
             onValueChange = onTitleChanged
         )
         FreeAreaTextField(
-            modifier = Modifier.padding(horizontal = 13.dp),
+            modifier = Modifier
+                .padding(horizontal = 13.dp)
+                .weight(1f),
             value = state.text,
             placeholderText = TextSource.Resource(R.string.text_placeholder),
             onValueChange = onTextChanged
         )
+        NewNoteTaskBar(
+            lastEditedDate = state.lastEdited,
+            onSearchClicked = { },
+            onPinClicked = { },
+            onMoreClicked = { })
     }
 }
-
 
 @Composable
 @DevicePreviews

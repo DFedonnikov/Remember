@@ -24,6 +24,9 @@ object RememberIcons {
     val Guidance = R.drawable.ic_guidance
     val RoutineTasks = R.drawable.ic_routine_tasks
     val ChevronLeft = R.drawable.ic_chevron_left
+    val SearchSmall = R.drawable.ic_search_small
+    val Pin = R.drawable.ic_pin
+    val More = R.drawable.ic_more
 }
 
 sealed interface Icon {
