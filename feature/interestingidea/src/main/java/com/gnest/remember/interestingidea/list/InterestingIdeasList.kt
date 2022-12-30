@@ -23,7 +23,8 @@ internal fun InterestingIdeasRowList(
     NotesRowList(
         modifier = modifier,
         listTitle = TextSource.Resource(R.string.interesting_idea),
-        notesList = interestingIdeas
+        notesList = interestingIdeas,
+        onItemClick = { viewModel.openIdea(it) }
     )
 }
 

@@ -1,19 +1,15 @@
 package com.gnest.remember.feature.settings.navigation
 
-import androidx.navigation.NavController
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import com.gnest.remember.core.ui.push
 import com.gnest.remember.feature.settings.SettingsRoute
+import com.gnest.remember.navigation.SettingsScreen
+import com.gnest.remember.navigation.extensions.push
 
-const val settingsRoute = "settingsRoute"
 
-fun NavController.navigateToSettings(navOptions: NavOptions? = null) {
-    this.navigate(settingsRoute, navOptions)
-}
-
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.settingsScreen() {
-    push(route = settingsRoute) {
+    push(route = SettingsScreen.route) {
         SettingsRoute()
     }
 }

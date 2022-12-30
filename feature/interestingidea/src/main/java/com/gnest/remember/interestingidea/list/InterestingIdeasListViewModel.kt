@@ -6,12 +6,17 @@ import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.database.model.NoteColor
 import com.gnest.remember.interestingidea.domain.ObserveInterestingIdeasUseCase
+import com.gnest.remember.navigation.InterestingIdeaScreen
+import com.gnest.remember.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
-internal class InterestingIdeasListViewModel @Inject constructor(useCase: ObserveInterestingIdeasUseCase) :
+internal class InterestingIdeasListViewModel @Inject constructor(
+    useCase: ObserveInterestingIdeasUseCase,
+    private val navigator: Navigator
+) :
     ViewModel() {
 
     val notes = useCase().map { ideas ->
@@ -23,6 +28,10 @@ internal class InterestingIdeasListViewModel @Inject constructor(useCase: Observ
                 color = it.color.asUiColor
             )
         }
+    }
+
+    fun openIdea(idea: InterestingIdeaUi) {
+        navigator.navigateTo(InterestingIdeaScreen(idea.id))
     }
 
 }

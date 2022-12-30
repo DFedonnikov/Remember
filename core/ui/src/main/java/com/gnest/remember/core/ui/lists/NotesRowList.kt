@@ -1,5 +1,6 @@
 package com.gnest.remember.core.ui.lists
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,10 +27,11 @@ import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.ui.R
 
 @Composable
-fun NotesRowList(
+fun <NOTE : ListNote> NotesRowList(
     modifier: Modifier = Modifier,
     listTitle: TextSource,
-    notesList: List<ListNote>
+    notesList: List<NOTE>,
+    onItemClick: (NOTE) -> Unit = {}
 ) {
     Column(modifier) {
         Row(
@@ -54,7 +56,8 @@ fun NotesRowList(
                     modifier = Modifier
                         .padding(start = 10.dp, end = 10.dp)
                         .width(180.dp)
-                        .height(240.dp),
+                        .height(240.dp)
+                        .clickable { onItemClick(it) },
                     colors = CardDefaults.cardColors(containerColor = it.color)
                 ) {
                     TextBaseMedium(

@@ -1,19 +1,14 @@
 package com.gnest.remember.feature.search.navigation
 
-import androidx.navigation.NavController
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import com.gnest.remember.core.ui.push
 import com.gnest.remember.feature.search.SearchRoute
+import com.gnest.remember.navigation.SearchScreen
+import com.gnest.remember.navigation.extensions.push
 
-const val searchRoute = "searchRoute"
-
-fun NavController.navigateToSearch(navOptions: NavOptions? = null) {
-    this.navigate(searchRoute, navOptions)
-}
-
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.searchScreen() {
-    push(route = searchRoute) {
+    push(route = SearchScreen.route) {
         SearchRoute()
     }
 }

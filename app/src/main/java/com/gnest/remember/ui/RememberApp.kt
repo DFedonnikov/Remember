@@ -29,13 +29,17 @@ import com.gnest.remember.core.ui.AddNoteFab
 import com.gnest.remember.core.designsystem.component.RememberNavigationBar
 import com.gnest.remember.core.designsystem.component.RememberNavigationBarItem
 import com.gnest.remember.core.designsystem.icon.Icon
-import com.gnest.remember.feature.newnote.navigation.navigateToNewNote
+import com.gnest.remember.navigation.Navigator
+import com.gnest.remember.navigation.NewNoteScreen
 import com.gnest.remember.navigation.RememberNavHost
 import com.gnest.remember.navigation.TopLevelDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RememberApp(appState: RememberAppState = rememberAppState()) {
+fun RememberApp(
+    navigator: Navigator,
+    appState: RememberAppState
+) {
     val isBottomBarVisible = appState.isBottomBarVisible
     Scaffold(
         contentColor = MaterialTheme.colorScheme.onBackground,
@@ -53,17 +57,16 @@ fun RememberApp(appState: RememberAppState = rememberAppState()) {
                 isVisible = isBottomBarVisible,
                 modifier = Modifier.offset(y = 60.dp)
             ) {
-                appState.navController.navigateToNewNote()
+                navigator.navigateTo(NewNoteScreen)
             }
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         BackHandler {
-            appState.onBackClick()
+            navigator.popBack()
         }
         RememberNavHost(
             navController = appState.navController,
-            onBackClick = appState::onBackClick,
             modifier = Modifier
                 .padding(
                     start = padding.calculateStartPadding(LayoutDirection.Ltr),

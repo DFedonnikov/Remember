@@ -35,14 +35,19 @@ internal fun HomeRoute(
 ) {
     val hasAnyNotes by viewModel.hasAnyNotes.collectAsStateWithLifecycle(false)
     when {
-        hasAnyNotes -> NotesList(modifier.statusBarsPadding(), interestingNotes)
-        else -> EmptyScreen(modifier.statusBarsPadding())
+        hasAnyNotes -> NotesList(modifier, interestingNotes)
+        else -> EmptyScreen(modifier)
     }
 }
 
 @Composable
 private fun NotesList(modifier: Modifier = Modifier, interestingNotes: @Composable () -> Unit) {
-    Column(modifier = modifier.padding(top = 24.dp)) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .padding(top = 24.dp)
+    ) {
         interestingNotes()
     }
 }
@@ -51,7 +56,9 @@ private fun NotesList(modifier: Modifier = Modifier, interestingNotes: @Composab
 @Preview(widthDp = 360, heightDp = 780, backgroundColor = 0xFFF9FFFB, showBackground = true)
 internal fun EmptyScreen(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {

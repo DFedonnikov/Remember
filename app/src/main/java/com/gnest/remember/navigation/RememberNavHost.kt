@@ -5,14 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.gnest.remember.feature.finished.navigation.finishedScreen
-import com.gnest.remember.feature.home.navigation.homeRoute
 import com.gnest.remember.feature.home.navigation.homeScreen
 import com.gnest.remember.feature.newnote.navigation.newNoteScreen
 import com.gnest.remember.feature.settings.navigation.settingsScreen
 import com.gnest.remember.feature.search.navigation.searchScreen
 import com.gnest.remember.interestingidea.navigation.interestingIdeasRowList
 import com.gnest.remember.interestingidea.navigation.interestingIdeaScreen
-import com.gnest.remember.interestingidea.navigation.navigateToInterestingIdea
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 /**
@@ -26,9 +24,8 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 @Composable
 fun RememberNavHost(
     navController: NavHostController,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    startDestination: String = homeRoute
+    startDestination: String = HomeScreen.route
 ) {
     AnimatedNavHost(
         navController = navController,
@@ -39,9 +36,7 @@ fun RememberNavHost(
         finishedScreen()
         searchScreen()
         settingsScreen()
-        newNoteScreen(navigateToInterestingIdea = {
-            navController.navigateToInterestingIdea()
-        }, onBackClick)
-        interestingIdeaScreen(onBackClick)
+        newNoteScreen()
+        interestingIdeaScreen()
     }
 }

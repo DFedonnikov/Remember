@@ -1,22 +1,18 @@
 package com.gnest.remember.feature.newnote.navigation
 
-import androidx.navigation.NavController
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import com.gnest.remember.core.ui.modal
+import com.gnest.remember.navigation.extensions.modal
 import com.gnest.remember.feature.newnote.NewNoteRoute
+import com.gnest.remember.navigation.NewNoteScreen
+import com.gnest.remember.navigation.extensions.pushExitTransition
+import com.gnest.remember.navigation.extensions.pushPopEnterTransition
 
-const val newNoteRoute = "newNoteRoute"
-
-fun NavController.navigateToNewNote(navOptions: NavOptions? = null) {
-    this.navigate(newNoteRoute, navOptions)
-}
-
-fun NavGraphBuilder.newNoteScreen(navigateToInterestingIdea: () -> Unit, onBackClick: () -> Unit) {
-    modal(route = newNoteRoute) {
-        NewNoteRoute(
-            navigateToInterestingIdea = navigateToInterestingIdea,
-            onBackClick = onBackClick
-        )
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.newNoteScreen() {
+    modal(route = NewNoteScreen.route,
+        exitTransition = { pushExitTransition },
+        popEnterTransition = { pushPopEnterTransition }) {
+        NewNoteRoute()
     }
 }

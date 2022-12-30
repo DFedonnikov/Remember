@@ -1,19 +1,14 @@
 package com.gnest.remember.feature.finished.navigation
 
-import androidx.navigation.NavController
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import com.gnest.remember.core.ui.push
 import com.gnest.remember.feature.finished.FinishedRoute
+import com.gnest.remember.navigation.FinishedScreen
+import com.gnest.remember.navigation.extensions.push
 
-const val finishedRoute = "finishedRoute"
-
-fun NavController.navigateToFinished(navOptions: NavOptions? = null) {
-    this.navigate(finishedRoute, navOptions)
-}
-
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.finishedScreen() {
-    push(route = finishedRoute) {
+    push(route = FinishedScreen.route) {
         FinishedRoute()
     }
 }

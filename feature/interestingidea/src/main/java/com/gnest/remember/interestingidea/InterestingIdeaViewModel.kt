@@ -13,6 +13,7 @@ import com.gnest.remember.interestingidea.domain.GetInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.domain.InterestingIdea
 import com.gnest.remember.interestingidea.domain.SaveInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.navigation.ideaId
+import com.gnest.remember.navigation.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +35,8 @@ class InterestingIdeaViewModel @Inject constructor(
     private val getIdeaUseCase: GetInterestingIdeaUseCase,
     private val createNewInterestingIdeaUseCase: CreateNewInterestingIdeaUseCase,
     private val saveIdeaUseCase: SaveInterestingIdeaUseCase,
-    private val deleteIdeaUseCase: DeleteInterestingIdeaUseCase
+    private val deleteIdeaUseCase: DeleteInterestingIdeaUseCase,
+    private val navigator: Navigator
 ) : ViewModel() {
 
     private val localIdea = MutableStateFlow(emptyIdea())
@@ -84,6 +86,10 @@ class InterestingIdeaViewModel @Inject constructor(
                 deleteIdeaUseCase(id)
             }
         }
+    }
+
+    fun onBackClick() {
+        navigator.popBack()
     }
 }
 

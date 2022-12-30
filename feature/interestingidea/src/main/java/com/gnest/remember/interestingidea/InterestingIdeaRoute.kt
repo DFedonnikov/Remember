@@ -1,10 +1,12 @@
 package com.gnest.remember.interestingidea
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,18 +22,15 @@ import com.gnest.remember.core.ui.TopBar
 internal fun InterestingIdeaRoute(
     modifier: Modifier = Modifier,
     viewModel: InterestingIdeaViewModel = hiltViewModel(),
-    onBackClick: () -> Unit,
 ) {
-    val state = viewModel.state.collectAsState(initial = null).value
-    if (state != null) {
-        InterestingIdeaScreen(
-            modifier = modifier,
-            state = state,
-            onTitleChanged = { viewModel.updateTitle(it) },
-            onTextChanged = { viewModel.updateText(it) },
-            onBackClick = onBackClick
-        )
-    }
+    val state by viewModel.state.collectAsState(initial = InterestingIdeaState())
+    InterestingIdeaScreen(
+        modifier = modifier.fillMaxSize(),
+        state = state,
+        onTitleChanged = { viewModel.updateTitle(it) },
+        onTextChanged = { viewModel.updateText(it) },
+        onBackClick = { viewModel.onBackClick() }
+    )
 }
 
 @Composable

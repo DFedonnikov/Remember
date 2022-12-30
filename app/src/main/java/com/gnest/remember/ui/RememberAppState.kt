@@ -9,27 +9,26 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
-import com.gnest.remember.feature.finished.navigation.finishedRoute
-import com.gnest.remember.feature.finished.navigation.navigateToFinished
-import com.gnest.remember.feature.home.navigation.homeRoute
-import com.gnest.remember.feature.home.navigation.navigateToHome
-import com.gnest.remember.feature.search.navigation.navigateToSearch
-import com.gnest.remember.feature.search.navigation.searchRoute
-import com.gnest.remember.feature.settings.navigation.navigateToSettings
-import com.gnest.remember.feature.settings.navigation.settingsRoute
+import com.gnest.remember.navigation.FinishedScreen
+import com.gnest.remember.navigation.HomeScreen
+import com.gnest.remember.navigation.Navigator
+import com.gnest.remember.navigation.SearchScreen
+import com.gnest.remember.navigation.SettingsScreen
 import com.gnest.remember.navigation.TopLevelDestination
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun rememberAppState(navController: NavHostController = rememberAnimatedNavController()): RememberAppState {
-    return remember(navController) {
-        RememberAppState(navController)
+fun rememberAppState(
+    navController: NavHostController = rememberAnimatedNavController(),
+    navigator: Navigator
+) =
+    remember(navController) {
+        RememberAppState(navController, navigator)
     }
-}
 
 @Stable
-class RememberAppState(val navController: NavHostController) {
+class RememberAppState(val navController: NavHostController, private val navigator: Navigator) {
 
     val currentDestination: NavDestination?
         @Composable get() = navController
@@ -39,10 +38,10 @@ class RememberAppState(val navController: NavHostController) {
 
     private val currentTopLevelDestination: TopLevelDestination?
         @Composable get() = when (currentDestination?.route) {
-            homeRoute -> TopLevelDestination.HOME
-            finishedRoute -> TopLevelDestination.FINISHED
-            searchRoute -> TopLevelDestination.SEARCH
-            settingsRoute -> TopLevelDestination.SETTINGS
+            HomeScreen.route -> TopLevelDestination.HOME
+            FinishedScreen.route -> TopLevelDestination.FINISHED
+            SearchScreen.route -> TopLevelDestination.SEARCH
+            SettingsScreen.route -> TopLevelDestination.SETTINGS
             else -> null
         }
 
@@ -64,14 +63,10 @@ class RememberAppState(val navController: NavHostController) {
         }
 
         when (topLevelDestination) {
-            TopLevelDestination.HOME -> navController.navigateToHome(topLevelNavOptions)
-            TopLevelDestination.FINISHED -> navController.navigateToFinished(topLevelNavOptions)
-            TopLevelDestination.SEARCH -> navController.navigateToSearch(topLevelNavOptions)
-            TopLevelDestination.SETTINGS -> navController.navigateToSettings(topLevelNavOptions)
+            TopLevelDestination.HOME -> navigator.navigateTo(HomeScreen, topLevelNavOptions)
+            TopLevelDestination.FINISHED -> navigator.navigateTo(FinishedScreen, topLevelNavOptions)
+            TopLevelDestination.SEARCH -> navigator.navigateTo(SearchScreen, topLevelNavOptions)
+            TopLevelDestination.SETTINGS -> navigator.navigateTo(SettingsScreen, topLevelNavOptions)
         }
-    }
-
-    fun onBackClick() {
-        navController.popBackStack()
     }
 }

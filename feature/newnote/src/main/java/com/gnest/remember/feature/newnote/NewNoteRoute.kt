@@ -1,6 +1,7 @@
 package com.gnest.remember.feature.newnote
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,16 +26,19 @@ import com.gnest.remember.core.ui.TopBar
 internal fun NewNoteRoute(
     modifier: Modifier = Modifier,
     viewModel: NewNoteViewModel = hiltViewModel(),
-    navigateToInterestingIdea: () -> Unit,
-    onBackClick: () -> Unit,
 ) {
-    NewNoteScreen(modifier, navigateToInterestingIdea, onBackClick)
+    NewNoteScreen(
+        modifier = modifier.fillMaxSize(),
+        navigateToInterestingIdea = { viewModel.openInterestingIdea() },
+        onBackClick = { viewModel.onBackClick() })
 }
 
 @Composable
-private fun NewNoteScreen(modifier: Modifier = Modifier,
-                          navigateToInterestingIdea: () -> Unit,
-                          onBackClick: () -> Unit) {
+private fun NewNoteScreen(
+    modifier: Modifier = Modifier,
+    navigateToInterestingIdea: () -> Unit,
+    onBackClick: () -> Unit
+) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         TopBar(title = TextSource.Resource(R.string.new_note_title), onBackClick = onBackClick)
         Column(
