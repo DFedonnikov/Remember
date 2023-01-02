@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.gnest.remember.database.model.ActiveNoPositionUpdate
 import com.gnest.remember.database.model.InterestingIdeaEntity
+import com.gnest.remember.database.model.ColorUpdate
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,16 +21,19 @@ interface InterestingIdeaDao {
     @Query("SELECT * FROM InterestingIdeaEntity WHERE id = :id")
     suspend fun getById(id: Long): InterestingIdeaEntity?
 
+    @Query("SELECT * FROM InterestingIdeaEntity WHERE id = :id")
+    fun observeById(id: Long): Flow<InterestingIdeaEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(note: InterestingIdeaEntity): Long
 
-    @Update(entity = InterestingIdeaEntity::class)
+    @Update(entity = InterestingIdeaEntity::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(entity: ActiveNoPositionUpdate)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(vararg notes: InterestingIdeaEntity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(notes: List<InterestingIdeaEntity>)
 
     @Query("DELETE FROM InterestingIdeaEntity where id = :id")
@@ -37,5 +41,8 @@ interface InterestingIdeaDao {
 
     @Query("SELECT COUNT(id) FROM InterestingIdeaEntity")
     fun countNotes(): Flow<Int>
+
+    @Update(entity = InterestingIdeaEntity::class, onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateColor(entity: ColorUpdate)
 
 }

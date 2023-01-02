@@ -8,7 +8,8 @@ val LightColorScheme = lightColorScheme(
     primary = AppColors.Jewel,
     background = AppColors.HintOfGreen,
     onPrimary = AppColors.White,
-    onPrimaryContainer = AppColors.Jewel
+    onPrimaryContainer = AppColors.Jewel,
+    surface = AppColors.White
 )
 
 @Composable

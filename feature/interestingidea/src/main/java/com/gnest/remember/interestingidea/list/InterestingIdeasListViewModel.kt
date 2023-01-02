@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
-import com.gnest.remember.database.model.NoteColor
+import com.gnest.remember.common.domain.NoteColor
 import com.gnest.remember.interestingidea.domain.ObserveInterestingIdeasUseCase
 import com.gnest.remember.navigation.InterestingIdeaScreen
 import com.gnest.remember.navigation.Navigator

@@ -24,5 +24,8 @@ fun interestingIdeasRowList(): @Composable () -> Unit = {
     InterestingIdeasRowList()
 }
 
-internal val SavedStateHandle.ideaId: Long?
-    get() = this.get<Long?>(InterestingIdeaScreen.ideaIdArg)?.takeIf { it != -1L }
+internal var SavedStateHandle.ideaId: Long?
+    get() = get<Long?>(InterestingIdeaScreen.ideaIdArg)?.takeIf { it != -1L }
+    set(value) {
+        this[InterestingIdeaScreen.ideaIdArg] = value
+    }

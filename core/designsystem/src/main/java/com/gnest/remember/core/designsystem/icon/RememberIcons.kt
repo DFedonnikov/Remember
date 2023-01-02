@@ -27,6 +27,7 @@ object RememberIcons {
     val SearchSmall = R.drawable.ic_search_small
     val Pin = R.drawable.ic_pin
     val More = R.drawable.ic_more
+    val Close = R.drawable.ic_close
 }
 
 sealed interface Icon {

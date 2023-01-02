@@ -3,6 +3,7 @@ package com.gnest.remember.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.gnest.remember.common.domain.NoteColor
 import kotlinx.datetime.LocalDateTime
 
 @Entity
@@ -27,4 +28,11 @@ class ActiveNoPositionUpdate(
     @ColumnInfo(name = "last_edited") val lastEdited: LocalDateTime,
     @ColumnInfo(name = "alarm_date") val alarmDate: LocalDateTime?,
     @ColumnInfo(name = "is_alarm_set") val isAlarmSet: Boolean
+)
+
+@Entity
+class ColorUpdate(
+    @ColumnInfo(name = "id") val id: Long,
+    @ColumnInfo(name = "color") val color: NoteColor,
+    @ColumnInfo(name = "last_edited") val lastEdited: LocalDateTime
 )

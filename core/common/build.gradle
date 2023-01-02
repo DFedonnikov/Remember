@@ -33,6 +33,11 @@ android {
 
 dependencies {
 
+    implementation(project(":core:designsystem")) {
+        transitive = false
+    }
+
+    implementation(libs.androidx.compose.ui)
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.datetime)
     kapt(libs.hilt.compiler)

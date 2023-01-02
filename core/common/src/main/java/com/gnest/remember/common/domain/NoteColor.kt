@@ -1,4 +1,4 @@
-package com.gnest.remember.database.model
+package com.gnest.remember.common.domain
 
 enum class NoteColor {
     WHITE,

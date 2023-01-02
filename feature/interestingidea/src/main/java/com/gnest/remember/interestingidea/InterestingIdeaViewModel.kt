@@ -1,24 +1,34 @@
 package com.gnest.remember.interestingidea
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gnest.remember.common.extensions.formatForNewNote
 import com.gnest.remember.common.extensions.localDateTimeNow
+import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
-import com.gnest.remember.database.model.NoteColor
+import com.gnest.remember.common.domain.NoteColor
+import com.gnest.remember.common.extensions.asComposeColor
 import com.gnest.remember.interestingidea.domain.CreateNewInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.domain.DeleteInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.domain.GetInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.domain.InterestingIdea
+import com.gnest.remember.interestingidea.domain.ObserveInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.domain.SaveInterestingIdeaUseCase
 import com.gnest.remember.interestingidea.navigation.ideaId
 import com.gnest.remember.navigation.Navigator
+import com.gnest.remember.navigation.NoteSettingsScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -33,20 +43,12 @@ import kotlin.time.toDuration
 class InterestingIdeaViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getIdeaUseCase: GetInterestingIdeaUseCase,
+    observeIdeaUseCase: ObserveInterestingIdeaUseCase,
     private val createNewInterestingIdeaUseCase: CreateNewInterestingIdeaUseCase,
     private val saveIdeaUseCase: SaveInterestingIdeaUseCase,
     private val deleteIdeaUseCase: DeleteInterestingIdeaUseCase,
     private val navigator: Navigator
 ) : ViewModel() {
-
-    private val localIdea = MutableStateFlow(emptyIdea())
-    val state: Flow<InterestingIdeaState> = localIdea.map { idea ->
-        InterestingIdeaState(
-            title = TextSource.Simple(idea.title),
-            text = TextSource.Simple(idea.text),
-            lastEdited = idea.lastEdited.formatForNewNote()
-        )
-    }
 
     init {
         viewModelScope.launch {
@@ -54,11 +56,36 @@ class InterestingIdeaViewModel @Inject constructor(
                 null -> createNewInterestingIdeaUseCase()
                 else -> requireNotNull(getIdeaUseCase(id))
             }
+            savedStateHandle.ideaId = idea.id
             localIdea.emit(idea)
             localIdea.debounce(1.toDuration(DurationUnit.SECONDS))
                 .onEach { saveIdeaUseCase(it) }
                 .launchIn(this)
         }
+    }
+
+    private val localIdea = MutableStateFlow(emptyIdea())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val state: Flow<InterestingIdeaState> by lazy {
+        localIdea.flatMapLatest { localIdea ->
+            if (localIdea.id < 1) return@flatMapLatest emptyFlow()
+            observeIdeaUseCase(localIdea.id).map { idea ->
+                when {
+                    localIdea.lastEdited > idea.lastEdited -> localIdea
+                    else -> idea
+                }
+            }
+        }
+            .distinctUntilChanged()
+            .map { idea ->
+                InterestingIdeaState(
+                    title = TextSource.Simple(idea.title),
+                    text = TextSource.Simple(idea.text),
+                    color = idea.color.asComposeColor(),
+                    lastEdited = idea.lastEdited.formatForNewNote()
+                )
+            }
     }
 
 
@@ -91,11 +118,16 @@ class InterestingIdeaViewModel @Inject constructor(
     fun onBackClick() {
         navigator.popBack()
     }
+
+    fun onMoreClick() {
+        navigator.navigateTo(NoteSettingsScreen(requireNotNull(savedStateHandle.ideaId)))
+    }
 }
 
 data class InterestingIdeaState(
     val title: TextSource = TextSource.Simple(""),
     val text: TextSource = TextSource.Simple(""),
+    val color: Color = AppColors.White,
     val lastEdited: String = ""
 )
 

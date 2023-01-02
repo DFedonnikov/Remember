@@ -11,6 +11,7 @@ import com.gnest.remember.feature.settings.navigation.settingsScreen
 import com.gnest.remember.feature.search.navigation.searchScreen
 import com.gnest.remember.interestingidea.navigation.interestingIdeasRowList
 import com.gnest.remember.interestingidea.navigation.interestingIdeaScreen
+import com.gnest.remember.notesettings.navigation.noteSettingsBottomSheet
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 /**
@@ -38,5 +39,6 @@ fun RememberNavHost(
         settingsScreen()
         newNoteScreen()
         interestingIdeaScreen()
+        noteSettingsBottomSheet()
     }
 }

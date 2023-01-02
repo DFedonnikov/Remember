@@ -47,3 +47,17 @@ class InterestingIdeaScreen(private val id: Long = -1L) : Screen {
 
     }
 }
+
+class NoteSettingsScreen(private val id: Long) : Screen {
+
+    override val route get() = "$noteSettingsRoute/$id"
+
+    companion object {
+
+        private const val noteSettingsRoute = "noteSettingsRoute"
+        const val noteIdArg = "InterestingIdeaId"
+        const val routePattern = "$noteSettingsRoute/{$noteIdArg}"
+        val args = listOf(navArgument(noteIdArg) { type = NavType.LongType })
+
+    }
+}

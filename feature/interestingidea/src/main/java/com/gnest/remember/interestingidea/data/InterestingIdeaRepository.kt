@@ -6,7 +6,7 @@ import com.gnest.remember.common.network.RememberDispatchers
 import com.gnest.remember.database.dao.InterestingIdeaDao
 import com.gnest.remember.database.model.ActiveNoPositionUpdate
 import com.gnest.remember.database.model.InterestingIdeaEntity
-import com.gnest.remember.database.model.NoteColor
+import com.gnest.remember.common.domain.NoteColor
 import com.gnest.remember.interestingidea.domain.InterestingIdea
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +21,8 @@ import javax.inject.Inject
 interface InterestingIdeaRepository {
 
     suspend fun getIdeaById(id: Long): InterestingIdea?
+
+    fun observeIdeaById(id: Long): Flow<InterestingIdea>
     suspend fun createNewIdea(): InterestingIdea
     suspend fun updateIdea(idea: InterestingIdea)
     fun deleteById(id: Long)
@@ -38,13 +40,17 @@ class InterestingIdeaRepositoryImpl @Inject constructor(
         dao.getById(id)?.asDomainModel()
     }
 
+    override fun observeIdeaById(id: Long): Flow<InterestingIdea> = dao.observeById(id)
+        .map { it.asDomainModel() }
+        .flowOn(coroutineContext)
+
     override suspend fun createNewIdea(): InterestingIdea = withContext(coroutineContext) {
         val idea = InterestingIdeaEntity(
             id = 0,
             title = "",
             text = "",
             position = 0,
-            color = NoteColor.AERO_BLUE,
+            color = NoteColor.WHITE,
             lastEdited = Clock.System.localDateTimeNow(),
             alarmDate = null,
             isAlarmSet = false,

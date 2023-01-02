@@ -1,5 +1,7 @@
 package com.gnest.remember.interestingidea
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -29,7 +31,8 @@ internal fun InterestingIdeaRoute(
         state = state,
         onTitleChanged = { viewModel.updateTitle(it) },
         onTextChanged = { viewModel.updateText(it) },
-        onBackClick = { viewModel.onBackClick() }
+        onBackClick = { viewModel.onBackClick() },
+        onMoreClicked = { viewModel.onMoreClick() }
     )
 }
 
@@ -39,9 +42,13 @@ private fun InterestingIdeaScreen(
     state: InterestingIdeaState,
     onTitleChanged: (String) -> Unit,
     onTextChanged: (String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onMoreClicked: () -> Unit,
 ) {
-    Column(modifier = modifier.navigationBarsPadding()) {
+    val backgroundColor by animateColorAsState(targetValue = state.color)
+    Column(modifier = modifier
+        .background(backgroundColor)
+        .navigationBarsPadding()) {
         TopBar(onBackClick = onBackClick)
         TitleTextField(
             modifier = Modifier
@@ -63,7 +70,8 @@ private fun InterestingIdeaScreen(
             lastEditedDate = state.lastEdited,
             onSearchClicked = { },
             onPinClicked = { },
-            onMoreClicked = { })
+            onMoreClicked = onMoreClicked
+        )
     }
 }
 
@@ -75,6 +83,7 @@ private fun InterestingIdeaScreenPreview() {
             state = InterestingIdeaState(),
             onTitleChanged = {},
             onTextChanged = {},
-            onBackClick = {})
+            onBackClick = {},
+            onMoreClicked = {})
     }
 }

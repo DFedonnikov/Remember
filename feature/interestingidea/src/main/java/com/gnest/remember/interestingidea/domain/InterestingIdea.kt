@@ -1,6 +1,6 @@
 package com.gnest.remember.interestingidea.domain
 
-import com.gnest.remember.database.model.NoteColor
+import com.gnest.remember.common.domain.NoteColor
 import kotlinx.datetime.LocalDateTime
 
 data class InterestingIdea(

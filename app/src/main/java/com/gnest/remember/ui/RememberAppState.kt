@@ -16,19 +16,26 @@ import com.gnest.remember.navigation.SearchScreen
 import com.gnest.remember.navigation.SettingsScreen
 import com.gnest.remember.navigation.TopLevelDestination
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.navigation.material.BottomSheetNavigator
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class)
 @Composable
 fun rememberAppState(
-    navController: NavHostController = rememberAnimatedNavController(),
+    bottomSheetNavigator: BottomSheetNavigator = rememberBottomSheetNavigator(),
+    navController: NavHostController = rememberAnimatedNavController(bottomSheetNavigator),
     navigator: Navigator
 ) =
     remember(navController) {
-        RememberAppState(navController, navigator)
+        RememberAppState(navController, bottomSheetNavigator, navigator)
     }
 
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @Stable
-class RememberAppState(val navController: NavHostController, private val navigator: Navigator) {
+class RememberAppState(val navController: NavHostController,
+                       val bottomSheetNavigator: BottomSheetNavigator,
+                       private val navigator: Navigator) {
 
     val currentDestination: NavDestination?
         @Composable get() = navController

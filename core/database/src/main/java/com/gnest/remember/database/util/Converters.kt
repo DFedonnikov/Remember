@@ -1,7 +1,7 @@
 package com.gnest.remember.database.util
 
 import androidx.room.TypeConverter
-import com.gnest.remember.database.model.NoteColor
+import com.gnest.remember.common.domain.NoteColor
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone

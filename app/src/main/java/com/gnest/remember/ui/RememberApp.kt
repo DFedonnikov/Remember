@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.gnest.remember.core.designsystem.component.RememberBottomSheet
 import com.gnest.remember.core.ui.AddNoteFab
 import com.gnest.remember.core.designsystem.component.RememberNavigationBar
 import com.gnest.remember.core.designsystem.component.RememberNavigationBarItem
@@ -33,8 +34,9 @@ import com.gnest.remember.navigation.Navigator
 import com.gnest.remember.navigation.NewNoteScreen
 import com.gnest.remember.navigation.RememberNavHost
 import com.gnest.remember.navigation.TopLevelDestination
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialNavigationApi::class)
 @Composable
 fun RememberApp(
     navigator: Navigator,
@@ -65,16 +67,18 @@ fun RememberApp(
         BackHandler {
             navigator.popBack()
         }
-        RememberNavHost(
-            navController = appState.navController,
-            modifier = Modifier
-                .padding(
-                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
-                    top = padding.calculateTopPadding(),
-                    end = padding.calculateEndPadding(LayoutDirection.Ltr),
-                    bottom = if (isBottomBarVisible) padding.calculateBottomPadding() else 0.dp
-                )
-        )
+        RememberBottomSheet(bottomSheetNavigator = appState.bottomSheetNavigator) {
+            RememberNavHost(
+                navController = appState.navController,
+                modifier = Modifier
+                    .padding(
+                        start = padding.calculateStartPadding(LayoutDirection.Ltr),
+                        top = padding.calculateTopPadding(),
+                        end = padding.calculateEndPadding(LayoutDirection.Ltr),
+                        bottom = if (isBottomBarVisible) padding.calculateBottomPadding() else 0.dp
+                    )
+            )
+        }
     }
 }
 

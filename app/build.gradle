@@ -114,12 +114,13 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:navigation"))
     implementation(project(":core:ui"))
-    implementation(project(":feature:home"))
     implementation(project(":feature:finished"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:interestingidea"))
+    implementation(project(":feature:newnote"))
+    implementation(project(":feature:notesettings"))
     implementation(project(":feature:search"))
     implementation(project(":feature:settings"))
-    implementation(project(":feature:newnote"))
-    implementation(project(":feature:interestingidea"))
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -137,6 +138,7 @@ dependencies {
     implementation(libs.android.material)
 
     implementation(libs.accompanist.navigation.animation)
+    implementation(libs.accompanist.navigation.material)
     implementation(libs.accompanist.systemuicontroller)
 
     implementation(libs.firebase.analytics)

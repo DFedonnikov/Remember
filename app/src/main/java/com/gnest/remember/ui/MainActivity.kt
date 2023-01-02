@@ -10,10 +10,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import com.gnest.remember.core.designsystem.theme.RememberTheme
 import com.gnest.remember.navigation.Navigator
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 

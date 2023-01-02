@@ -7,7 +7,7 @@ import com.gnest.remember.database.dao.InterestingIdeaDao
 import com.gnest.remember.database.di.ArchivedRealm
 import com.gnest.remember.database.di.MainRealm
 import com.gnest.remember.database.model.InterestingIdeaEntity
-import com.gnest.remember.database.model.NoteColor
+import com.gnest.remember.common.domain.NoteColor
 import com.gnest.remember.database.model.old.Memo
 import io.realm.Realm
 import io.realm.RealmConfiguration
