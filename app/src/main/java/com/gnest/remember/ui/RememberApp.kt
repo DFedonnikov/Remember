@@ -30,8 +30,8 @@ import com.gnest.remember.core.ui.AddNoteFab
 import com.gnest.remember.core.designsystem.component.RememberNavigationBar
 import com.gnest.remember.core.designsystem.component.RememberNavigationBarItem
 import com.gnest.remember.core.designsystem.icon.Icon
-import com.gnest.remember.navigation.Navigator
-import com.gnest.remember.navigation.NewNoteScreen
+import com.gnest.remember.core.navigation.Navigator
+import com.gnest.remember.core.navigation.NewNoteScreen
 import com.gnest.remember.navigation.RememberNavHost
 import com.gnest.remember.navigation.TopLevelDestination
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">reminder</string>
+    <string name="extras">Extras</string>
+    <string name="reminder">Reminder</string>
+    <string name="set_reminder">Set Reminder</string>
+    <string name="not_set">Not set</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="repeat">Repeat</string>
+    <string name="once">Once</string>
+    <string name="daily">Daily</string>
+    <string name="weekdays">Monday to Friday</string>
+    <string name="weekend"><![CDATA[Saturday & Sunday]]></string>
+    <string name="custom">Custom</string>
+</resources>

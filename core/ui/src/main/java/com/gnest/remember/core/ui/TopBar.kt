@@ -41,7 +41,7 @@ fun TopBar(
             if (isBackIconVisible) {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        painter = painterResource(id = RememberIcons.ChevronLeft),
+                        painter = painterResource(id = RememberIcons.ChevronLeftSolid),
                         tint = MaterialTheme.colorScheme.primary,
                         contentDescription = "Back icon"
                     )

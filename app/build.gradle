@@ -83,7 +83,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = "1.4.8"
     }
 }
 
@@ -121,6 +121,7 @@ dependencies {
     implementation(project(":feature:notesettings"))
     implementation(project(":feature:search"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:reminder"))
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -129,15 +130,14 @@ dependencies {
 
     implementation(libs.androidx.compose.activity)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.navigation)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.hilt.navigation.compose)
-//    implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.android.material)
 
-    implementation(libs.accompanist.navigation.animation)
     implementation(libs.accompanist.navigation.material)
     implementation(libs.accompanist.systemuicontroller)
 

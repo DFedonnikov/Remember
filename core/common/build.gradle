@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.gnest.remember.common'
+    namespace 'com.gnest.remember.core.common'
     compileSdk 33
 
     defaultConfig {
@@ -33,12 +33,9 @@ android {
 
 dependencies {
 
-    implementation(project(":core:designsystem")) {
-        transitive = false
-    }
-
     implementation(libs.androidx.compose.ui)
     implementation(libs.hilt.android)
     implementation(libs.kotlinx.datetime)
+    implementation "io.reactivex.rxjava2:rxjava:2.2.21"
     kapt(libs.hilt.compiler)
 }

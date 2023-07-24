@@ -1,6 +1,5 @@
 package com.gnest.remember.ui
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -8,23 +7,23 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.gnest.remember.navigation.FinishedScreen
-import com.gnest.remember.navigation.HomeScreen
-import com.gnest.remember.navigation.Navigator
-import com.gnest.remember.navigation.SearchScreen
-import com.gnest.remember.navigation.SettingsScreen
+import com.gnest.remember.core.navigation.FinishedScreen
+import com.gnest.remember.core.navigation.HomeScreen
+import com.gnest.remember.core.navigation.Navigator
+import com.gnest.remember.core.navigation.SearchScreen
+import com.gnest.remember.core.navigation.SettingsScreen
 import com.gnest.remember.navigation.TopLevelDestination
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 fun rememberAppState(
     bottomSheetNavigator: BottomSheetNavigator = rememberBottomSheetNavigator(),
-    navController: NavHostController = rememberAnimatedNavController(bottomSheetNavigator),
+    navController: NavHostController = rememberNavController(bottomSheetNavigator),
     navigator: Navigator
 ) =
     remember(navController) {
@@ -35,7 +34,8 @@ fun rememberAppState(
 @Stable
 class RememberAppState(val navController: NavHostController,
                        val bottomSheetNavigator: BottomSheetNavigator,
-                       private val navigator: Navigator) {
+                       private val navigator: Navigator
+) {
 
     val currentDestination: NavDestination?
         @Composable get() = navController

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="change_background">CHANGE BACKGROUND</string>
+
+    <string name="extras_upper_case">EXTRAS</string>
+    <string name="set_reminder">Set Reminder</string>
+    <string name="not_set">Not set</string>
 </resources>

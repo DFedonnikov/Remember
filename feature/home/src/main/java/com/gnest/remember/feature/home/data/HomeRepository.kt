@@ -1,8 +1,8 @@
 package com.gnest.remember.feature.home.data
 
-import com.gnest.remember.common.network.Dispatcher
-import com.gnest.remember.common.network.RememberDispatchers
-import com.gnest.remember.database.dao.InterestingIdeaDao
+import com.gnest.remember.core.common.network.Dispatcher
+import com.gnest.remember.core.common.network.RememberDispatchers
+import com.gnest.remember.core.database.dao.InterestingIdeaDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

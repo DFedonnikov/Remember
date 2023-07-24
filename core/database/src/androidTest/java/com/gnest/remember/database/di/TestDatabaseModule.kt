@@ -2,7 +2,10 @@ package com.gnest.remember.database.di
 
 import android.content.Context
 import androidx.room.Room
-import com.gnest.remember.database.NotesDatabase
+import com.gnest.remember.core.database.NotesDatabase
+import com.gnest.remember.core.database.di.ArchivedRealm
+import com.gnest.remember.core.database.di.DatabaseModule
+import com.gnest.remember.core.database.di.MainRealm
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.gnest.remember.testing'
+    namespace 'com.gnest.remember.core.testing'
     compileSdk 33
 
     defaultConfig {

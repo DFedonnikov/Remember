@@ -1,8 +1,10 @@
 package com.gnest.remember.core.designsystem.theme
 
+import androidx.annotation.ArrayRes
 import androidx.annotation.StringRes
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -41,10 +43,11 @@ internal val RememberTypography = Typography(
         fontSize = 28.sp,
         lineHeight = 36.sp
     ),
+    //Verified
     headlineSmall = TextStyle(
-        fontWeight = FontWeight.W400,
+        fontWeight = FontWeight.W500,
         fontSize = 24.sp,
-        lineHeight = 32.sp
+        lineHeight = 28.8.sp
     ),
     //Verified
     titleLarge = TextStyle(
@@ -117,6 +120,12 @@ sealed interface TextSource {
 
         val arguments = args
     }
+
+    class StringArray(
+        @ArrayRes val array: Int,
+        val indexes: List<Int>,
+        val separator: CharSequence = ", "
+    ) : TextSource
 }
 
 val TextSource.asString: String
@@ -124,4 +133,10 @@ val TextSource.asString: String
         is TextSource.Simple -> text
         is TextSource.Resource -> stringResource(id = resId)
         is TextSource.Formatted -> source.asString.format(args = arguments)
+        is TextSource.StringArray -> {
+            val stringArray = stringArrayResource(id = array)
+            indexes.joinToString(separator = separator) { stringArray[it] }
+        }
     }
+
+val String.asTextSource get() = TextSource.Simple(this)

@@ -19,14 +19,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gnest.remember.core.designsystem.component.text.TextSMRegular
 import com.gnest.remember.core.designsystem.component.text.TextXLBold
 import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 internal fun HomeRoute(
     modifier: Modifier = Modifier,

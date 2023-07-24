@@ -9,7 +9,8 @@ val LightColorScheme = lightColorScheme(
     background = AppColors.HintOfGreen,
     onPrimary = AppColors.White,
     onPrimaryContainer = AppColors.Jewel,
-    surface = AppColors.White
+    surface = AppColors.White,
+    onSurfaceVariant = AppColors.FrenchGray
 )
 
 @Composable

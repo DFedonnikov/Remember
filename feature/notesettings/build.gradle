@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.gnest.remember.notesettings'
+    namespace 'com.gnest.remember.feature.notesettings'
     compileSdk 33
 
     defaultConfig {
@@ -34,7 +34,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = "1.4.8"
     }
 }
 dependencies {
@@ -44,6 +44,8 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:navigation"))
     implementation(project(":core:ui"))
+    implementation project(":core:note")
+    implementation project(":core:noteuimapper")
 
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.ui.tooling.preview)

@@ -4,10 +4,11 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'realm-android'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.22'
 }
 
 android {
-    namespace 'com.gnest.remember.database'
+    namespace 'com.gnest.remember.core.database'
     compileSdk 33
 
     defaultConfig {
@@ -34,6 +35,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -45,13 +47,14 @@ android {
 dependencies {
 
     implementation(project(":core:common"))
+    implementation(project(":core:note"))
     implementation(project(":core:testing"))
 
-
-    implementation(libs.kotlinx.coroutines)
-    implementation(libs.kotlinx.datetime)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation(libs.kotlinx.coroutines)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization)
     implementation(libs.room.runtime)
     kapt(libs.room.compiler)
     implementation(libs.room.ktx)

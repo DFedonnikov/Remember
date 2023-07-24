@@ -2,11 +2,12 @@ package com.gnest.remember.database.migration
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.gnest.remember.database.dao.InterestingIdeaDao
-import com.gnest.remember.database.di.ArchivedRealm
-import com.gnest.remember.database.di.MainRealm
-import com.gnest.remember.database.model.InterestingIdeaEntity
-import com.gnest.remember.database.model.old.Memo
+import com.gnest.remember.core.database.dao.InterestingIdeaDao
+import com.gnest.remember.core.database.di.ArchivedRealm
+import com.gnest.remember.core.database.di.MainRealm
+import com.gnest.remember.core.database.migration.RealmToRoomMigration
+import com.gnest.remember.core.database.model.InterestingIdeaEntity
+import com.gnest.remember.core.database.model.old.Memo
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.realm.Realm
@@ -88,14 +89,14 @@ class RealmToRoomMigrationTest {
         assert(position == oldMemo.position)
         assert(color.name == oldMemo.color)
         if (oldMemo.alarmDate != -1L) {
-            val newMemoMillis = alarmDate?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds()
+            val newMemoMillis = reminderDate?.toInstant(TimeZone.currentSystemDefault())?.toEpochMilliseconds()
             assert(newMemoMillis == oldMemo.alarmDate) {
-                "new memo alarmDate: $alarmDate; millis: $newMemoMillis old memo alarmDate millis: ${oldMemo.alarmDate}"
+                "new memo alarmDate: $reminderDate; millis: $newMemoMillis old memo alarmDate millis: ${oldMemo.alarmDate}"
             }
         } else {
-            assert(alarmDate == null)
+            assert(reminderDate == null)
         }
-        assert(isAlarmSet == oldMemo.isAlarmSet)
+        assert(isReminderSet == oldMemo.isAlarmSet)
         assert(this.isFinished == isArchived)
     }
 
@@ -103,8 +104,8 @@ class RealmToRoomMigrationTest {
     @Throws(Exception::class)
     fun testBigMemoListMigration() {
         runTest {
-            val mainMemos = (0..9999).map { Memo(it, "Memo $it", it, "BLUE", -1, false)}
-            val archivedMemos = (10000..20000).map { Memo(it, "Memo $it", it, "EMERALD", -1, false)}
+            val mainMemos = (0..9999).map { Memo(it, "Memo $it", it, "BLUE", -1, false) }
+            val archivedMemos = (10000..20000).map { Memo(it, "Memo $it", it, "EMERALD", -1, false) }
 
             mainRealm.executeTransaction {
                 it.insert(mainMemos)
