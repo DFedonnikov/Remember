@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
@@ -15,101 +14,122 @@ import androidx.compose.ui.unit.sp
  * Remember Typography
  */
 
-internal val RememberTypography = Typography(
-    displayLarge = TextStyle(
-        fontWeight = FontWeight.W400,
-        fontSize = 57.sp,
-        lineHeight = 64.sp,
-        letterSpacing = (-0.25).sp
-    ),
-    displayMedium = TextStyle(
-        fontWeight = FontWeight.W400,
-        fontSize = 45.sp,
-        lineHeight = 52.sp
-    ),
-    displaySmall = TextStyle(
-        fontWeight = FontWeight.W400,
-        fontSize = 36.sp,
-        lineHeight = 44.sp
-    ),
-    //Verified
-    headlineLarge = TextStyle(
-        fontWeight = FontWeight.W700,
-        fontSize = 32.sp,
-        lineHeight = 38.sp
-    ),
-    headlineMedium = TextStyle(
-        fontWeight = FontWeight.W400,
-        fontSize = 28.sp,
-        lineHeight = 36.sp
-    ),
-    //Verified
-    headlineSmall = TextStyle(
-        fontWeight = FontWeight.W500,
-        fontSize = 24.sp,
-        lineHeight = 28.8.sp
-    ),
-    //Verified
-    titleLarge = TextStyle(
-        fontWeight = FontWeight.W700,
-        fontSize = 24.sp,
-        lineHeight = 28.sp
-    ),
-    //Verified
-    titleMedium = TextStyle(
-        fontWeight = FontWeight.W700,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.1.sp
-    ),
-    //Verified
-    titleSmall = TextStyle(
-        fontWeight = FontWeight.W500,
-        fontSize = 16.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
-    ),
-    //Verified
-    bodyLarge = TextStyle(
-        fontWeight = FontWeight.W400,
-        fontSize = 16.sp,
-        lineHeight = 22.sp,
-        letterSpacing = 0.5.sp
-    ),
-    //Verified
-    bodyMedium = TextStyle(
-        fontWeight = FontWeight.W400,
+internal object TextStyles {
+
+    val TextXSRegular = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.W400)
+    val TextXSMedium = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.W500)
+    val TextXSBold = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.W700)
+    val Text2XSRegular = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.W400)
+    val Text2XSMedium = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.W500)
+    val Text2XSBold = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.W700)
+    val TextSMRegular = TextStyle(
         fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.25.sp
-    ),
-    //Verified
-    bodySmall = TextStyle(
-        fontWeight = FontWeight.W400,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.4.sp
-    ),
-    //Verified
-    labelLarge = TextStyle(
-        fontWeight = FontWeight.W700,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp
-    ),
-    //Verified
-    labelMedium = TextStyle(
-        fontWeight = FontWeight.W500,
-        fontSize = 12.sp,
-        lineHeight = 15.sp,
-        letterSpacing = 0.5.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Monospace,
-        fontWeight = FontWeight.W500,
-        fontSize = 10.sp,
-        lineHeight = 16.sp
+        lineHeight = 19.6.sp,
+        fontWeight = FontWeight.W400
     )
+    val TextSMMedium = TextStyle(
+        fontSize = 14.sp,
+        lineHeight = 19.6.sp,
+        fontWeight = FontWeight.W500
+    )
+    val TextSMBold = TextStyle(
+        fontSize = 14.sp,
+        lineHeight = 19.6.sp,
+        fontWeight = FontWeight.W700
+    )
+    val TextBaseRegular = TextStyle(
+        fontSize = 16.sp,
+        lineHeight = 22.4.sp,
+        fontWeight = FontWeight.W400
+    )
+    val TextBaseMedium = TextStyle(
+        fontSize = 16.sp,
+        lineHeight = 22.4.sp,
+        fontWeight = FontWeight.W500
+    )
+    val TextBaseBold = TextStyle(
+        fontSize = 16.sp,
+        lineHeight = 22.4.sp,
+        fontWeight = FontWeight.W700
+    )
+    val TextLgRegular = TextStyle(
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
+        fontWeight = FontWeight.W400
+    )
+    val TextLgMedium = TextStyle(
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
+        fontWeight = FontWeight.W500
+    )
+    val TextLgBold = TextStyle(
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
+        fontWeight = FontWeight.W700
+    )
+    val TextXLRegular = TextStyle(
+        fontSize = 24.sp,
+        lineHeight = 28.8.sp,
+        fontWeight = FontWeight.W400
+    )
+    val TextXLMedium = TextStyle(
+        fontSize = 24.sp,
+        lineHeight = 28.8.sp,
+        fontWeight = FontWeight.W500
+    )
+    val TextXLBold = TextStyle(
+        fontSize = 24.sp,
+        lineHeight = 28.8.sp,
+        fontWeight = FontWeight.W700
+    )
+    val Text2XLRegular = TextStyle(
+        fontSize = 32.sp,
+        lineHeight = 38.4.sp,
+        fontWeight = FontWeight.W400
+    )
+    val Text2XLMedium = TextStyle(
+        fontSize = 32.sp,
+        lineHeight = 38.4.sp,
+        fontWeight = FontWeight.W500
+    )
+    val Text2XLBold = TextStyle(
+        fontSize = 32.sp,
+        lineHeight = 38.4.sp,
+        fontWeight = FontWeight.W700
+    )
+    val Text3XLRegular = TextStyle(
+        fontSize = 40.sp,
+        lineHeight = 44.sp,
+        fontWeight = FontWeight.W400
+    )
+    val Text3XLMedium = TextStyle(
+        fontSize = 40.sp,
+        lineHeight = 44.sp,
+        fontWeight = FontWeight.W500
+    )
+    val Text3XLBold = TextStyle(
+        fontSize = 40.sp,
+        lineHeight = 44.sp,
+        fontWeight = FontWeight.W700
+    )
+}
+
+internal val RememberTypography = Typography(
+    displayLarge = TextStyles.Text3XLBold,
+    displayMedium = TextStyles.Text3XLMedium,
+    displaySmall = TextStyles.Text3XLRegular,
+    headlineLarge = TextStyles.TextXLBold,
+    headlineMedium = TextStyles.TextXLMedium,
+    headlineSmall = TextStyles.TextXLRegular,
+    titleLarge = TextStyles.TextBaseBold,
+    titleMedium = TextStyles.TextBaseMedium,
+    titleSmall = TextStyles.TextBaseRegular,
+    bodyLarge = TextStyles.TextSMBold,
+    bodyMedium = TextStyles.TextSMMedium,
+    bodySmall = TextStyles.TextSMRegular,
+    labelLarge = TextStyles.TextXSBold,
+    labelMedium = TextStyles.TextXSMedium,
+    labelSmall = TextStyles.TextXSRegular
 )
 
 sealed interface TextSource {

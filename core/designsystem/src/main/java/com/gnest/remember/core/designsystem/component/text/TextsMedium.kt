@@ -9,10 +9,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
+import com.gnest.remember.core.designsystem.theme.TextStyles
 import com.gnest.remember.core.designsystem.theme.asString
 
 @Composable
-fun Text2XSMedium(
+fun TextXSMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
     color: Color = AppColors.Ebony,
@@ -30,6 +31,42 @@ fun Text2XSMedium(
 }
 
 @Composable
+fun Text2XSMedium(
+    modifier: Modifier = Modifier,
+    text: TextSource,
+    color: Color = AppColors.Ebony,
+    textAlign: TextAlign? = null,
+    textDecoration: TextDecoration? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text.asString,
+        style = TextStyles.Text2XLMedium,
+        color = color,
+        textAlign = textAlign,
+        textDecoration = textDecoration
+    )
+}
+
+@Composable
+fun TextSMMedium(
+    modifier: Modifier = Modifier,
+    text: TextSource,
+    color: Color = AppColors.Ebony,
+    textAlign: TextAlign? = null,
+    textDecoration: TextDecoration? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text.asString,
+        style = MaterialTheme.typography.bodyMedium,
+        color = color,
+        textAlign = textAlign,
+        textDecoration = textDecoration
+    )
+}
+
+@Composable
 fun TextBaseMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
@@ -40,7 +77,79 @@ fun TextBaseMedium(
     Text(
         modifier = modifier,
         text = text.asString,
-        style = MaterialTheme.typography.titleSmall,
+        style = MaterialTheme.typography.titleMedium,
+        color = color,
+        textAlign = textAlign,
+        textDecoration = textDecoration
+    )
+}
+
+@Composable
+fun TextLgMedium(
+    modifier: Modifier = Modifier,
+    text: TextSource,
+    color: Color = AppColors.Ebony,
+    textAlign: TextAlign? = null,
+    textDecoration: TextDecoration? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text.asString,
+        style = TextStyles.TextLgMedium,
+        color = color,
+        textAlign = textAlign,
+        textDecoration = textDecoration
+    )
+}
+
+@Composable
+fun TextXLMedium(
+    modifier: Modifier = Modifier,
+    text: TextSource,
+    color: Color = AppColors.Ebony,
+    textAlign: TextAlign? = null,
+    textDecoration: TextDecoration? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text.asString,
+        style = MaterialTheme.typography.headlineMedium,
+        color = color,
+        textAlign = textAlign,
+        textDecoration = textDecoration
+    )
+}
+
+@Composable
+fun Text2XLMedium(
+    modifier: Modifier = Modifier,
+    text: TextSource,
+    color: Color = AppColors.Ebony,
+    textAlign: TextAlign? = null,
+    textDecoration: TextDecoration? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text.asString,
+        style = TextStyles.Text2XLMedium,
+        color = color,
+        textAlign = textAlign,
+        textDecoration = textDecoration
+    )
+}
+
+@Composable
+fun Text3XLMedium(
+    modifier: Modifier = Modifier,
+    text: TextSource,
+    color: Color = AppColors.Ebony,
+    textAlign: TextAlign? = null,
+    textDecoration: TextDecoration? = null
+) {
+    Text(
+        modifier = modifier,
+        text = text.asString,
+        style = MaterialTheme.typography.displayMedium,
         color = color,
         textAlign = textAlign,
         textDecoration = textDecoration
