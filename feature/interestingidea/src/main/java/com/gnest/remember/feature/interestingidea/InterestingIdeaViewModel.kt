@@ -21,14 +21,10 @@ import com.gnest.remember.core.note.NoteColor
 import com.gnest.remember.core.note.RepeatPeriod
 import com.gnest.remember.core.noteuimapper.asUiColor
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -66,26 +62,15 @@ class InterestingIdeaViewModel @Inject constructor(
 
     private val localIdea = MutableStateFlow(emptyIdea())
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val state: Flow<InterestingIdeaState> by lazy {
-        localIdea.flatMapLatest { localIdea ->
-            if (localIdea.id < 1) return@flatMapLatest emptyFlow()
-            observeIdeaUseCase(localIdea.id).map { idea ->
-                when {
-                    localIdea.lastEdited > idea.lastEdited -> localIdea
-                    else -> idea
-                }
-            }
+        localIdea.map { idea ->
+            InterestingIdeaState(
+                title = TextSource.Simple(idea.title),
+                text = TextSource.Simple(idea.text),
+                color = idea.color.asUiColor(),
+                lastEdited = idea.lastEdited.formatForNewNote()
+            )
         }
-            .distinctUntilChanged()
-            .map { idea ->
-                InterestingIdeaState(
-                    title = TextSource.Simple(idea.title),
-                    text = TextSource.Simple(idea.text),
-                    color = idea.color.asUiColor(),
-                    lastEdited = idea.lastEdited.formatForNewNote()
-                )
-            }
     }
 
 

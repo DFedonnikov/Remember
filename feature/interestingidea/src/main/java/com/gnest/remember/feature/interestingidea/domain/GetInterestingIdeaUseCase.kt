@@ -9,5 +9,7 @@ interface GetInterestingIdeaUseCase : suspend (Long) -> Note.InterestingIdea?
 class GetInterestingIdeaUseCaseImpl @Inject constructor(private val repository: InterestingIdeaRepository) :
     GetInterestingIdeaUseCase {
 
-    override suspend fun invoke(id: Long): Note.InterestingIdea? = repository.getIdeaById(id)
+    override suspend fun invoke(id: Long): Note.InterestingIdea? {
+        return repository.getIdeaById(id)
+    }
 }

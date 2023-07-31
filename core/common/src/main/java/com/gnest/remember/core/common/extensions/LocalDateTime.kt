@@ -7,7 +7,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.days
 
 fun LocalDateTime.formatForNewNote(): String = when {
-    isToday() -> "${padded { hour }}.${padded { minute }}"
+    isToday() -> "${padded { hour }}:${padded { minute }}"
     else -> "${padded { dayOfMonth }}.${padded { monthNumber }}.$year " +
             "${padded { hour }}:${padded { minute }}"
 }

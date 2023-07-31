@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,6 +19,7 @@ import com.gnest.remember.core.designsystem.component.text.FreeAreaTextField
 import com.gnest.remember.core.designsystem.component.text.TitleTextField
 import com.gnest.remember.core.designsystem.theme.RememberTheme
 import com.gnest.remember.core.designsystem.theme.TextSource
+import com.gnest.remember.core.designsystem.theme.asTextSource
 import com.gnest.remember.core.ui.DevicePreviews
 import com.gnest.remember.core.ui.NewNoteTaskBar
 import com.gnest.remember.core.ui.TopBar
@@ -79,9 +83,10 @@ private fun InterestingIdeaScreen(
 @DevicePreviews
 private fun InterestingIdeaScreenPreview() {
     RememberTheme {
+        var title by remember { mutableStateOf("") }
         InterestingIdeaScreen(
-            state = InterestingIdeaState(),
-            onTitleChanged = {},
+            state = InterestingIdeaState(title = title.asTextSource),
+            onTitleChanged = { title = it },
             onTextChanged = {},
             onBackClick = {},
             onMoreClicked = {})

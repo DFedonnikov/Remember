@@ -6,8 +6,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.designsystem.theme.asString
@@ -15,7 +20,7 @@ import com.gnest.remember.core.designsystem.theme.asString
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TitleTextField(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     value: TextSource,
     placeholderText: TextSource = TextSource.Simple(""),
     onValueChange: (String) -> Unit
@@ -40,6 +45,13 @@ fun TitleTextField(
         },
         onValueChange = onValueChange
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TitleTextFieldPreview() {
+    var value by remember { mutableStateOf("") }
+    TitleTextField(value = TextSource.Simple(value), onValueChange = { value = it  })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
