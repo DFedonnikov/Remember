@@ -63,7 +63,7 @@ internal fun NoteSettingsRoute(
             title = TextSource.Resource(R.string.set_reminder),
             extra = state.dateTime
         ) {
-            viewModel.navigateToReminder()
+            viewModel.onSetReminderClicked()
         }
     }
 }

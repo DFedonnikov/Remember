@@ -4,8 +4,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.days
 
 fun LocalDateTime.formatForNewNote(): String = when {
     isToday() -> "${padded { hour }}.${padded { minute }}"
@@ -20,9 +19,8 @@ fun LocalDateTime.isToday() =
 
 fun Clock.System.localDateTimeNow() = now().toLocalDateTime(TimeZone.currentSystemDefault())
 
-fun Clock.System.nearestRoundHour() = with(now()) {
-    val minutes = toLocalDateTime(TimeZone.currentSystemDefault()).minute
-    this.plus(1.hours).minus(minutes.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
+fun Clock.System.twentyFourHoursFromNow() = with(now()) {
+    this.plus(1.days).toLocalDateTime(TimeZone.currentSystemDefault())
 }
 
 private inline fun LocalDateTime.padded(block: LocalDateTime.() -> Int) =

@@ -34,6 +34,11 @@ object RememberIcons {
     val Close = R.drawable.ic_close
 }
 
+val Int.asIcon get() = Icon.DrawableResourceIcon(this)
+
+@Composable
+fun Int.asPainter() = asIcon.asPainter
+
 sealed interface Icon {
     data class ImageVectorIcon(val imageVector: ImageVector) : Icon
     data class DrawableResourceIcon(@DrawableRes val id: Int) : Icon

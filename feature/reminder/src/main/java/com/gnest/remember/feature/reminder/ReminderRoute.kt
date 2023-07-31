@@ -1,5 +1,6 @@
 package com.gnest.remember.feature.reminder
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ internal fun ReminderRoute(
     modifier: Modifier = Modifier,
     viewModel: ReminderRouteViewModel = hiltViewModel()
 ) {
+    BackHandler { viewModel.onBackClick() }
     Column(
         modifier = modifier
             .padding(horizontal = 16.dp)

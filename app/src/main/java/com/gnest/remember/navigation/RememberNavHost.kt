@@ -7,11 +7,11 @@ import androidx.navigation.compose.NavHost
 import com.gnest.remember.core.navigation.HomeScreen
 import com.gnest.remember.feature.finished.navigation.finishedScreen
 import com.gnest.remember.feature.home.navigation.homeScreen
-import com.gnest.remember.feature.newnote.navigation.newNoteScreen
 import com.gnest.remember.feature.search.navigation.searchScreen
 import com.gnest.remember.feature.settings.navigation.settingsScreen
 import com.gnest.remember.feature.interestingidea.navigation.interestingIdeaScreen
 import com.gnest.remember.feature.interestingidea.navigation.interestingIdeasRowList
+import com.gnest.remember.feature.newnote.navigation.newNoteScreen
 import com.gnest.remember.feature.notesettings.navigation.noteSettingsBottomSheet
 import com.gnest.remember.feature.reminder.navigation.reminderBottomSheet
 

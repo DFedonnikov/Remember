@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">reminder</string>
+    <string name="app_name">Remember</string>
     <string name="extras">Extras</string>
     <string name="reminder">Reminder</string>
     <string name="set_reminder">Set Reminder</string>
@@ -12,4 +12,10 @@
     <string name="weekdays">Monday to Friday</string>
     <string name="weekend"><![CDATA[Saturday & Sunday]]></string>
     <string name="custom">Custom</string>
+    <string name="reminder_title">You wanted me to remind you of this</string>
+    <string name="default_reminder_text">Your notes</string>
+    <string name="approve_reminder_dialog_title">Do you want to save changes?</string>
+    <string name="approve_reminder_dialog_text">Please choose if you want to save or dismiss your changes and exit reminder screen</string>
+    <string name="ok">OK</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

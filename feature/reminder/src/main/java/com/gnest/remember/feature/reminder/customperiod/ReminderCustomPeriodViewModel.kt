@@ -8,16 +8,17 @@ import com.gnest.remember.core.note.RepeatPeriod
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.designsystem.theme.asTextSource
 import com.gnest.remember.core.navigation.Navigator
-import com.gnest.remember.core.navigation.NoteSettingsScreen
 import com.gnest.remember.feature.reminder.displayName
 import com.gnest.remember.feature.reminder.domain.ChangeReminderPeriodUseCase
 import com.gnest.remember.feature.reminder.domain.ObserveCustomPeriodUseCase
+import com.gnest.remember.feature.reminder.navigation.ReminderApproveDialog
 import com.gnest.remember.feature.reminder.navigation.noteId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import javax.inject.Inject
 
@@ -44,7 +45,7 @@ internal class ReminderCustomPeriodViewModel @Inject constructor(
     }
 
     fun onCloseClick() {
-        navigator.popBackTo(NoteSettingsScreen(handle.noteId), isInclusive = true)
+        navigator.navigateTo(ReminderApproveDialog(handle.noteId))
     }
 
     fun onIntervalClicked(isChecked: Boolean, index: Int) {
@@ -54,7 +55,7 @@ internal class ReminderCustomPeriodViewModel @Inject constructor(
             else -> indexes.remove(index)
         }
         val days = DayOfWeek.values().filterIndexed { dayIndex, _ -> dayIndex in indexes }
-        changeReminderPeriodUseCase(handle.noteId, RepeatPeriod.Custom(days))
+        viewModelScope.launch { changeReminderPeriodUseCase(handle.noteId, RepeatPeriod.Custom(days)) }
     }
 }
 

@@ -54,7 +54,7 @@ internal class NoteSettingsViewModel @Inject constructor(
         }
     }
 
-    fun navigateToReminder() {
+    fun onSetReminderClicked() {
         navigator.navigateTo(ReminderScreen(savedStateHandle.noteId))
     }
 }

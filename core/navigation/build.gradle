@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.22'
 }
 
 android {
@@ -45,6 +46,7 @@ dependencies {
     implementation(libs.accompanist.navigation.material)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
+    implementation(libs.kotlinx.serialization)
 
     kapt(libs.hilt.compiler)
 }
