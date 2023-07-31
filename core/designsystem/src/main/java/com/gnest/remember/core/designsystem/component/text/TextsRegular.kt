@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.designsystem.theme.TextStyles
 import com.gnest.remember.core.designsystem.theme.asString
@@ -16,7 +15,7 @@ import com.gnest.remember.core.designsystem.theme.asString
 fun TextXSRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -34,7 +33,7 @@ fun TextXSRegular(
 fun Text2XSRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -52,7 +51,7 @@ fun Text2XSRegular(
 fun TextSMRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -70,7 +69,7 @@ fun TextSMRegular(
 fun TextBaseRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -88,7 +87,7 @@ fun TextBaseRegular(
 fun TextLgRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -106,7 +105,7 @@ fun TextLgRegular(
 fun TextXLRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -124,7 +123,7 @@ fun TextXLRegular(
 fun Text2XLRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -142,7 +141,7 @@ fun Text2XLRegular(
 fun Text3XLRegular(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {

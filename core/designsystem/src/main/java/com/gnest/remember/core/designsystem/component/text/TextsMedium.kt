@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.designsystem.theme.TextStyles
 import com.gnest.remember.core.designsystem.theme.asString
@@ -16,7 +15,7 @@ import com.gnest.remember.core.designsystem.theme.asString
 fun TextXSMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -34,7 +33,7 @@ fun TextXSMedium(
 fun Text2XSMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -52,7 +51,7 @@ fun Text2XSMedium(
 fun TextSMMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -70,7 +69,7 @@ fun TextSMMedium(
 fun TextBaseMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -88,7 +87,7 @@ fun TextBaseMedium(
 fun TextLgMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -106,7 +105,7 @@ fun TextLgMedium(
 fun TextXLMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -124,7 +123,7 @@ fun TextXLMedium(
 fun Text2XLMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
@@ -142,7 +141,7 @@ fun Text2XLMedium(
 fun Text3XLMedium(
     modifier: Modifier = Modifier,
     text: TextSource,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {

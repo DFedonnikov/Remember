@@ -6,11 +6,13 @@ import androidx.compose.runtime.Composable
 
 val LightColorScheme = lightColorScheme(
     primary = AppColors.Jewel,
-    background = AppColors.HintOfGreen,
     onPrimary = AppColors.White,
+    secondary = AppColors.Amazon,
+    background = AppColors.HintOfGreen,
     onPrimaryContainer = AppColors.Jewel,
     surface = AppColors.White,
-    onSurfaceVariant = AppColors.FrenchGray
+    onSurfaceVariant = AppColors.FrenchGray,
+    outline = AppColors.Jewel
 )
 
 @Composable

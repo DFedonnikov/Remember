@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationVector3D
 import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.animateValueAsState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
-import com.gnest.remember.core.designsystem.theme.AppColors
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.designsystem.theme.asString
 
@@ -23,7 +23,7 @@ fun AnimatedText(
     text: TextSource,
     style: TextStyle,
     modifier: Modifier = Modifier,
-    color: Color = AppColors.Ebony,
+    color: Color = MaterialTheme.colorScheme.primary,
     textAlign: TextAlign? = null,
     textDecoration: TextDecoration? = null
 ) {
