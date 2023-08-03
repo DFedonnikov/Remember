@@ -32,6 +32,7 @@ object RememberIcons {
     val Pin = R.drawable.ic_pin
     val More = R.drawable.ic_more
     val Close = R.drawable.ic_close
+    val ShieldExclamationOutlined = R.drawable.ic_shield_exclamation_outlined
 }
 
 val Int.asIcon get() = Icon.DrawableResourceIcon(this)

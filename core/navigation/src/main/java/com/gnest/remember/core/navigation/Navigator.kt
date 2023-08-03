@@ -1,5 +1,7 @@
 package com.gnest.remember.core.navigation
 
+import android.content.Intent
+import android.net.Uri
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +20,8 @@ interface Navigator {
     fun popBack()
 
     fun popBackTo(screen: Screen, isInclusive: Boolean = false)
+
+    fun openExternalActivity(action: String, data: Uri? = null)
 }
 
 class NavigatorImpl @Inject constructor() : Navigator {
@@ -41,6 +45,8 @@ class NavigatorImpl @Inject constructor() : Navigator {
                                 inclusive = command.isInclusive
                             )
                         ) onEmptyBackStack()
+
+                        is Command.ExternalActivity -> navController.context.startActivity(Intent(command.action, command.data))
                     }
                 }.collect()
         }
@@ -58,6 +64,10 @@ class NavigatorImpl @Inject constructor() : Navigator {
     override fun popBackTo(screen: Screen, isInclusive: Boolean) {
         commandFlow.tryEmit(Command.PopBackTo(screen, isInclusive))
     }
+
+    override fun openExternalActivity(action: String, data: Uri?) {
+        commandFlow.tryEmit(Command.ExternalActivity(action = action, data = data))
+    }
 }
 
 private sealed interface Command {
@@ -66,4 +76,6 @@ private sealed interface Command {
     object PopBack : Command
 
     data class PopBackTo(val screen: Screen, val isInclusive: Boolean) : Command
+
+    data class ExternalActivity(val action: String, val data: Uri? = null) : Command
 }

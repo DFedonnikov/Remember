@@ -133,13 +133,25 @@ internal val RememberTypography = Typography(
 )
 
 sealed interface TextSource {
+
+    @Composable
+    operator fun plus(other: TextSource): TextSource = this + other.asString
+
+    @Composable
+    operator fun plus(other: String): TextSource = Simple("$asString$other")
+
     class Simple(val text: String) : TextSource
     class Resource(@StringRes val resId: Int) : TextSource
 
-    class Formatted(val source: TextSource, vararg args: Any) : TextSource {
+    class Formatted(val source: TextSource, vararg args: TextSource) : TextSource {
 
         val arguments = args
     }
+
+    class FormattedAny(val source: TextSource, vararg args: Any) : TextSource {
+        val arguments = args
+    }
+
 
     class StringArray(
         @ArrayRes val array: Int,
@@ -152,11 +164,13 @@ val TextSource.asString: String
     @Composable get() = when (this) {
         is TextSource.Simple -> text
         is TextSource.Resource -> stringResource(id = resId)
-        is TextSource.Formatted -> source.asString.format(args = arguments)
+        is TextSource.Formatted -> source.asString.format(args = arguments.map { it.asString }.toTypedArray())
+        is TextSource.FormattedAny -> source.asString.format(args = arguments)
         is TextSource.StringArray -> {
             val stringArray = stringArrayResource(id = array)
             indexes.joinToString(separator = separator) { stringArray[it] }
         }
+
     }
 
 val String.asTextSource get() = TextSource.Simple(this)

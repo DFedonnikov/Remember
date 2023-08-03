@@ -30,7 +30,7 @@ fun NewNoteTaskBar(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 8.dp)
                     .weight(1f),
-                text = TextSource.Formatted(
+                text = TextSource.FormattedAny(
                     TextSource.Resource(R.string.last_edited),
                     lastEditedDate
                 )

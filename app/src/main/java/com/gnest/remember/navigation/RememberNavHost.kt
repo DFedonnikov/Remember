@@ -17,6 +17,7 @@ import com.gnest.remember.feature.interestingidea.navigation.interestingIdeaScre
 import com.gnest.remember.feature.interestingidea.navigation.interestingIdeasRowList
 import com.gnest.remember.feature.newnote.navigation.newNoteScreen
 import com.gnest.remember.feature.notesettings.navigation.noteSettingsBottomSheet
+import com.gnest.remember.feature.permissionprovider.navigation.permissionScreen
 import com.gnest.remember.feature.reminder.navigation.reminderBottomSheet
 
 /**
@@ -59,5 +60,6 @@ fun RememberNavHost(
         interestingIdeaScreen()
         noteSettingsBottomSheet()
         reminderBottomSheet()
+        permissionScreen()
     }
 }

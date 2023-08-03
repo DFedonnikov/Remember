@@ -4,7 +4,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.gnest.remember.core.navigation.Screen
 
-internal class InterestingIdeaScreen(private val id: Long? = null) : Screen {
+internal class InterestingIdeaScreen(private val id: Long = -1L) : Screen {
 
     override val route get() = "$interestingIdeaRoute/$id"
 

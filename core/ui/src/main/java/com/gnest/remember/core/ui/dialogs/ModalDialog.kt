@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -65,12 +65,12 @@ fun ModalDialog(
         },
         buttons = {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                OutlinedButton(modifier = Modifier.width(108.dp), onClick = onDismiss) {
+                OutlinedButton(modifier = Modifier.widthIn(min = 108.dp), onClick = onDismiss) {
                     TextBaseMedium(text = dismissButtonText)
                 }
                 Button(
                     modifier = Modifier
-                        .width(108.dp)
+                        .widthIn(min = 108.dp)
                         .clickable(onClick = onApprove), onClick = onApprove
                 ) {
                     TextBaseMedium(text = approveButtonText, color = MaterialTheme.colorScheme.onPrimary)

@@ -34,6 +34,7 @@ android {
 dependencies {
 
     implementation(project(":core:navigation"))
+    implementation(project(":core:permission"))
     implementation(project(":feature:finished"))
     implementation(project(":feature:home"))
     implementation(project(":feature:settings"))
@@ -42,6 +43,7 @@ dependencies {
     implementation(project(":feature:notesettings"))
     implementation(project(":feature:search"))
     implementation(project(":feature:reminder"))
+    implementation(project(":feature:permissionprovider"))
     implementation(libs.hilt.android)
 
     kapt(libs.hilt.compiler)

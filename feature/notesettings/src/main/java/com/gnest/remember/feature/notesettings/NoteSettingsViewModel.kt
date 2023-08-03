@@ -10,6 +10,7 @@ import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.navigation.Navigator
 import com.gnest.remember.core.noteuimapper.asNoteColor
 import com.gnest.remember.core.noteuimapper.isEqualTo
+import com.gnest.remember.core.permission.Permission
 import com.gnest.remember.feature.notesettings.domain.ObserveNoteColorUseCase
 import com.gnest.remember.feature.notesettings.domain.ObserveNoteReminderDateUseCase
 import com.gnest.remember.feature.notesettings.domain.SaveNoteColorUseCase
@@ -55,8 +56,12 @@ internal class NoteSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSetReminderClicked() {
-        navigator.navigateTo(screenDependency.getReminderScreen(requireNotNull(savedStateHandle.noteId)))
+    fun onSetReminderClicked(isPostNotificationsGranted: Boolean) {
+        when {
+            isPostNotificationsGranted -> navigator.navigateTo(screenDependency.getReminderScreen(requireNotNull(savedStateHandle.noteId)))
+            else -> navigator.navigateTo(screenDependency.getPermissionScreen(Permission.PostNotifications))
+        }
+
     }
 }
 

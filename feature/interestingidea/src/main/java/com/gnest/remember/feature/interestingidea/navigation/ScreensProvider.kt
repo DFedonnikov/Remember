@@ -5,10 +5,10 @@ import javax.inject.Inject
 
 interface ScreensProvider {
 
-    fun provideInterestingIdeaScreen(id: Long? = null): Screen
+    fun provideInterestingIdeaScreen(id: Long = -1L): Screen
 }
 
 internal class ScreensProviderImpl @Inject constructor() : ScreensProvider {
 
-    override fun provideInterestingIdeaScreen(id: Long?): Screen = InterestingIdeaScreen(id)
+    override fun provideInterestingIdeaScreen(id: Long): Screen = InterestingIdeaScreen(id)
 }

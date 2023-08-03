@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="approve">APPROVE</string>
+    <string name="post_notifications_title">Post notifications permission</string>
+    <string name="post_notifications_text">Please grant permission to post notifications</string>
+    <string name="post_notifications_explanation">In order to be able to remind you of your notes we need a permission to post notifications. Without this permission reminder functionality is unavailable</string>
+    <string name="dismiss">DISMISS</string>
+    <string name="settings">SETTINGS</string>
+    <string name="post_notifications_denied_text">To use this functionality you should enable \"Post Notifications\" permission in the settings</string>
+</resources>
