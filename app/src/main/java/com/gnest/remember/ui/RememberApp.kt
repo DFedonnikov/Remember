@@ -31,7 +31,7 @@ import com.gnest.remember.core.designsystem.component.RememberNavigationBar
 import com.gnest.remember.core.designsystem.component.RememberNavigationBarItem
 import com.gnest.remember.core.designsystem.icon.Icon
 import com.gnest.remember.core.navigation.Navigator
-import com.gnest.remember.core.navigation.NewNoteScreen
+import com.gnest.remember.core.navigation.Screen
 import com.gnest.remember.navigation.RememberNavHost
 import com.gnest.remember.navigation.TopLevelDestination
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -40,7 +40,9 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 @Composable
 fun RememberApp(
     navigator: Navigator,
-    appState: RememberAppState
+    appState: RememberAppState,
+    startDestination: Screen,
+    newNoteScreen: Screen,
 ) {
     val isBottomBarVisible = appState.isBottomBarVisible
     Scaffold(
@@ -59,7 +61,7 @@ fun RememberApp(
                 isVisible = isBottomBarVisible,
                 modifier = Modifier.offset(y = 60.dp)
             ) {
-                navigator.navigateTo(NewNoteScreen)
+                navigator.navigateTo(newNoteScreen)
             }
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -76,7 +78,9 @@ fun RememberApp(
                         top = padding.calculateTopPadding(),
                         end = padding.calculateEndPadding(LayoutDirection.Ltr),
                         bottom = if (isBottomBarVisible) padding.calculateBottomPadding() else 0.dp
-                    )
+                    ),
+                startDestination = startDestination,
+                newNoteScreen = newNoteScreen
             )
         }
     }

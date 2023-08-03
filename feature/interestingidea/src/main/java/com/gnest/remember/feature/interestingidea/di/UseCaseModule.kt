@@ -8,8 +8,6 @@ import com.gnest.remember.feature.interestingidea.domain.DeleteInterestingIdeaUs
 import com.gnest.remember.feature.interestingidea.domain.DeleteInterestingIdeaUseCaseImpl
 import com.gnest.remember.feature.interestingidea.domain.GetInterestingIdeaUseCase
 import com.gnest.remember.feature.interestingidea.domain.GetInterestingIdeaUseCaseImpl
-import com.gnest.remember.feature.interestingidea.domain.ObserveInterestingIdeaUseCase
-import com.gnest.remember.feature.interestingidea.domain.ObserveInterestingIdeaUseCaseImpl
 import com.gnest.remember.feature.interestingidea.domain.SaveInterestingIdeaUseCase
 import com.gnest.remember.feature.interestingidea.domain.SaveInterestingIdeaUseCaseImpl
 import dagger.Binds
@@ -23,9 +21,6 @@ interface UseCaseModule {
 
     @Binds
     fun bindGetInterestingIdeaUseCase(useCase: GetInterestingIdeaUseCaseImpl): GetInterestingIdeaUseCase
-
-    @Binds
-    fun bindObserveInterestingIdeaUseCase(useCase: ObserveInterestingIdeaUseCaseImpl): ObserveInterestingIdeaUseCase
 
     @Binds
     fun bindCreateNewInterestingIdeaUseCase(useCase: CreateNewInterestingIdeaUseCaseImpl): CreateNewInterestingIdeaUseCase

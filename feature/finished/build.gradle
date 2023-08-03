@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -46,4 +47,6 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
+
+    kapt(libs.hilt.compiler)
 }

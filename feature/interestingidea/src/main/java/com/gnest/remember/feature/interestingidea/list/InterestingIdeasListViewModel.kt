@@ -3,9 +3,9 @@ package com.gnest.remember.feature.interestingidea.list
 import androidx.lifecycle.ViewModel
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.feature.interestingidea.domain.ObserveInterestingIdeasUseCase
-import com.gnest.remember.core.navigation.InterestingIdeaScreen
 import com.gnest.remember.core.navigation.Navigator
 import com.gnest.remember.core.noteuimapper.asUiColor
+import com.gnest.remember.feature.interestingidea.navigation.InterestingIdeaScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

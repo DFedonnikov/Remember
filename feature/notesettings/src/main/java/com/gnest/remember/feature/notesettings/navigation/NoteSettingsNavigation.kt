@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
-import com.gnest.remember.core.navigation.NoteSettingsScreen
 import com.gnest.remember.core.navigation.extensions.bottomSheet
 import com.gnest.remember.feature.notesettings.NoteSettingsRoute
 

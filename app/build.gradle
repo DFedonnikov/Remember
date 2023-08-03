@@ -114,6 +114,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:navigation"))
     implementation(project(":core:ui"))
+    implementation(project(":core:screensprovider"))
     implementation(project(":feature:finished"))
     implementation(project(":feature:home"))
     implementation(project(":feature:interestingidea"))

@@ -8,12 +8,12 @@ import com.gnest.remember.core.ui.lists.ColorSelectorItem
 import com.gnest.remember.core.common.extensions.formatForDateTime
 import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.core.navigation.Navigator
-import com.gnest.remember.core.navigation.ReminderScreen
 import com.gnest.remember.core.noteuimapper.asNoteColor
 import com.gnest.remember.core.noteuimapper.isEqualTo
 import com.gnest.remember.feature.notesettings.domain.ObserveNoteColorUseCase
 import com.gnest.remember.feature.notesettings.domain.ObserveNoteReminderDateUseCase
 import com.gnest.remember.feature.notesettings.domain.SaveNoteColorUseCase
+import com.gnest.remember.feature.notesettings.navigation.ScreenDependency
 import com.gnest.remember.feature.notesettings.navigation.noteId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -28,6 +28,7 @@ internal class NoteSettingsViewModel @Inject constructor(
     observeNoteColorUseCase: ObserveNoteColorUseCase,
     observeNoteReminderDateUseCase: ObserveNoteReminderDateUseCase,
     private val saveNoteColorUseCase: SaveNoteColorUseCase,
+    private val screenDependency: ScreenDependency,
     private val navigator: Navigator
 ) : ViewModel() {
 
@@ -55,7 +56,7 @@ internal class NoteSettingsViewModel @Inject constructor(
     }
 
     fun onSetReminderClicked() {
-        navigator.navigateTo(ReminderScreen(savedStateHandle.noteId))
+        navigator.navigateTo(screenDependency.getReminderScreen(requireNotNull(savedStateHandle.noteId)))
     }
 }
 

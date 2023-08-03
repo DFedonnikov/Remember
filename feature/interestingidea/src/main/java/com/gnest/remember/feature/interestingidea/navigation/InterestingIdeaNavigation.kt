@@ -6,7 +6,6 @@ import androidx.navigation.NavGraphBuilder
 import com.gnest.remember.core.navigation.extensions.push
 import com.gnest.remember.feature.interestingidea.InterestingIdeaRoute
 import com.gnest.remember.feature.interestingidea.list.InterestingIdeasRowList
-import com.gnest.remember.core.navigation.InterestingIdeaScreen
 
 fun NavGraphBuilder.interestingIdeaScreen() {
     push(

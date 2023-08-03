@@ -11,15 +11,14 @@ import com.gnest.remember.core.designsystem.theme.TextSource
 import com.gnest.remember.feature.interestingidea.domain.CreateNewInterestingIdeaUseCase
 import com.gnest.remember.feature.interestingidea.domain.DeleteInterestingIdeaUseCase
 import com.gnest.remember.feature.interestingidea.domain.GetInterestingIdeaUseCase
-import com.gnest.remember.feature.interestingidea.domain.ObserveInterestingIdeaUseCase
 import com.gnest.remember.feature.interestingidea.domain.SaveInterestingIdeaUseCase
 import com.gnest.remember.feature.interestingidea.navigation.ideaId
 import com.gnest.remember.core.navigation.Navigator
-import com.gnest.remember.core.navigation.NoteSettingsScreen
 import com.gnest.remember.core.note.Note
 import com.gnest.remember.core.note.NoteColor
 import com.gnest.remember.core.note.RepeatPeriod
 import com.gnest.remember.core.noteuimapper.asUiColor
+import com.gnest.remember.feature.interestingidea.navigation.ScreenDependency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -39,10 +38,10 @@ import kotlin.time.toDuration
 class InterestingIdeaViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getIdeaUseCase: GetInterestingIdeaUseCase,
-    observeIdeaUseCase: ObserveInterestingIdeaUseCase,
     private val createNewInterestingIdeaUseCase: CreateNewInterestingIdeaUseCase,
     private val saveIdeaUseCase: SaveInterestingIdeaUseCase,
     private val deleteIdeaUseCase: DeleteInterestingIdeaUseCase,
+    private val screenDependency: ScreenDependency,
     private val navigator: Navigator
 ) : ViewModel() {
 
@@ -105,7 +104,7 @@ class InterestingIdeaViewModel @Inject constructor(
     }
 
     fun onMoreClick() {
-        navigator.navigateTo(NoteSettingsScreen(requireNotNull(savedStateHandle.ideaId)))
+        navigator.navigateTo(screenDependency.getNoteSettingsScreen(requireNotNull(savedStateHandle.ideaId)))
     }
 }
 

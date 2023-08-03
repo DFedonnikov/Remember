@@ -2,8 +2,9 @@ package com.gnest.remember.feature.finished
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 @HiltViewModel
-class FinishedViewModel : ViewModel() {
+class FinishedViewModel @Inject constructor() : ViewModel() {
 
 }

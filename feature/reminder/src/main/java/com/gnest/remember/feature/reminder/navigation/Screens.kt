@@ -2,9 +2,23 @@ package com.gnest.remember.feature.reminder.navigation
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.gnest.remember.core.navigation.ReminderScreen
 import com.gnest.remember.core.navigation.Screen
 
+internal class ReminderScreen(private val id: Long) : Screen {
+
+    override val route get() = "$reminderRoute/$id"
+    override val popBackRoute: String = "$reminderRoute/{$noteIdArg}"
+
+    companion object {
+
+        private const val reminderRoute = "reminderRoute"
+        const val noteIdArg = "NoteId"
+        const val graphPattern = "reminderGraphRoute"
+        const val routePattern = "$reminderRoute/{$noteIdArg}"
+        val args = listOf(navArgument(noteIdArg) { type = NavType.LongType })
+
+    }
+}
 internal class ReminderDateScreen(id: Long) : Screen {
 
     override val route: String = "$reminderDateRoute/$id"

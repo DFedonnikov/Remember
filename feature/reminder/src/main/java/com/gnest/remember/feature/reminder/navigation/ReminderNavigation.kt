@@ -6,7 +6,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
-import com.gnest.remember.core.navigation.ReminderScreen
 import com.gnest.remember.core.navigation.extensions.bottomSheet
 import com.gnest.remember.feature.reminder.ReminderRoute
 import com.gnest.remember.feature.reminder.approve.ApproveDialog
